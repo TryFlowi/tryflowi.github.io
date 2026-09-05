@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowi — Organize sem complicar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--night:#0a0a0a;}
+body{font-family:'Inter',sans-serif;background:var(--night);color:white;overflow-x:hidden;}
+.flowi-menu-overlay{position:fixed;inset:0;z-index:200;display:none;}
+.flowi-menu-overlay.open{display:block;}
+.flowi-menu-bg{position:absolute;inset:0;background:rgba(0,0,0,0.5);}
+.flowi-menu-panel{position:absolute;top:0;left:0;bottom:0;width:260px;background:#111827;padding:24px 20px;overflow-y:auto;}
+.flowi-menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.flowi-menu-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px;}
+.flowi-menu-item{display:flex;align-items:center;padding:11px 12px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.8);font-size:12px;font-weight:500;margin-bottom:4px;transition:background .2s;font-family:'Inter',sans-serif;}
+.flowi-menu-item:hover{background:rgba(255,255,255,0.1);}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(10,10,10,0.95),transparent);}
+.nav-logo{display:flex;align-items:flex-end;gap:6px;cursor:pointer;}
+.nav-icon{display:flex;flex-direction:column;gap:3px;}
+.nav-icon span{display:block;background:white;border-radius:2px;}
+.nav-icon span:nth-child(1){width:22px;height:2.5px;}
+.nav-icon span:nth-child(2){width:15px;height:2.5px;}
+.nav-icon span:nth-child(3){width:9px;height:2.5px;}
+.nav-dot{width:7px;height:7px;background:white;border-radius:50%;margin-bottom:1px;margin-left:-4px;}
+.hero{height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 24px;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;}
+.hero-bg img{width:100%;height:100%;object-fit:cover;opacity:0.18;filter:saturate(0.4);}
+.hero-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(10,10,10,0.1) 0%, rgba(10,10,10,0.92) 100%);}
+.hero-content{position:relative;z-index:2;}
+.hero-eyebrow{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:6px;margin-bottom:24px;}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(52px,8vw,100px);line-height:0.95;margin-bottom:28px;}
+.hero-title em{font-style:italic;color:rgba(255,255,255,0.4);}
+.hero-sub{font-size:clamp(14px,1.5vw,17px);color:rgba(255,255,255,0.4);line-height:1.7;max-width:420px;margin:0 auto 40px;font-weight:300;}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:white;color:#0a0a0a;font-size:13px;font-weight:600;letter-spacing:1px;padding:14px 28px;border-radius:40px;text-decoration:none;transition:opacity .2s;}
+.hero-cta:hover{opacity:0.85;}
+.segs{padding:100px 40px;max-width:1100px;margin:0 auto;}
+.segs-title{font-family:'Playfair Display',serif;font-size:clamp(32px,4vw,52px);line-height:1.1;margin-bottom:60px;text-align:center;}
+.segs-title span{font-style:italic;color:rgba(255,255,255,0.35);}
+.segs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;}
+.seg-card{position:relative;overflow:hidden;min-height:340px;display:flex;align-items:flex-end;text-decoration:none;}
+.card-img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:transform .7s;filter:saturate(0.7);}
+.seg-card:hover .card-img{transform:scale(1.05);}
+.card-overlay{position:absolute;inset:0;transition:opacity .3s;}
+.card-content{position:relative;z-index:2;padding:28px;}
+.card-tag{font-size:10px;letter-spacing:4px;margin-bottom:8px;font-weight:500;}
+.card-nome{font-family:'Playfair Display',serif;font-size:clamp(22px,2.5vw,32px);color:white;line-height:1.1;margin-bottom:12px;}
+.card-desc{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;}
+.card-arrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:1px;margin-top:14px;padding:8px 16px;border-radius:20px;font-weight:500;transition:opacity .2s;}
+.card-arrow:hover{opacity:0.8;}
+.votar-section{padding:80px 40px;border-top:1px solid rgba(255,255,255,0.06);}
+.votar-inner{max-width:700px;margin:0 auto;text-align:center;}
+.votar-title{font-family:'Playfair Display',serif;font-size:clamp(24px,3vw,36px);margin-bottom:12px;}
+.votar-sub{font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:32px;}
+.votar-form{display:flex;gap:8px;max-width:460px;margin:0 auto;}
+.votar-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 16px;font-size:13px;color:white;font-family:'Inter',sans-serif;outline:none;}
+.votar-input::placeholder{color:rgba(255,255,255,0.25);}
+.votar-btn{background:white;color:#0a0a0a;border:none;border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;}
+.votar-btn:hover{opacity:0.85;}
+.votos-lista{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-size:12px;}
+.voto-tag{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:4px 12px;color:rgba(255,255,255,0.4);}
+footer{border-top:1px solid rgba(255,255,255,0.05);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+@media(max-width:768px){
+  nav{padding:16px 20px;}
+  .segs{padding:60px 20px;}
+  .segs-grid{grid-template-columns:1fr;}
+  .votar-section{padding:60px 20px;}
+  .votar-form{flex-direction:column;}
+  footer{padding:24px 20px;flex-direction:column;text-align:center;}
+}
+#back-top{position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;font-size:16px;cursor:pointer;z-index:99;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+</style>
+</head>
+<body>
+
+<div class="flowi-menu-overlay" id="flowi-menu">
+  <div class="flowi-menu-bg" onclick="fecharMenu()"></div>
+  <div class="flowi-menu-panel">
+    <div class="flowi-menu-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="28" height="11" viewBox="0 0 28 11"><rect x="0" y="0" width="18" height="2.5" rx="1.25" fill="white" opacity="0.8"/><rect x="0" y="4.5" width="12" height="2.5" rx="1.25" fill="white" opacity="0.8"/><rect x="0" y="9" width="7" height="2.5" rx="1.25" fill="white" opacity="0.8"/><circle cx="12" cy="10.25" r="2.5" fill="#ffffff"/></svg>
+        <span style="font-size:13px;font-weight:700;color:white;letter-spacing:2px;">flowi</span>
+      </div>
+      <button class="flowi-menu-close" onclick="fecharMenu()">✕</button>
+    </div>
+    <a href="https://tryflowi.github.io/" class="flowi-menu-item">🏠 Início</a>
+    <a href="https://tryflowi.github.io/flowi-viagens/" class="flowi-menu-item">✈ Flowi Viagens</a>
+    <a href="https://tryflowi.github.io/flowi-negocios/" class="flowi-menu-item">💼 Flowi Negócios</a>
+    <a href="https://tryflowi.github.io/flowi-festas/" class="flowi-menu-item">🎉 Flowi Festas</a>
+    <a href="https://tryflowi.github.io/flowi-financas/" class="flowi-menu-item">💰 Flowi Finanças</a>
+    <div style="border-top:1px solid rgba(255,255,255,0.08);margin-top:16px;padding-top:14px;text-align:center;">
+      <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:10px;color:rgba(255,255,255,0.35);text-decoration:none;letter-spacing:2px;">@tryflowi</a>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-logo" onclick="abrirMenu()">
+    <div style="display:flex;align-items:flex-end;gap:2px">
+      <div class="nav-icon"><span></span><span></span><span></span></div>
+      <div class="nav-dot"></div>
+    </div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:2px;color:white;margin-left:6px;">flowi</div>
+  </div>
+  <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:3px;text-decoration:none;">@tryflowi</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg">
+    <img src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1600&q=80" alt="">
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">ORGANIZE SEM COMPLICAR</div>
+    <h1 class="hero-title">Planejar<br><em>é</em> simples.</h1>
+    <p class="hero-sub">Ferramentas interativas para organizar o que importa para você. Sem app, sem cadastro, sem complicação.</p>
+    <a href="#segmentos" class="hero-cta">Explorar planejadores ↓</a>
+  </div>
+</div>
+
+<section class="segs" id="segmentos">
+  <h2 class="segs-title">Escolha seu<br><span>segmento</span></h2>
+  <div class="segs-grid">
+
+    <a href="./flowi-viagens/" class="seg-card" style="color:white">
+      <img class="card-img" src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1200&q=80" alt="">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.92) 0%,rgba(37,99,235,0.15) 60%,transparent 100%)"></div>
+      <div class="card-content">
+        <div class="card-tag" style="color:#93C5FD">VIAGENS</div>
+        <div class="card-nome">Disney, Europa,<br>Noronha e mais</div>
+        <div class="card-desc">Roteiro, orçamento, checklist e countdown para cada destino.</div>
+        <div class="card-arrow" style="background:#2563EB;color:white">Explorar destinos →</div>
+      </div>
+    </a>
+
+    <a href="./flowi-negocios/" class="seg-card" style="color:white">
+      <img class="card-img" src="https://images.unsplash.com/photo-1664575602554-2087b04935a5?w=1200&q=80" alt="">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.92) 0%,rgba(22,163,74,0.15) 60%,transparent 100%)"></div>
+      <div class="card-content">
+        <div class="card-tag" style="color:#86efac">NEGÓCIOS</div>
+        <div class="card-nome">Psicólogos, Nutricionistas,<br>Autônomos e mais</div>
+        <div class="card-desc">Controle financeiro para profissionais que trabalham por conta própria.</div>
+        <div class="card-arrow" style="background:#16a34a;color:white">Explorar perfis →</div>
+      </div>
+    </a>
+
+    <a href="./flowi-festas/" class="seg-card" style="color:white">
+      <img class="card-img" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&q=80" alt="">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.92) 0%,rgba(190,24,93,0.15) 60%,transparent 100%)"></div>
+      <div class="card-content">
+        <div class="card-tag" style="color:#f9a8d4">FESTAS</div>
+        <div class="card-nome">15 Anos, Casamentos,<br>Chá de bebê e mais</div>
+        <div class="card-desc">Cronograma, convidados, orçamento e checklist para cada celebração.</div>
+        <div class="card-arrow" style="background:#be185d;color:white">Explorar festas →</div>
+      </div>
+    </a>
+
+    <a href="./flowi-financas/" class="seg-card" style="color:white">
+      <img class="card-img" src="https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?w=1200&q=80" alt="">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.92) 0%,rgba(217,119,6,0.15) 60%,transparent 100%)"></div>
+      <div class="card-content">
+        <div class="card-tag" style="color:#fcd34d">FINANÇAS</div>
+        <div class="card-nome">Mãe Solo, Casal,<br>Estudante e mais</div>
+        <div class="card-desc">Receitas, despesas, reserva de emergência e histórico mensal.</div>
+        <div class="card-arrow" style="background:#d97706;color:white">Explorar perfis →</div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<section class="votar-section" id="votar">
+  <div class="votar-inner">
+    <h2 class="votar-title">Qual você quer ver a seguir?</h2>
+    <p class="votar-sub">Sugira um planejador e votaremos juntos o próximo a ser lançado.</p>
+    <div class="votar-form">
+      <input type="text" class="votar-input" id="voto-input" placeholder="Ex: Planejamento de viagem para Nova York..." maxlength="80">
+      <button class="votar-btn" onclick="enviarVoto()">Sugerir</button>
+    </div>
+    <div class="votos-lista" id="votos-lista"></div>
+  </div>
+</section>
+
+<footer>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="nav-icon" style="gap:2px"><span style="width:16px;height:2px"></span><span style="width:11px;height:2px"></span><span style="width:7px;height:2px"></span></div>
+    <div class="nav-dot" style="width:5px;height:5px;margin-left:-3px;margin-bottom:0"></div>
+    <span style="font-size:13px;font-weight:600;letter-spacing:2px;margin-left:4px;">flowi</span>
+  </div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.25);">Organize sem complicar</div>
+  <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.3);text-decoration:none;letter-spacing:1px;">@tryflowi</a>
+</footer>
+
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+function abrirMenu(){document.getElementById('flowi-menu').classList.add('open');}
+function fecharMenu(){document.getElementById('flowi-menu').classList.remove('open');}
+window.addEventListener('scroll',function(){var b=document.getElementById('back-top');if(b)b.style.display=window.scrollY>300?'flex':'none';});
+
+function enviarVoto(){
+  var input=document.getElementById('voto-input'),v=input&&input.value.trim();
+  if(!v)return;
+  var votos=JSON.parse(localStorage.getItem('flowi-votos')||'[]');
+  votos.push({texto:v,data:new Date().toISOString()});
+  localStorage.setItem('flowi-votos',JSON.stringify(votos));
+  input.value='';
+  renderVotos();
+  alert('Sugestão enviada! Obrigada ❤️');
+}
+function renderVotos(){
+  var el=document.getElementById('votos-lista');if(!el)return;
+  var votos=JSON.parse(localStorage.getItem('flowi-votos')||'[]').slice(-8);
+  if(!votos.length){el.innerHTML='';return;}
+  el.innerHTML='<div style="width:100%;font-size:11px;color:rgba(255,255,255,0.2);margin-bottom:6px">Suas sugestões salvas:</div>'+votos.map(v=>`<div class="voto-tag">${v.texto}</div>`).join('');
+}
+document.addEventListener('DOMContentLoaded',renderVotos);
+document.addEventListener('DOMContentLoaded',function(){
+  var a=document.querySelector('a[href="#segmentos"]');
+  if(a)a.addEventListener('click',function(e){e.preventDefault();document.getElementById('segmentos').scrollIntoView({behavior:'smooth'});});
+});
+</script>
+</body>
+</html>
