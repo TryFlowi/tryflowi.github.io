@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowi Festas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--night:#0a0a0a;--accent:#be185d;--white:#fff;}
+body{font-family:'Inter',sans-serif;background:var(--night);color:var(--white);overflow-x:hidden;}
+.flowi-menu-overlay{position:fixed;inset:0;z-index:200;display:none;}
+.flowi-menu-overlay.open{display:block;}
+.flowi-menu-bg{position:absolute;inset:0;background:rgba(0,0,0,0.5);}
+.flowi-menu-panel{position:absolute;top:0;left:0;bottom:0;width:260px;background:#111827;padding:24px 20px;overflow-y:auto;}
+.flowi-menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.flowi-menu-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px;}
+.flowi-menu-item{display:flex;align-items:center;padding:11px 12px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.8);font-size:12px;font-weight:500;margin-bottom:4px;transition:background .2s;font-family:'Inter',sans-serif;}
+.flowi-menu-item:hover{background:rgba(255,255,255,0.1);}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(10,10,10,0.95),transparent);}
+.nav-logo{display:flex;align-items:flex-end;gap:6px;cursor:pointer;}
+.nav-icon{display:flex;flex-direction:column;gap:3px;}
+.nav-icon span{display:block;background:white;border-radius:2px;}
+.nav-icon span:nth-child(1){width:22px;height:2.5px;}
+.nav-icon span:nth-child(2){width:15px;height:2.5px;}
+.nav-icon span:nth-child(3){width:9px;height:2.5px;}
+.nav-dot{width:7px;height:7px;background:#be185d;border-radius:50%;margin-bottom:1px;margin-left:-4px;}
+.hero{height:100vh;display:flex;align-items:flex-end;padding:80px 40px;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;}
+.hero-bg img{width:100%;height:100%;object-fit:cover;opacity:0.35;filter:saturate(0.7);}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,1) 0%,rgba(10,10,10,0.3) 60%,transparent 100%);}
+.hero-content{position:relative;z-index:2;max-width:600px;}
+.hero-eyebrow{font-size:11px;color:#f9a8d4;letter-spacing:4px;margin-bottom:18px;font-weight:500;}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(44px,6vw,72px);line-height:1.05;margin-bottom:20px;}
+.hero-title em{font-style:italic;color:#f9a8d4;}
+.hero-sub{font-size:15px;color:rgba(255,255,255,0.5);line-height:1.7;max-width:440px;font-weight:300;}
+.lista{padding:80px 40px;max-width:1200px;margin:0 auto;}
+.section-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:50px;}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(28px,3.5vw,44px);line-height:1.1;}
+.section-title span{color:#f9a8d4;font-style:italic;}
+.section-count{font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:2px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:3px;}
+.grid > *:first-child{grid-column:span 2;min-height:380px;}
+.seg-card{position:relative;overflow:hidden;cursor:pointer;min-height:280px;display:flex;align-items:flex-end;}
+.card-img{width:100%;height:100%;object-fit:cover;transition:transform .7s ease;filter:saturate(0.8);position:absolute;inset:0;}
+.seg-card:hover .card-img{transform:scale(1.04);}
+.card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,0.92) 0%,rgba(10,10,10,0.2) 60%,transparent 100%);}
+.card-content{position:relative;z-index:2;padding:24px;width:100%;}
+.card-tipo{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:3px;margin-bottom:5px;}
+.card-nome{font-family:'Playfair Display',serif;font-size:clamp(18px,2vw,26px);line-height:1.2;margin-bottom:10px;}
+.card-badge{display:inline-flex;align-items:center;background:#be185d;color:white;font-size:10px;font-weight:600;letter-spacing:1px;padding:4px 10px;border-radius:20px;}
+.card-badge.free{background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);}
+.card-arrow{position:absolute;top:20px;right:20px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:12px;opacity:0;transition:opacity .3s;z-index:3;}
+.seg-card:hover .card-arrow{opacity:1;}
+.seg-soon{cursor:default;}
+.badge-soon{display:inline-flex;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.35);font-size:10px;letter-spacing:1px;padding:4px 10px;border-radius:20px;}
+footer{border-top:1px solid rgba(255,255,255,0.06);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;}
+@media(max-width:768px){
+  nav{padding:16px 20px;}
+  .hero{padding:60px 20px;}
+  .lista{padding:60px 20px;}
+  .grid{grid-template-columns:1fr 1fr;}
+  .grid > *:first-child{grid-column:span 2;}
+  .section-header{flex-direction:column;align-items:flex-start;gap:6px;}
+  footer{flex-direction:column;gap:12px;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<div class="flowi-menu-overlay" id="flowi-menu">
+  <div class="flowi-menu-bg" onclick="fecharMenu()"></div>
+  <div class="flowi-menu-panel">
+    <div class="flowi-menu-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="28" height="11" viewBox="0 0 28 11"><rect x="0" y="0" width="18" height="2.5" rx="1.25" fill="white" opacity="0.8"/><rect x="0" y="4.5" width="12" height="2.5" rx="1.25" fill="white" opacity="0.8"/><rect x="0" y="9" width="7" height="2.5" rx="1.25" fill="white" opacity="0.8"/><circle cx="12" cy="10.25" r="2.5" fill="#be185d"/></svg>
+        <span style="font-size:13px;font-weight:700;color:white;letter-spacing:2px;">flowi</span>
+      </div>
+      <button class="flowi-menu-close" onclick="fecharMenu()">✕</button>
+    </div>
+    <a href="https://tryflowi.github.io/" class="flowi-menu-item">🏠 Início</a>
+    <a href="https://tryflowi.github.io/flowi-viagens/" class="flowi-menu-item">✈ Flowi Viagens</a>
+    <a href="https://tryflowi.github.io/flowi-negocios/" class="flowi-menu-item">💼 Flowi Negócios</a>
+    <a href="https://tryflowi.github.io/flowi-festas/" class="flowi-menu-item">🎉 Flowi Festas</a>
+    <a href="https://tryflowi.github.io/flowi-financas/" class="flowi-menu-item">💰 Flowi Finanças</a>
+    <div style="border-top:1px solid rgba(255,255,255,0.08);margin-top:16px;padding-top:14px;text-align:center;">
+      <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:10px;color:rgba(255,255,255,0.35);text-decoration:none;letter-spacing:2px;">@tryflowi</a>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-logo" onclick="abrirMenu()">
+    <div style="display:flex;align-items:flex-end;gap:2px">
+      <div class="nav-icon"><span></span><span></span><span></span></div>
+      <div class="nav-dot"></div>
+    </div>
+    <div style="font-size:16px;font-weight:600;letter-spacing:2px;color:white;margin-left:6px;">flowi</div>
+    <div style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:3px;margin-left:4px;margin-bottom:1px;">FESTAS</div>
+  </div>
+  <div style="font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:4px;">ORGANIZE SEM COMPLICAR</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg">
+    <img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=1200&q=80" alt="">
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">FLOWI FESTAS</div>
+    <h1 class="hero-title">Cada detalhe.<br><em>No lugar certo.</em></h1>
+    <p class="hero-sub">Planejadores para organizar cada celebração com calma e clareza.</p>
+  </div>
+</div>
+
+<section class="lista">
+  <div class="section-header">
+    <h2 class="section-title">Escolha seu<br><span>planejador</span></h2>
+    <div class="section-count">8 disponíveis · 1 ativo</div>
+  </div>
+  <div class="grid">
+    <a href="./15anos/" class="seg-card" style="text-decoration:none;color:white;">
+      <img class="card-img" src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=1200&q=80" alt="Festa de 15 Anos">
+      <div class="card-overlay"></div>
+      <div class="card-arrow">↗</div>
+      <div class="card-content">
+        <div class="card-tipo">DEBUTANTE</div>
+        <div class="card-nome">Festa de 15 Anos</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <span class="card-badge">Disponível</span>
+          <span class="card-badge free">Experimentar grátis</span>
+        </div>
+      </div>
+    </a>
+    <div class="seg-card seg-soon">
+      <img class="card-img" src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80" alt="Casamento">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.6) 100%)"></div>
+      <div class="card-content">
+        <div class="card-tipo">UNIÃO</div>
+        <div class="card-nome" style="color:rgba(255,255,255,0.5)">Casamento</div>
+        <span class="badge-soon">Em breve</span>
+      </div>
+    </div>
+    <div class="seg-card seg-soon">
+      <img class="card-img" src="https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800&q=80" alt="Noivado">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.6) 100%)"></div>
+      <div class="card-content">
+        <div class="card-tipo">UNIÃO</div>
+        <div class="card-nome" style="color:rgba(255,255,255,0.5)">Noivado</div>
+        <span class="badge-soon">Em breve</span>
+      </div>
+    </div>
+    <div class="seg-card seg-soon">
+      <img class="card-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" alt="Chá de Casa Nova">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.6) 100%)"></div>
+      <div class="card-content">
+        <div class="card-tipo">CELEBRAÇÃO</div>
+        <div class="card-nome" style="color:rgba(255,255,255,0.5)">Chá de Casa Nova</div>
+        <span class="badge-soon">Em breve</span>
+      </div>
+    </div>
+    <div class="seg-card seg-soon">
+      <img class="card-img" src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&q=80" alt="Aniversário Adulto">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.6) 100%)"></div>
+      <div class="card-content">
+        <div class="card-tipo">CELEBRAÇÃO</div>
+        <div class="card-nome" style="color:rgba(255,255,255,0.5)">Aniversário Adulto</div>
+        <span class="badge-soon">Em breve</span>
+      </div>
+    </div>
+    <div class="seg-card seg-soon">
+      <img class="card-img" src="https://images.unsplash.com/photo-1544078751-58fee2d8a03b?w=800&q=80" alt="Chá de Bebê">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.6) 100%)"></div>
+      <div class="card-content">
+        <div class="card-tipo">CELEBRAÇÃO</div>
+        <div class="card-nome" style="color:rgba(255,255,255,0.5)">Chá de Bebê</div>
+        <span class="badge-soon">Em breve</span>
+      </div>
+    </div>
+    <div class="seg-card seg-soon">
+      <img class="card-img" src="https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=800&q=80" alt="Chá Revelação">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.6) 100%)"></div>
+      <div class="card-content">
+        <div class="card-tipo">CELEBRAÇÃO</div>
+        <div class="card-nome" style="color:rgba(255,255,255,0.5)">Chá Revelação</div>
+        <span class="badge-soon">Em breve</span>
+      </div>
+    </div>
+    <div class="seg-card seg-soon">
+      <img class="card-img" src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&q=80" alt="Formatura">
+      <div class="card-overlay" style="background:linear-gradient(to top,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.6) 100%)"></div>
+      <div class="card-content">
+        <div class="card-tipo">CONQUISTA</div>
+        <div class="card-nome" style="color:rgba(255,255,255,0.5)">Formatura</div>
+        <span class="badge-soon">Em breve</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="nav-icon" style="gap:2px"><span style="width:16px;height:2px"></span><span style="width:11px;height:2px"></span><span style="width:7px;height:2px"></span></div>
+    <div style="width:5px;height:5px;background:#be185d;border-radius:50%;margin-left:-3px;"></div>
+    <span style="font-size:13px;font-weight:600;letter-spacing:2px;margin-left:4px;">flowi</span>
+    <span style="font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:3px;margin-left:4px;">FESTAS</span>
+  </div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.25);">Organize sem complicar</div>
+  <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.3);text-decoration:none;letter-spacing:1px;">@tryflowi</a>
+</footer>
+
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})" id="back-top" title="Voltar ao topo" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;font-size:16px;cursor:pointer;z-index:99;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);">↑</button>
+
+<script>
+function abrirMenu(){document.getElementById('flowi-menu').classList.add('open');}
+function fecharMenu(){document.getElementById('flowi-menu').classList.remove('open');}
+window.addEventListener('scroll',function(){var b=document.getElementById('back-top');if(b)b.style.display=window.scrollY>300?'flex':'none';});
+</script>
+</body>
+</html>
