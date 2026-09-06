@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,7 +10,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flowi - Organize sem complicar</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
+/* Visual da Janela de Login do Flowi */
+.auth-modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+  background: rgba(0,0,0,0.85); z-index: 9999; display: none; 
+  align-items: center; justify-content: center; backdrop-filter: blur(8px);
+}
+.auth-modal-overlay.open { display: flex; }
+.auth-box {
+  background: #111827; border: 1px solid rgba(255,255,255,0.1); 
+  border-radius: 16px; padding: 32px; width: 90%; max-width: 380px; 
+  text-align: center; position: relative; color: white; font-family: sans-serif;
+}
+.auth-close {
+  position: absolute; top: 16px; right: 16px; background: none; 
+  border: none; color: rgba(255,255,255,0.5); font-size: 18px; cursor: pointer;
+}
+.auth-title { font-size: 22px; margin-bottom: 8px; font-weight: 600; }
+.auth-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 20px; }
+.auth-input {
+  width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+  border-radius: 8px; padding: 12px; font-size: 14px; color: white; 
+  margin-bottom: 12px; outline: none; box-sizing: border-box;
+}
+.auth-btn {
+  width: 100%; background: #ffffff; color: #000000; border: none; 
+  border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600; 
+  cursor: pointer; margin-top: 8px;
+}
+.auth-switch { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px; cursor: pointer; }
+.auth-switch span { color: #ffffff; text-decoration: underline; }
+  <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{--night:#0a0a0a;}
 body{font-family:'Inter',sans-serif;background:var(--night);color:white;overflow-x:hidden;}
@@ -239,6 +272,70 @@ document.addEventListener('DOMContentLoaded',function(){
   var a=document.querySelector('a[href="#segmentos"]');
   if(a)a.addEventListener('click',function(e){e.preventDefault();document.getElementById('segmentos').scrollIntoView({behavior:'smooth'});});
 });
+</script>
+  <!-- Janela Popup de Login/Cadastro -->
+<div class="auth-modal-overlay" id="auth-modal">
+  <div class="auth-box">
+    <button class="auth-close" onclick="fecharAuth()">✕</button>
+    <h3 class="auth-title" id="auth-title-text">Entrar na Conta</h3>
+    <p class="auth-sub" id="auth-sub-text">Acesse seus planejadores em qualquer dispositivo.</p>
+    <input type="email" id="auth-email" class="auth-input" placeholder="Seu e-mail">
+    <input type="password" id="auth-password" class="auth-input" placeholder="Sua senha">
+    <button class="auth-btn" id="auth-submit-btn" onclick="executarAuth()">Entrar</button>
+    <div class="auth-switch" onclick="alternarModoAuth()" id="auth-switch-text">Não tem conta? <span>Cadastre-se</span></div>
+  </div>
+</div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://gkvanakreiiiprriyats.supabase.co';
+  const SUPABASE_KEY = 'SUA_PUBLISHABLE_KEY_AQUI'; 
+  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let modoCadastro = false;
+
+  function abrirAuth(){ document.getElementById('auth-modal').classList.add('open'); }
+  function fecharAuth(){ document.getElementById('auth-modal').classList.remove('open'); }
+
+  function alternarModoAuth(){
+    modoCadastro = !modoCadastro;
+    document.getElementById('auth-title-text').innerText = modoCadastro ? 'Criar Conta' : 'Entrar na Conta';
+    document.getElementById('auth-submit-btn').innerText = modoCadastro ? 'Cadastrar' : 'Entrar';
+    document.getElementById('auth-switch-text').innerHTML = modoCadastro ? 'Já tem conta? <span>Entrar</span>' : 'Não tem conta? <span>Cadastre-se</span>';
+  }
+
+  async function executarAuth(){
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    if(!email || !password) return alert('Preencha todos os campos!');
+
+    if(modoCadastro){
+      const { data, error } = await _supabase.auth.signUp({ email, password });
+      if(error) alert('Erro no cadastro: ' + error.message);
+      else { alert('Conta criada com sucesso! Faça login.'); alternarModoAuth(); }
+    } else {
+      const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+      if(error) alert('Erro ao entrar: ' + error.message);
+      else { alert('Login realizado com sucesso!'); fecharAuth(); migrarDadosGratuitosParaNuvem(); }
+    }
+  }
+
+  // Pega o que a pessoa preencheu no "modo grátis" offline e envia para a nuvem
+  async function migrarDadosGratuitosParaNuvem(){
+    const { data: { user } } = await _supabase.auth.getUser();
+    if(!user) return;
+
+    // Busca se existe algo salvo no navegador
+    const dadosLocais = localStorage.getItem('flowi_dados') || '{}';
+    
+    // Salva no banco de dados do Supabase
+    await _supabase.from('usuarios_dados').upsert({
+      id: user.id,
+      dados: JSON.parse(dadosLocais),
+      updated_at: new Date()
+    });
+
+    console.log('Dados sincronizados com sucesso!');
+  }
 </script>
 </body>
 </html>
