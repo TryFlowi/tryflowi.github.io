@@ -1,230 +1,421 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flowi Viagens - Disney (Free)</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #f4f5f7; color: #1e293b; padding: 20px; }
-    .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    h1 { font-size: 20px; margin-bottom: 15px; text-align: center; color: #0f172a; }
-    .nav { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; }
-    .nav button { flex: 1; padding: 10px; border: none; background: none; font-weight: 600; color: #64748b; cursor: pointer; }
-    .nav button.active { color: #2563eb; border-bottom: 2px solid #2563eb; margin-bottom: -2px; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .field-row { display: flex; gap: 10px; margin-bottom: 15px; }
-    .field { flex: 1; }
-    label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 5px; }
-    input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
-    button.btn-add { width: 100%; padding: 12px; background: #0f172a; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-    .list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #e2e8f0; }
-    .list-item.done span { text-decoration: line-through; color: #94a3b8; }
-    .item-actions { display: flex; gap: 8px; }
-    .btn-icon { background: none; border: none; cursor: pointer; font-size: 14px; color: #64748b; }
-    .cd-box { display: flex; justify-content: space-around; background: #0f172a; color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
-    .cd-num { font-size: 20px; font-weight: bold; }
-    .cd-lbl { font-size: 10px; text-transform: uppercase; color: #94a3b8; }
-  </style>
+<meta charset="UTF-8">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowi Viagens — Disney & Universal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --night:#111827;--accent:#2563EB;--accent-light:#DBEAFE;--accent-mid:#93C5FD;
+  --cream:#F9FAFB;--sand:#F3F4F6;--white:#fff;
+  --text:#111827;--muted:#6B7280;--border:#E5E7EB;
+  --warn:#FEF9C3;--warn-border:#FDE047;
+  --red:#DC2626;--red-light:#FEE2E2;--green:#16a34a;--green-light:#DCFCE7;
+}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+.flowi-menu-overlay{position:fixed;inset:0;z-index:200;display:none;}
+.flowi-menu-overlay.open{display:block;}
+.flowi-menu-bg{position:absolute;inset:0;background:rgba(0,0,0,0.5);}
+.flowi-menu-panel{position:absolute;top:0;left:0;bottom:0;width:260px;background:#111827;padding:24px 20px;overflow-y:auto;}
+.flowi-menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.flowi-menu-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px;}
+.flowi-menu-item{display:flex;align-items:center;padding:11px 12px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.8);font-size:12px;font-weight:500;margin-bottom:4px;transition:background .2s;font-family:'Inter',sans-serif;}
+.flowi-menu-item:hover{background:rgba(255,255,255,0.1);}
+.header{background:var(--night);position:sticky;top:0;z-index:100;}
+.header-inner{max-width:640px;margin:0 auto;padding:20px 20px 0;}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.brand-icon{display:flex;flex-direction:column;gap:3px;cursor:pointer;}
+.brand-icon span{display:block;background:white;border-radius:2px;}
+.brand-icon span:nth-child(1){width:28px;height:3px;}
+.brand-icon span:nth-child(2){width:19px;height:3px;}
+.brand-icon span:nth-child(3){width:12px;height:3px;}
+.brand-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;margin-left:-6px;margin-top:8px;}
+.brand-name{font-size:18px;font-weight:700;color:white;letter-spacing:2px;}
+.brand-tag{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:3px;margin-left:2px;}
+.mes-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.mes-btn{background:rgba(255,255,255,0.08);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.mes-atual{font-size:14px;font-weight:600;color:white;flex:1;text-align:center;letter-spacing:1px;}
+.tabs{display:flex;border-top:1px solid rgba(255,255,255,0.08);overflow-x:auto;}
+.tab-btn{flex:1;min-width:56px;padding:12px 4px;background:none;border:none;color:rgba(255,255,255,0.45);font-size:10px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab-btn.active{color:white;border-bottom-color:var(--accent);}
+.content{max-width:640px;margin:0 auto;padding:20px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.card{background:white;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;}
+.card h3{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;margin-bottom:14px;}
+.resumo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.resumo-item{background:var(--sand);border-radius:12px;padding:14px;}
+.resumo-label{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:4px;}
+.resumo-val{font-size:20px;font-weight:700;color:var(--text);}
+.resumo-val.pos{color:var(--green);}
+.resumo-val.neg{color:var(--red);}
+.resumo-val.acc{color:var(--accent);}
+.meta-bar-bg{background:var(--sand);border-radius:8px;height:10px;margin:10px 0 6px;}
+.meta-bar-fill{height:10px;border-radius:8px;background:var(--accent);transition:width .5s ease;}
+.meta-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
+.field{margin-bottom:12px;}
+.field label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:500;letter-spacing:.5px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;background:var(--cream);}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.field-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.btn-add{width:100%;padding:12px;background:var(--night);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-reset{background:var(--red-light);color:var(--red);border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-sm{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--muted);cursor:pointer;font-family:inherit;}
+.btn-del{background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:inherit;}
+.item-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--sand);border-radius:10px;margin-bottom:7px;}
+.item-nome{font-size:12px;font-weight:500;color:var(--text);}
+.item-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.edit-box{background:var(--sand);border-radius:10px;padding:12px;margin-bottom:8px;}
+.edit-box input,.edit-box select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px;font-family:'Inter',sans-serif;color:var(--text);}
+.edit-actions{display:flex;gap:6px;margin-top:6px;}
+.edit-save{flex:1;padding:7px;background:var(--night);color:white;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.edit-cancel{flex:1;padding:7px;background:white;color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
+.edit-del{padding:7px 12px;background:var(--red-light);color:var(--red);border:none;border-radius:8px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.check-item:last-child{border-bottom:none;}
+.check-item.done .ci-name{text-decoration:line-through;color:var(--muted);}
+.ci-circle{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .2s;margin-top:1px;cursor:pointer;}
+.check-item.done .ci-circle{background:var(--accent);border-color:var(--accent);color:white;}
+.ci-name{font-size:12px;font-weight:500;color:var(--text);}
+.ci-detail{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;}
+.ci-quando{font-size:10px;color:var(--accent);font-weight:600;margin-top:4px;}
+.premium-card{background:linear-gradient(135deg,var(--night) 0%,#1a1a2e 100%);border-radius:20px;padding:24px;color:white;text-align:center;}
+.pf-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;text-align:left;}
+.pf-check{width:16px;height:16px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px;color:white;}
+.pf-text{font-size:12px;color:rgba(255,255,255,0.8);}
+.premium-btn{display:block;background:var(--accent);color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:13px;font-weight:700;letter-spacing:1px;margin-top:16px;}
+.section-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:2px;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.flowi-footer{text-align:center;padding:16px 0 8px;font-size:10px;color:var(--muted);letter-spacing:2px;}
+.countdown{display:flex;gap:12px;margin-bottom:16px;}
+.cd-box{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;text-align:center;flex:1;}
+.cd-num{font-size:28px;font-weight:700;color:white;line-height:1;}
+.cd-label{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:2px;margin-top:4px;}
+.badge-free{margin-left:auto;background:rgba(37,99,235,0.2);border:1px solid rgba(37,99,235,0.4);border-radius:20px;padding:3px 10px;font-size:9px;color:#93C5FD;letter-spacing:2px;font-weight:600;}
+.orc-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--sand);border-radius:10px;margin-bottom:6px;}
+.preview-lock{background:rgba(37,99,235,0.05);border:1px dashed rgba(37,99,235,0.3);border-radius:12px;padding:14px;margin-top:10px;}
+.cambio-mini{background:#DBEAFE;border-radius:10px;padding:12px 14px;margin-top:12px;}
+</style>
 </head>
 <body>
-
-<div class="container">
-  <h1>flowi <span style="font-size: 12px; color: #64748b;">DISNEY FREE</span></h1>
-
-  <div class="cd-box">
-    <div><div class="cd-num" id="cd-dias">--</div><div class="cd-lbl">Dias</div></div>
-    <div><div class="cd-num" id="cd-hrs">--</div><div class="cd-lbl">Horas</div></div>
-    <div><div class="cd-num" id="cd-min">--</div><div class="cd-lbl">Min</div></div>
-  </div>
-
-  <div class="nav">
-    <button class="tab-btn active" onclick="switchTab('inicio')">Início</button>
-    <button class="tab-btn" onclick="switchTab('docs')">Documentos</button>
-    <button class="tab-btn" onclick="switchTab('orcamento')">Orçamento</button>
-    <button class="tab-btn" style="color: #2563eb;" onclick="location.href='premium.html'">★ Premium</button>
-  </div>
-
-  <!-- ABA INÍCIO -->
-  <div id="tab-inicio" class="tab-content active">
-    <div class="field"><label>Nome da viagem</label><input type="text" id="cfg-nome" oninput="salvar()"></div>
-    <div class="field-row" style="margin-top: 10px;">
-      <div class="field"><label>Data de ida</label><input type="date" id="cfg-ida" oninput="salvar()" onchange="salvar()"></div>
-      <div class="field"><label>Data de volta</label><input type="date" id="cfg-volta" oninput="salvar()" onchange="salvar()"></div>
-    </div>
-  </div>
-
-  <!-- ABA DOCUMENTOS -->
-  <div id="tab-docs" class="tab-content">
-    <label>Documento ou tarefa</label>
-    <input type="text" id="doc-input" placeholder="Ex: Renovando Passaporte">
-    <button class="btn-add" onclick="addDoc()">Adicionar</button>
-    <div id="docs-list" style="margin-top: 15px;"></div>
-  </div>
-
-  <!-- ABA ORÇAMENTO -->
-  <div id="tab-orcamento" class="tab-content">
-    <label>Descrição da Despesa</label>
-    <input type="text" id="orc-desc" placeholder="Ex: Passagens Aéreas" style="margin-bottom: 10px;">
-    <div class="field-row">
-      <div class="field"><label>Categoria</label>
-        <select id="orc-cat">
-          <option value="Passagens">Passagens</option>
-          <option value="Hospedagem">Hospedagem</option>
-          <option value="Ingressos">Ingressos</option>
-          <option value="Outros">Outros</option>
-        </select>
+<div class="flowi-menu-overlay" id="flowi-menu">
+  <div class="flowi-menu-bg" onclick="fecharMenu()"></div>
+  <div class="flowi-menu-panel">
+    <div class="flowi-menu-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="28" height="11" viewBox="0 0 28 11"><rect x="0" y="0" width="18" height="2.5" rx="1.25" fill="white" opacity="0.8"/><rect x="0" y="4.5" width="12" height="2.5" rx="1.25" fill="white" opacity="0.8"/><rect x="0" y="9" width="7" height="2.5" rx="1.25" fill="white" opacity="0.8"/><circle cx="12" cy="10.25" r="2.5" fill="#2563EB"/></svg>
+        <span style="font-size:13px;font-weight:700;color:white;letter-spacing:2px;">flowi</span>
       </div>
-      <div class="field"><label>Valor Estimado (R$)</label><input type="number" id="orc-val" placeholder="0"></div>
+      <button class="flowi-menu-close" onclick="fecharMenu()">✕</button>
     </div>
-    <button class="btn-add" onclick="addOrc()">Adicionar Item</button>
-    <div id="orc-list" style="margin-top: 15px;"></div>
+    <a href="https://tryflowi.github.io/" class="flowi-menu-item">🏠 Início</a>
+    <a href="https://tryflowi.github.io/flowi-viagens/" class="flowi-menu-item">✈ Flowi Viagens</a>
+    <a href="https://tryflowi.github.io/flowi-negocios/" class="flowi-menu-item">💼 Flowi Negócios</a>
+    <a href="https://tryflowi.github.io/flowi-festas/" class="flowi-menu-item">🎉 Flowi Festas</a>
+    <a href="https://tryflowi.github.io/flowi-financas/" class="flowi-menu-item">💰 Flowi Finanças</a>
+    <div style="border-top:1px solid rgba(255,255,255,0.08);margin-top:16px;padding-top:14px;text-align:center;">
+      <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:10px;color:rgba(255,255,255,0.35);text-decoration:none;letter-spacing:2px;">@tryflowi</a>
+    </div>
+  </div>
+</div>
+<div style="background:#FEF9C3;border-bottom:1px solid #FDE047;padding:9px 20px;text-align:center;font-size:11px;color:#854d0e;line-height:1.5;">💾 Seus dados ficam salvos <strong>apenas neste dispositivo e navegador</strong>. Se trocar de aparelho, baixe o arquivo offline primeiro.</div>
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div style="display:flex;align-items:flex-end;gap:2px">
+        <div class="brand-icon" onclick="abrirMenu()"><span></span><span></span><span></span></div>
+        <div class="brand-dot"></div>
+      </div>
+      <div><div class="brand-name">flowi</div><div class="brand-tag">VIAGENS · DISNEY</div></div>
+      <div class="badge-free">FREE</div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:22px;font-weight:700;color:white;" id="hdr-nome">Minha Viagem Disney</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px;" id="hdr-sub">Configure na aba Início</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;">
+      <div class="cd-box"><div class="cd-num" id="cd-dias">--</div><div class="cd-label">DIAS</div></div>
+      <div class="cd-box"><div class="cd-num" id="cd-hrs">--</div><div class="cd-label">HORAS</div></div>
+      <div class="cd-box"><div class="cd-num" id="cd-min">--</div><div class="cd-label">MIN</div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('inicio',this)">Início</button>
+      <button class="tab-btn" onclick="switchTab('documentos',this)">Documentos</button>
+      <button class="tab-btn" onclick="switchTab('orcamento',this)">Orçamento</button>
+      <button class="tab-btn" onclick="switchTab('premium',this)">✦ Premium</button>
+    </div>
   </div>
 </div>
 
+<div class="content">
+
+<div class="tab-panel active" id="tab-inicio">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="margin-bottom:0">MINHA VIAGEM</h3>
+      <button class="btn-reset" onclick="resetarTudo()">↺ Resetar</button>
+    </div>
+    <div class="field"><label>Nome da viagem</label><input type="text" id="cfg-nome" placeholder="Ex: Disney com a família!" oninput="salvar()"></div>
+    <div class="field-row">
+      <div class="field"><label>Data de ida</label><input type="date" id="cfg-ida" oninput="salvar()"></div>
+      <div class="field"><label>Data de volta</label><input type="date" id="cfg-volta" oninput="salvar()"></div>
+    </div>
+    <div class="field"><label>Número de viajantes</label><input type="number" id="cfg-viajantes" placeholder="Ex: 4" min="1" oninput="salvar()"></div>
+  </div>
+
+  <div class="card">
+    <h3>RESUMO</h3>
+    <div class="resumo-grid">
+      <div class="resumo-item"><div class="resumo-label">Total estimado</div><div class="resumo-val acc" id="res-total">R$ 0</div></div>
+      <div class="resumo-item"><div class="resumo-label">Por pessoa</div><div class="resumo-val" id="res-pessoa">R$ 0</div></div>
+      <div class="resumo-item"><div class="resumo-label">Viajantes</div><div class="resumo-val" id="res-viaj">--</div></div>
+      <div class="resumo-item"><div class="resumo-label">Dias para a viagem</div><div class="resumo-val" id="res-dias">--</div></div>
+    </div>
+
+    <!-- PONTINHA: conversor de câmbio básico -->
+    <div class="cambio-mini">
+      <div style="font-size:11px;font-weight:600;color:#1d4ed8;margin-bottom:8px">💱 CONVERSOR RÁPIDO</div>
+      <div class="field-row" style="margin-bottom:0">
+        <div class="field" style="margin-bottom:0"><label>Cotação do dólar (R$)</label><input type="number" id="cambio-cotacao" placeholder="Ex: 5.80" step="0.01" oninput="calcCambio()"></div>
+        <div class="field" style="margin-bottom:0"><label>Valor em US$</label><input type="number" id="cambio-usd" placeholder="Ex: 500" oninput="calcCambio()"></div>
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:#1d4ed8;font-weight:600" id="cambio-resultado">Preencha os campos acima para converter</div>
+    </div>
+    <div class="preview-lock" style="margin-top:10px">
+      <div style="font-size:18px;margin-bottom:6px">🔒</div>
+      <div style="font-size:12px;font-weight:600;color:#1e3a8a;margin-bottom:4px">Orçamento em R$ e US$ com câmbio integrado</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">No Premium, cada item do orçamento pode ser inserido em dólar e converte automaticamente. Você ainda vê: "se o dólar subir R$ 0,50, sua viagem fica R$ X mais cara."</div>
+      <button class="btn-add" style="margin-top:10px;font-size:11px;padding:8px 14px" onclick="switchTab('premium',document.querySelectorAll('.tab-btn')[3])">Ver Premium →</button>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center">
+    <div style="font-size:26px;margin-bottom:8px">📥</div>
+    <h3 style="margin-bottom:6px;font-size:13px;color:var(--text)">SALVAR PARA USO OFFLINE</h3>
+    <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Baixe com seus dados salvos. Se trocar de dispositivo, abra este arquivo para recuperar tudo.</p>
+    <button onclick="baixarOffline()" class="btn-add">⬇ Baixar para usar offline</button>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-documentos">
+  <div class="card">
+    <h3>ADICIONAR ITEM</h3>
+    <div class="field"><label>Documento ou tarefa</label><input type="text" id="chk-nome" placeholder="Ex: Renovar passaporte"></div>
+    <button class="btn-add" onclick="adicionarCheck()">Adicionar</button>
+  </div>
+  <div class="card">
+    <h3>CHECKLIST DE DOCUMENTOS E PREPARATIVOS</h3>
+    <div id="lista-check"></div>
+  </div>
+
+  <!-- PONTINHA: sequência de ação bloqueada -->
+  <div class="card" style="background:var(--sand)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="font-size:16px">🔒</span>
+      <h3 style="margin-bottom:0;font-size:13px">Sequência de ação — o que fazer e quando</h3>
+    </div>
+    <p style="font-size:11px;color:var(--muted);line-height:1.7">Passaporte antes ou depois do visto? Ingresso antes ou depois do hotel? A ordem errada pode custar caro ou fazer você perder datas. O Premium traz a sequência correta, com prazo recomendado para cada etapa.</p>
+    <button class="btn-add" style="margin-top:10px;font-size:11px;padding:8px 14px" onclick="switchTab('premium',document.querySelectorAll('.tab-btn')[3])">Quero a sequência certa →</button>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-orcamento">
+  <div class="card">
+    <h3>ADICIONAR ITEM</h3>
+    <div class="field"><label>Descrição</label><input type="text" id="o-nome" placeholder="Ex: Ingresso Magic Kingdom"></div>
+    <div class="field-row">
+      <div class="field"><label>Categoria</label>
+        <select id="o-cat"><option>Passagens</option>
+<option>Hospedagem</option>
+<option>Ingressos Disney</option>
+<option>Ingressos Universal</option>
+<option>Alimentação nos parques</option>
+<option>Alimentação fora dos parques</option>
+<option>Transporte</option>
+<option>Seguro viagem</option>
+<option>Compras & Souvenirs</option>
+<option>Câmbio</option>
+<option>Outro</option></select>
+      </div>
+      <div class="field"><label>Valor (R$)</label><input type="number" id="o-val" placeholder="0"></div>
+    </div>
+    <button class="btn-add" onclick="adicionarOrc()">Adicionar item</button>
+  </div>
+  <div class="card">
+    <h3>ORÇAMENTO DA VIAGEM</h3>
+    <div id="lista-orc"><div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhum item adicionado</div></div>
+  </div>
+
+  <!-- PONTINHA: roteiro e calculadora transporte -->
+  <div class="card" style="background:var(--sand)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="font-size:16px">🔒</span>
+      <h3 style="margin-bottom:0;font-size:13px">Calculadora Uber vs. Carro Alugado</h3>
+    </div>
+    <p style="font-size:11px;color:var(--muted);line-height:1.7">Andar de Uber ou alugar carro em Orlando? Depende da sua rotina nos parques. O Premium calcula os dois cenários e mostra qual sai mais barato para o seu perfil de viagem.</p>
+    <button class="btn-add" style="margin-top:10px;font-size:11px;padding:8px 14px" onclick="switchTab('premium',document.querySelectorAll('.tab-btn')[3])">Calcular meu transporte →</button>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-premium">
+  <div class="premium-card" style="border:1px solid rgba(37,99,235,0.3)">
+    <div style="display:inline-block;background:#2563EB;color:white;font-size:10px;font-weight:600;letter-spacing:2px;padding:4px 12px;border-radius:20px;margin-bottom:14px">PREMIUM</div>
+    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px">Planejamento completo.<br>Sem fila, sem susto, sem erro.</h3>
+    <p style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.7;margin-bottom:18px">Do primeiro passo até o último dia nos parques.</p>
+    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Sequência de ação:</strong> o que contratar em qual ordem, com prazo recomendado</div></div>
+    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Roteiro dia a dia:</strong> D1 a D7 editáveis com atrações prioritárias e dicas de fila</div></div>
+    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Orçamento com câmbio:</strong> itens em dólar ou real, conversão automática e simulador de variação</div></div>
+    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Orçamento por categoria:</strong> veja onde está indo cada centavo da viagem</div></div>
+    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Calculadora Uber vs. Carro:</strong> descubra o modal mais econômico para o seu perfil</div></div>
+    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Guia de apps e estratégias:</strong> Genie+, Lightning Lane, melhores horários por parque</div></div>
+    <div style="margin:18px 0"><div style="font-size:32px;font-weight:700;color:white">R$ 15,90</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">pagamento único · acesso vitalício</div></div>
+    <a href="https://pay.kiwify.com.br/OFuvHj5" target="_blank" class="premium-btn">Garantir o Premium por R$ 15,90 →</a>
+  </div>
+  <div class="flowi-footer">FLOWI · ORGANIZE SEM COMPLICAR · <a href="https://instagram.com/tryflowi" target="_blank" style="color:var(--muted);text-decoration:none">@tryflowi</a></div>
+</div>
+
+</div>
+<div style="max-width:640px;margin:0 auto;padding:0 20px 20px;text-align:center;font-size:11px;color:var(--muted);">Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none;">@tryflowi</a> &nbsp;·&nbsp; <a href="https://tryflowi.github.io/#votar" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none;">Sugerir melhoria</a></div>
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})" id="back-top" title="Voltar ao topo" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(17,24,39,0.85);border:1px solid rgba(255,255,255,0.15);color:white;font-size:16px;cursor:pointer;z-index:99;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);">↑</button>
+
 <script>
-let estado = {
-  config: {},
-  check: [
-    { id: 'c1', nome: 'Passaporte válido por 6+ meses', cat: 'Documentação', done: false },
-    { id: 'c2', nome: 'Visto americano (B1/B2) aprovado', cat: 'Documentação', done: false },
-    { id: 'c3', nome: 'Passagens aéreas compradas', cat: 'Reservas', done: false },
-    { id: 'c4', nome: 'Hotel ou resort reservado', cat: 'Hospedagem', done: false },
-    { id: 'c5', nome: 'Ingressos Disney comprados', cat: 'Ingressos', done: false }
-  ],
-  orc: []
-};
+let estado={config:{},check:[{"id": "chk0", "nome": "Passaporte válido por 6+ meses", "done": false}, {"id": "chk1", "nome": "Visto americano (B1/B2) aprovado", "done": false}, {"id": "chk2", "nome": "Passagens aéreas compradas", "done": false}, {"id": "chk3", "nome": "Hotel ou resort reservado", "done": false}, {"id": "chk4", "nome": "Ingressos Disney comprados", "done": false}, {"id": "chk5", "nome": "Ingressos Universal comprados", "done": false}, {"id": "chk6", "nome": "My Disney Experience configurado", "done": false}, {"id": "chk7", "nome": "Seguro viagem contratado", "done": false}, {"id": "chk8", "nome": "Chip ou eSIM EUA ativado", "done": false}, {"id": "chk9", "nome": "Câmbio ou cartão internacional pronto", "done": false}, {"id": "chk10", "nome": "Protetor solar FPS 50+ comprado", "done": false}, {"id": "chk11", "nome": "Mochila do parque preparada", "done": false}, {"id": "chk12", "nome": "Confirmar transfer do aeroporto", "done": false}, {"id": "chk13", "nome": "Fazer reservas de restaurantes", "done": false}],orc:[]};
+let editCheckId=null,editOrcId=null;
 
-function set(id, v) { var e = document.getElementById(id); if(e) e.textContent = v; }
-function get(id) { return (document.getElementById(id) || {}).value || ''; }
-
-function carregar() {
-  try {
-    var s = localStorage.getItem('flowi-disney-data');
-    if (s) estado = JSON.parse(s);
-  } catch(e){}
-
-  var c = estado.config || {};
-  if(document.getElementById('cfg-nome')) document.getElementById('cfg-nome').value = c.nome || '';
-  if(document.getElementById('cfg-ida')) document.getElementById('cfg-ida').value = c.ida || '';
-  if(document.getElementById('cfg-volta')) document.getElementById('cfg-volta').value = c.volta || '';
-
-  renderDocs();
-  renderOrc();
-  countdown();
+function abrirMenu(){document.getElementById('flowi-menu').classList.add('open');}
+function fecharMenu(){document.getElementById('flowi-menu').classList.remove('open');}
+function get(id){return(document.getElementById(id)||{}).value||'';}
+function set(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function baixarOffline(){
+  var h=document.documentElement.outerHTML,
+      b=new Blob([h],{type:'text/html'}),
+      u=URL.createObjectURL(b),
+      a=document.createElement('a');
+  a.href=u;a.download='flowi-disney-free.html';a.click();URL.revokeObjectURL(u);
 }
+function confirmarExclusao(msg,fn){if(confirm(msg||'Excluir este item?'))fn();}
+window.addEventListener('scroll',function(){var b=document.getElementById('back-top');if(b)b.style.display=window.scrollY>300?'flex':'none';});
+window.addEventListener('beforeunload',function(e){
+  var k=Object.keys(localStorage).some(function(k){return k.startsWith('flowi-');});
+  if(k){e.preventDefault();e.returnValue='Seus dados ficam salvos apenas neste navegador. Baixe o arquivo offline antes de trocar de dispositivo.';return e.returnValue;}
+});
 
-function salvar() {
-  estado.config = {
-    nome: get('cfg-nome'),
-    ida: get('cfg-ida'),
-    volta: get('cfg-volta')
-  };
-  localStorage.setItem('flowi-disney-data', JSON.stringify(estado));
-  countdown();
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
 }
-
-function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  event.target.classList.add('active');
+function carregar(){
+  try{var s=localStorage.getItem('flowi-disney-free');if(s)estado=JSON.parse(s);}catch(e){}
+  var c=estado.config||{};
+  var mapa={'cfg-nome':'nome','cfg-ida':'ida','cfg-volta':'volta','cfg-viajantes':'viajantes'};
+  Object.entries(mapa).forEach(([id,key])=>{var el=document.getElementById(id);if(el&&c[key])el.value=c[key];});
+  atualizarHeader();renderCheck();renderOrc();calcResumo();countdown();
+  setInterval(countdown,30000);
 }
-
-function renderDocs() {
-  var list = document.getElementById('docs-list');
-  if(!list) return;
-  var html = '';
-  (estado.check || []).forEach((item, index) => {
-    html += `
-      <div class="list-item ${item.done ? 'done' : ''}">
-        <span onclick="toggleDoc(${index})" style="cursor:pointer;">${item.done ? '✓ ' : '◯ '} ${item.nome}</span>
-        <div class="item-actions">
-          <button class="btn-icon" onclick="removerDoc(${index})">✕</button>
-        </div>
-      </div>`;
-  });
-  list.innerHTML = html;
+function salvar(){
+  estado.config={nome:get('cfg-nome'),ida:get('cfg-ida'),volta:get('cfg-volta'),viajantes:get('cfg-viajantes')};
+  salvarEstado();atualizarHeader();calcResumo();countdown();
 }
-
-function addDoc() {
-  var v = get('doc-input');
-  if(!v) return;
-  if(!estado.check) estado.check = [];
-  estado.check.push({ id: 'c_' + Date.now(), nome: v, cat: 'Documentação', done: false });
-  document.getElementById('doc-input').value = '';
-  localStorage.setItem('flowi-disney-data', JSON.stringify(estado));
-  renderDocs();
+function salvarEstado(){try{localStorage.setItem('flowi-disney-free',JSON.stringify(estado));}catch(e){}}
+function atualizarHeader(){
+  var c=estado.config||{};
+  set('hdr-nome',c.nome||'Minha Viagem Disney');
+  var sub=[];
+  if(c.viajantes)sub.push(c.viajantes+' viajante'+(c.viajantes!=='1'?'s':''));
+  if(c.ida)sub.push(new Date(c.ida+'T12:00:00').toLocaleDateString('pt-BR'));
+  set('hdr-sub',sub.join(' · ')||'Configure na aba Início');
 }
-
-function toggleDoc(i) {
-  estado.check[i].done = !estado.check[i].done;
-  localStorage.setItem('flowi-disney-data', JSON.stringify(estado));
-  renderDocs();
-}
-
-function removerDoc(i) {
-  estado.check.splice(i, 1);
-  localStorage.setItem('flowi-disney-data', JSON.stringify(estado));
-  renderDocs();
-}
-
-function renderOrc() {
-  var list = document.getElementById('orc-list');
-  if(!list) return;
-  var html = '';
-  (estado.orc || []).forEach((item, index) => {
-    html += `
-      <div class="list-item">
-        <div><strong>${item.nome}</strong> <small>(${item.cat})</small></div>
-        <div>R$ ${(parseFloat(item.est) || 0).toFixed(2)} <button class="btn-icon" onclick="removerOrc(${index})">✕</button></div>
-      </div>`;
-  });
-  list.innerHTML = html;
-}
-
-function addOrc() {
-  var desc = get('orc-desc');
-  var cat = get('orc-cat');
-  var val = parseFloat(get('orc-val')) || 0;
-  if(!desc) return;
-  if(!estado.orc) estado.orc = [];
-  estado.orc.push({ id: 'o_' + Date.now(), nome: desc, cat: cat, est: val, pago: 0, status: 'Pendente' });
-  document.getElementById('orc-desc').value = '';
-  document.getElementById('orc-val').value = '';
-  localStorage.setItem('flowi-disney-data', JSON.stringify(estado));
-  renderOrc();
-}
-
-function removerOrc(i) {
-  estado.orc.splice(i, 1);
-  localStorage.setItem('flowi-disney-data', JSON.stringify(estado));
-  renderOrc();
-}
-
 function countdown(){
-  var c = estado.config || {};
-  if(!c.ida){
-    ['cd-dias','cd-hrs','cd-min'].forEach(id => set(id, '--'));
-    return;
-  }
-  var partes = c.ida.split('-');
-  var ida = new Date(partes[0], partes[1] - 1, partes[2], 0, 0, 0);
-  var agora = new Date();
-  var diff = ida - agora;
-
-  if(diff <= 0){
-    ['cd-dias','cd-hrs','cd-min'].forEach(id => set(id, '0'));
-    return;
-  }
-
-  set('cd-dias', Math.floor(diff / (1000 * 60 * 60 * 24)));
-  set('cd-hrs', Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-  set('cd-min', Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)));
+  var c=estado.config||{};
+  if(!c.ida){['cd-dias','cd-hrs','cd-min'].forEach(id=>set(id,'--'));set('res-dias','--');return;}
+  var ida=new Date(c.ida+'T06:00:00'),agora=new Date(),diff=ida-agora;
+  if(diff<=0){['cd-dias','cd-hrs','cd-min'].forEach(id=>set(id,'0'));set('res-dias','0');return;}
+  var dias=Math.floor(diff/86400000);
+  set('cd-dias',dias);set('cd-hrs',Math.floor((diff%86400000)/3600000));set('cd-min',Math.floor((diff%3600000)/60000));
+  set('res-dias',dias);
 }
-
-document.addEventListener('DOMContentLoaded', carregar);
+function fmt(v){return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});}
+function calcResumo(){
+  var v=parseInt((estado.config||{}).viajantes)||1;
+  var total=(estado.orc||[]).reduce((a,o)=>a+parseFloat(o.val||0),0);
+  set('res-total',fmt(total));set('res-pessoa',fmt(Math.round(total/v)));
+  set('res-viaj',v+' pessoa'+(v!==1?'s':''));
+}
+function calcCambio(){
+  var cotacao=parseFloat(get('cambio-cotacao'))||0;
+  var usd=parseFloat(get('cambio-usd'))||0;
+  var el=document.getElementById('cambio-resultado');if(!el)return;
+  if(!cotacao||!usd){el.textContent='Preencha os campos acima para converter';return;}
+  var brl=cotacao*usd;
+  el.textContent='US$ '+usd.toLocaleString('pt-BR',{minimumFractionDigits:2})+' = '+fmt(brl)+' na cotação de R$ '+cotacao.toLocaleString('pt-BR',{minimumFractionDigits:2});
+}
+function adicionarCheck(){
+  var nome=get('chk-nome').trim();if(!nome)return alert('Preencha o item.');
+  if(!estado.check)estado.check=[];
+  estado.check.push({id:Date.now(),nome,done:false});
+  salvarEstado();renderCheck();
+  var el=document.getElementById('chk-nome');if(el)el.value='';
+}
+function renderCheck(){
+  var el=document.getElementById('lista-check');if(!el)return;
+  var items=estado.check||[];
+  el.innerHTML=items.map(c=>{
+    if(editCheckId===c.id)return `<div class="edit-box">
+      <input type="text" id="eck-${c.id}" value="${c.nome.replace(/"/g,'&quot;')}">
+      <div class="edit-actions">
+        <button class="edit-save" onclick="salvarEditCheck(${c.id})">Salvar</button>
+        <button class="edit-cancel" onclick="editCheckId=null;renderCheck()">Cancelar</button>
+        <button class="edit-del" onclick="confirmarExclusao('Excluir?',()=>excluirCheck(${c.id}))">Excluir</button>
+      </div></div>`;
+    return `<div class="check-item ${c.done?'done':''}">
+      <div class="ci-circle" onclick="toggleCheck(${c.id})">${c.done?'✓':''}</div>
+      <div style="flex:1"><div class="ci-name">${c.nome}</div></div>
+      <button class="btn-sm" onclick="editCheckId=${c.id};renderCheck()">✏</button>
+    </div>`;
+  }).join('');
+}
+function toggleCheck(id){var c=(estado.check||[]).find(x=>x.id===id);if(c)c.done=!c.done;salvarEstado();renderCheck();}
+function salvarEditCheck(id){var c=(estado.check||[]).find(x=>x.id===id);if(c){var n=document.getElementById('eck-'+id);if(n)c.nome=n.value.trim()||c.nome;}editCheckId=null;salvarEstado();renderCheck();}
+function excluirCheck(id){estado.check=(estado.check||[]).filter(c=>c.id!==id);editCheckId=null;salvarEstado();renderCheck();}
+function adicionarOrc(){
+  var nome=get('o-nome').trim(),cat=get('o-cat'),val=get('o-val');
+  if(!nome)return alert('Preencha a descrição.');
+  if(!estado.orc)estado.orc=[];
+  estado.orc.push({id:Date.now(),nome,cat,val:parseFloat(val)||0});
+  salvarEstado();renderOrc();calcResumo();
+  var el=document.getElementById('o-nome');if(el)el.value='';
+  var el2=document.getElementById('o-val');if(el2)el2.value='';
+}
+function renderOrc(){
+  var el=document.getElementById('lista-orc');if(!el)return;
+  var items=estado.orc||[];
+  if(!items.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhum item adicionado</div>';return;}
+  el.innerHTML=items.map(o=>{
+    if(editOrcId===o.id)return `<div class="edit-box">
+      <input type="text" id="eo-nome-${o.id}" value="${o.nome.replace(/"/g,'&quot;')}">
+      <input type="number" id="eo-val-${o.id}" value="${o.val}" placeholder="Valor R$">
+      <div class="edit-actions">
+        <button class="edit-save" onclick="salvarEditOrc(${o.id})">Salvar</button>
+        <button class="edit-cancel" onclick="editOrcId=null;renderOrc()">Cancelar</button>
+        <button class="edit-del" onclick="confirmarExclusao('Excluir?',()=>excluirOrc(${o.id}))">Excluir</button>
+      </div></div>`;
+    return `<div class="orc-row">
+      <div style="flex:1"><div class="item-nome">${o.nome}</div><div class="item-sub">${o.cat}</div></div>
+      <div style="font-size:13px;font-weight:700;color:#2563EB">${fmt(parseFloat(o.val||0))}</div>
+      <button class="btn-sm" onclick="editOrcId=${o.id};renderOrc()">✏</button>
+    </div>`;
+  }).join('');
+}
+function salvarEditOrc(id){var o=(estado.orc||[]).find(x=>x.id===id);if(o){var n=document.getElementById('eo-nome-'+id);if(n)o.nome=n.value.trim()||o.nome;var v=document.getElementById('eo-val-'+id);if(v)o.val=parseFloat(v.value)||0;}editOrcId=null;salvarEstado();renderOrc();calcResumo();}
+function excluirOrc(id){estado.orc=(estado.orc||[]).filter(o=>o.id!==id);editOrcId=null;salvarEstado();renderOrc();calcResumo();}
+function resetarTudo(){confirmarExclusao('Apagar TODOS os dados?',function(){localStorage.removeItem('flowi-disney-free');location.reload();});}
+carregar();
 </script>
 </body>
 </html>
