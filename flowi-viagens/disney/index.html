@@ -311,7 +311,7 @@ function switchTab(id,btn){
   if(btn)btn.classList.add('active');
 }
 function carregar(){
-  try{var s=localStorage.getItem('flowi-disney-free');if(s)estado=JSON.parse(s);}catch(e){}
+  try{var s=localStorage.getItem('flowi-disney-data');if(s)estado=JSON.parse(s);}catch(e){}
   var c=estado.config||{};
   var mapa={'cfg-nome':'nome','cfg-ida':'ida','cfg-volta':'volta','cfg-viajantes':'viajantes'};
   Object.entries(mapa).forEach(([id,key])=>{var el=document.getElementById(id);if(el&&c[key])el.value=c[key];});
