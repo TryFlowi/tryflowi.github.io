@@ -36,9 +36,6 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .brand-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;margin-left:-6px;margin-top:8px;}
 .brand-name{font-size:18px;font-weight:700;color:white;letter-spacing:2px;}
 .brand-tag{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:3px;margin-left:2px;}
-.mes-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
-.mes-btn{background:rgba(255,255,255,0.08);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
-.mes-atual{font-size:14px;font-weight:600;color:white;flex:1;text-align:center;letter-spacing:1px;}
 .tabs{display:flex;border-top:1px solid rgba(255,255,255,0.08);overflow-x:auto;}
 .tab-btn{flex:1;min-width:56px;padding:12px 4px;background:none;border:none;color:rgba(255,255,255,0.45);font-size:10px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
 .tab-btn.active{color:white;border-bottom-color:var(--accent);}
@@ -54,22 +51,14 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .resumo-val.pos{color:var(--green);}
 .resumo-val.neg{color:var(--red);}
 .resumo-val.acc{color:var(--accent);}
-.meta-bar-bg{background:var(--sand);border-radius:8px;height:10px;margin:10px 0 6px;}
-.meta-bar-fill{height:10px;border-radius:8px;background:var(--accent);transition:width .5s ease;}
-.meta-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
 .field{margin-bottom:12px;}
 .field label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:500;letter-spacing:.5px;}
 .field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;background:var(--cream);}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.field-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .btn-add{width:100%;padding:12px;background:var(--night);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
 .btn-reset{background:var(--red-light);color:var(--red);border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
 .btn-sm{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--muted);cursor:pointer;font-family:inherit;}
-.btn-del{background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:inherit;}
-.item-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--sand);border-radius:10px;margin-bottom:7px;}
-.item-nome{font-size:12px;font-weight:500;color:var(--text);}
-.item-sub{font-size:10px;color:var(--muted);margin-top:2px;}
 .edit-box{background:var(--sand);border-radius:10px;padding:12px;margin-bottom:8px;}
 .edit-box input,.edit-box select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px;font-family:'Inter',sans-serif;color:var(--text);}
 .edit-actions{display:flex;gap:6px;margin-top:6px;}
@@ -82,14 +71,11 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .ci-circle{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .2s;margin-top:1px;cursor:pointer;}
 .check-item.done .ci-circle{background:var(--accent);border-color:var(--accent);color:white;}
 .ci-name{font-size:12px;font-weight:500;color:var(--text);}
-.ci-detail{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;}
-.ci-quando{font-size:10px;color:var(--accent);font-weight:600;margin-top:4px;}
 .premium-card{background:linear-gradient(135deg,var(--night) 0%,#1a1a2e 100%);border-radius:20px;padding:24px;color:white;text-align:center;}
 .pf-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;text-align:left;}
 .pf-check{width:16px;height:16px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px;color:white;}
 .pf-text{font-size:12px;color:rgba(255,255,255,0.8);}
 .premium-btn{display:block;background:var(--accent);color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:13px;font-weight:700;letter-spacing:1px;margin-top:16px;}
-.section-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:2px;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 .flowi-footer{text-align:center;padding:16px 0 8px;font-size:10px;color:var(--muted);letter-spacing:2px;}
 .countdown{display:flex;gap:12px;margin-bottom:16px;}
 .cd-box{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;text-align:center;flex:1;}
@@ -176,7 +162,6 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
       <div class="resumo-item"><div class="resumo-label">Dias para a viagem</div><div class="resumo-val" id="res-dias">--</div></div>
     </div>
 
-    <!-- PONTINHA: conversor de câmbio básico -->
     <div class="cambio-mini">
       <div style="font-size:11px;font-weight:600;color:#1d4ed8;margin-bottom:8px">💱 CONVERSOR RÁPIDO</div>
       <div class="field-row" style="margin-bottom:0">
@@ -212,7 +197,6 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
     <div id="lista-check"></div>
   </div>
 
-  <!-- PONTINHA: sequência de ação bloqueada -->
   <div class="card" style="background:var(--sand)">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
       <span style="font-size:16px">🔒</span>
@@ -229,17 +213,19 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
     <div class="field"><label>Descrição</label><input type="text" id="o-nome" placeholder="Ex: Ingresso Magic Kingdom"></div>
     <div class="field-row">
       <div class="field"><label>Categoria</label>
-        <select id="o-cat"><option>Passagens</option>
-<option>Hospedagem</option>
-<option>Ingressos Disney</option>
-<option>Ingressos Universal</option>
-<option>Alimentação nos parques</option>
-<option>Alimentação fora dos parques</option>
-<option>Transporte</option>
-<option>Seguro viagem</option>
-<option>Compras & Souvenirs</option>
-<option>Câmbio</option>
-<option>Outro</option></select>
+        <select id="o-cat">
+          <option>Passagens</option>
+          <option>Hospedagem</option>
+          <option>Ingressos Disney</option>
+          <option>Ingressos Universal</option>
+          <option>Alimentação nos parques</option>
+          <option>Alimentação fora dos parques</option>
+          <option>Transporte</option>
+          <option>Seguro viagem</option>
+          <option>Compras & Souvenirs</option>
+          <option>Câmbio</option>
+          <option>Outro</option>
+        </select>
       </div>
       <div class="field"><label>Valor (R$)</label><input type="number" id="o-val" placeholder="0"></div>
     </div>
@@ -250,7 +236,6 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
     <div id="lista-orc"><div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhum item adicionado</div></div>
   </div>
 
-  <!-- PONTINHA: roteiro e calculadora transporte -->
   <div class="card" style="background:var(--sand)">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
       <span style="font-size:16px">🔒</span>
@@ -326,7 +311,7 @@ function salvarEstado(){try{localStorage.setItem('flowi-disney-data',JSON.string
 function atualizarHeader(){
   var c=estado.config||{};
   set('hdr-nome',c.nome||'Minha Viagem Disney');
-  var s = localStorage.getItem('flowi-disney-data');
+  var sub=[];
   if(c.viajantes)sub.push(c.viajantes+' viajante'+(c.viajantes!=='1'?'s':''));
   if(c.ida)sub.push(new Date(c.ida+'T12:00:00').toLocaleDateString('pt-BR'));
   set('hdr-sub',sub.join(' · ')||'Configure na aba Início');
@@ -414,9 +399,8 @@ function renderOrc(){
 }
 function salvarEditOrc(id){var o=(estado.orc||[]).find(x=>x.id===id);if(o){var n=document.getElementById('eo-nome-'+id);if(n)o.nome=n.value.trim()||o.nome;var v=document.getElementById('eo-val-'+id);if(v)o.val=parseFloat(v.value)||0;}editOrcId=null;salvarEstado();renderOrc();calcResumo();}
 function excluirOrc(id){estado.orc=(estado.orc||[]).filter(o=>o.id!==id);editOrcId=null;salvarEstado();renderOrc();calcResumo();}
-function resetarTudo(){confirmarExclusao('Apagar TODOS os dados?',function(){localStorage.removeItem('flowi-disney-free');location.reload();});}
+function resetarTudo(){confirmarExclusao('Apagar TODOS os dados?',function(){localStorage.removeItem('flowi-disney-data');location.reload();});}
 carregar();
 </script>
 </body>
 </html>
-
