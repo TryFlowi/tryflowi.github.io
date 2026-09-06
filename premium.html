@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flowi Premium - Painel</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background: #0a0a0a; color: white; min-height: 100vh; padding: 40px 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
+    .logo { font-weight: 700; letter-spacing: 2px; }
+    .btn-sair { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #ef4444; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+    .content { background: #111827; border-radius: 16px; padding: 30px; border: 1px solid rgba(255,255,255,0.08); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo">flowi premium</div>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </header>
+
+  <div class="content">
+    <h2>Bem-vindo à sua área Premium!</h2>
+    <p style="margin-top: 10px; color: #94a3b8;">Seus planejadores e dados salvos aparecerão aqui.</p>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://gkvanakreiiiprriyats.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_1Lx3D9jBwegVvvqTK39JAg_yV6zuw3s';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Verifica se o usuário está autenticado
+  async function checarSessao() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      window.location.href = 'login.html';
+    }
+  }
+
+  async function sair() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  checarSessao();
+</script>
+
+</body>
+</html>
