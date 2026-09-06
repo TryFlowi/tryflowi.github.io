@@ -294,414 +294,172 @@ let estado = {
   config: { nome: '', ida: '', volta: '', viajantes: 1, cambio: 5.20 },
   roteiro: [],
   orc: [],
-  check: [
-    { id: 'c1', nome: 'Passaporte válido por 6+ meses', cat: 'Documentação', done: false },
-    { id: 'c2', nome: 'Visto americano aprovado', cat: 'Documentação', done: false },
-    { id: 'c3', nome: 'Passagens compradas', cat: 'Reservas & Ingressos', done: false },
-    { id: 'c4', nome: 'Seguro viagem contratado', cat: 'Reservas & Ingressos', done: false },
-    { id: 'c5', nome: 'Chip internacional / eSIM', cat: 'Mala & Preparativos', done: false }
-  ]
+  check: []
 };
 
 let diaAtivoIndex = 0;
 let editCheckId = null;
+let editOrcId = null;
 
-function get(id){ return (document.getElementById(id)||{}).value||''; }
-function set(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
+const CATEGORIAS_PADRAO = {
+  'Passaporte válido por 6+ meses': 'Documentação',
+  'Visto americano (B1/B2) aprovado': 'Documentação',
+  'Passagens aéreas compradas': 'Reservas',
+  'Hotel ou resort reservado': 'Hospedagem',
+  'Ingressos Disney comprados': 'Ingressos',
+  'Ingressos Universal comprados': 'Ingressos',
+  'My Disney Experience configurado': 'Preparativos',
+  'Seguro viagem contratado': 'Documentação',
+  'Chip ou eSIM EUA ativado': 'Preparativos',
+  'Câmbio ou cartão internacional pronto': 'Financeiro',
+  'Protetor solar FPS 50+ comprado': 'Mala',
+  'Mochila do parque preparada': 'Mala',
+  'Confirmar transfer do aeroporto': 'Reservas',
+  'Fazer reservas de restaurantes': 'Reservas'
+};
 
-function salvar(){
+function get(id) { return (document.getElementById(id) || {}).value || ''; }
+function set(id, v) { var e = document.getElementById(id); if(e) e.textContent = v; }
+
+function carregar() {
+  try {
+    var s = localStorage.getItem('flowi-disney-data');
+    if (s) estado = JSON.parse(s);
+  } catch (e) {
+    console.error("Erro ao carregar dados", e);
+  }
+
+  // Tratamento do Checklist (Adiciona categorias aos itens vindos do Free)
+  if (!estado.check || !Array.isArray(estado.check)) estado.check = [];
+  estado.check = estado.check.map(item => ({
+    id: item.id || 'c_' + Math.random().toString(36).substr(2, 9),
+    nome: item.nome || item.desc || 'Item sem nome',
+    cat: item.cat || CATEGORIAS_PADRAO[item.nome] || 'Geral',
+    done: !!item.done
+  }));
+
+  // Tratamento do Orçamento (Ajusta valores numéricos e chaves)
+  if (!estado.orc || !Array.isArray(estado.orc)) estado.orc = [];
+  estado.orc = estado.orc.map(item => {
+    let est = parseFloat(item.est || item.val || item.valor || 0);
+    let pago = parseFloat(item.pago || 0);
+    return {
+      id: item.id || 'o_' + Math.random().toString(36).substr(2, 9),
+      nome: item.nome || item.desc || 'Despesa',
+      cat: item.cat || 'Outros',
+      est: isNaN(est) ? 0 : est,
+      pago: isNaN(pago) ? 0 : pago,
+      status: item.status || (pago >= est && est > 0 ? 'Pago' : 'Pendente')
+    };
+  });
+
+  // Preencher campos de input
+  var c = estado.config || {};
+  if (document.getElementById('cfg-nome')) document.getElementById('cfg-nome').value = c.nome || '';
+  if (document.getElementById('cfg-ida')) document.getElementById('cfg-ida').value = c.ida || '';
+  if (document.getElementById('cfg-volta')) document.getElementById('cfg-volta').value = c.volta || '';
+  if (document.getElementById('cfg-viajantes')) document.getElementById('cfg-viajantes').value = c.viajantes || '1';
+
+  atualizarHeader();
+  renderCheck();
+  renderOrc();
+  calcResumo();
+  countdown();
+}
+
+function salvar() {
   estado.config = {
     nome: get('cfg-nome'),
     ida: get('cfg-ida'),
     volta: get('cfg-volta'),
-    viajantes: get('cfg-viajantes'),
-    cambio: get('cfg-cambio')
+    viajantes: get('cfg-viajantes')
   };
-  salvarEstado();
+  try {
+    localStorage.setItem('flowi-disney-data', JSON.stringify(estado));
+  } catch(e){}
   atualizarHeader();
   calcResumo();
+  countdown();
 }
 
-function salvarEstado(){ try{ localStorage.setItem('flowi-disney-data', JSON.stringify(estado)); }catch(e){} }
-
-function carregar(){
-  try{
-   var s = localStorage.getItem('flowi-disney-data');
-    if(s) estado = JSON.parse(s);
-  }catch(e){}
-  
+function atualizarHeader() {
   var c = estado.config || {};
-  if(c.nome) document.getElementById('cfg-nome').value = c.nome;
-  if(c.ida) document.getElementById('cfg-ida').value = c.ida;
-  if(c.volta) document.getElementById('cfg-volta').value = c.volta;
-  if(c.viajantes) document.getElementById('cfg-viajantes').value = c.viajantes;
-  if(c.cambio) document.getElementById('cfg-cambio').value = c.cambio;
-
-  atualizarHeader();
-  atualizarCountdown();
-  gerarDiasRoteiro();
-  renderOrc();
-  renderCheck();
-  calcResumo();
-  calcularUberCarro();
+  set('hdr-nome', c.nome || 'Sua Viagem');
+  set('hdr-detalhes', (c.viajantes || 1) + ' viajante(s) · ' + (c.ida ? c.ida.split('-').reverse().join('/') : '--/--/----'));
 }
 
-function switchTab(id, btn){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  if(btn) btn.classList.add('active');
+function calcResumo() {
+  var viajantes = parseInt((estado.config || {}).viajantes) || 1;
+  var totalOrcado = (estado.orc || []).reduce((acc, item) => acc + (parseFloat(item.est) || 0), 0);
+  var totalPago = (estado.orc || []).reduce((acc, item) => acc + (parseFloat(item.pago) || 0), 0);
+  var totalPendente = totalOrcado - totalPago;
+
+  set('res-orcado', fmt(totalOrcado));
+  set('res-pessoa', fmt(totalOrcado / viajantes));
+  set('res-pago', fmt(totalPago));
+  set('res-pendente', fmt(totalPendente < 0 ? 0 : totalPendente));
+
+  renderProgressoCategorias();
 }
 
-function atualizarHeader(){
-  var c = estado.config || {};
-  set('hdr-nome', c.nome || 'Minha Viagem Disney');
-  var sub = [];
-  if(c.viajantes) sub.push(c.viajantes + ' viajante(s)');
-  if(c.ida) sub.push(new Date(c.ida+'T12:00:00').toLocaleDateString('pt-BR'));
-  set('hdr-sub', sub.join(' · ') || 'Configure na aba Início');
-}
+function renderProgressoCategorias() {
+  var el = document.getElementById('progresso-categorias');
+  if (!el) return;
 
-function atualizarCountdown(){
-  var idaStr = get('cfg-ida');
-  if(!idaStr){
-    set('cd-dias', '--');
-    set('cd-hrs', '--');
-    set('cd-min', '--');
-    return;
-  }
-
-  var alvo = new Date(idaStr + 'T00:00:00').getTime();
-  var agora = new Date().getTime();
-  var diff = alvo - agora;
-
-  if(diff <= 0){
-    set('cd-dias', '00');
-    set('cd-hrs', '00');
-    set('cd-min', '00');
-    return;
-  }
-
-  var dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-  var horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  var mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-  set('cd-dias', String(dias).padStart(2, '0'));
-  set('cd-hrs', String(horas).padStart(2, '0'));
-  set('cd-min', String(mins).padStart(2, '0'));
-}
-
-setInterval(atualizarCountdown, 1000);
-
-/* ROTEIRO COM ABAS E TURNOS CRONOLÓGICOS */
-function gerarDiasRoteiro(){
-  var ida = get('cfg-ida');
-  var volta = get('cfg-volta');
-  var select = document.getElementById('rot-dia-sel');
-  var tabsBar = document.getElementById('dias-tabs-bar');
-  if(!select || !tabsBar) return;
-
-  select.innerHTML = '';
-  tabsBar.innerHTML = '';
-
-  if(!ida || !volta){
-    tabsBar.innerHTML = '<span style="font-size:11px;color:var(--muted)">Informe as datas de ida e volta na aba Início.</span>';
-    return;
-  }
-
-  var dInicio = new Date(ida+'T12:00:00');
-  var dFim = new Date(volta+'T12:00:00');
-  var index = 0;
-
-  var diasDaSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-
-  for(var d = new Date(dInicio); d <= dFim; d.setDate(d.getDate() + 1)){
-    var diaStr = 'D' + (index + 1) + ' - ' + d.getDate() + '/' + (d.getMonth()+1) + ' - ' + diasDaSemana[d.getDay()];
-    
-    var opt = document.createElement('option');
-    opt.value = index;
-    opt.textContent = diaStr;
-    select.appendChild(opt);
-
-    var btn = document.createElement('button');
-    btn.className = 'day-tab' + (index === diaAtivoIndex ? ' active' : '');
-    btn.textContent = diaStr;
-    let idx = index;
-    btn.onclick = function(){ diaAtivoIndex = idx; gerarDiasRoteiro(); };
-    tabsBar.appendChild(btn);
-
-    index++;
-  }
-
-  renderRoteiroDia();
-}
-
-function adicionarAtividade(){
-  var diaIdx = document.getElementById('rot-dia-sel').value;
-  var hora = get('rot-hora');
-  var titulo = get('rot-titulo').trim();
-  var desc = get('rot-desc').trim();
-
-  if(!titulo) return alert('Informe o título da atividade.');
-
-  if(!estado.roteiro) estado.roteiro = [];
-  estado.roteiro.push({
-    id: 'act-' + Date.now(),
-    diaIdx: parseInt(diaIdx),
-    hora: hora || '12:00',
-    titulo: titulo,
-    desc: desc
-  });
-
-  salvarEstado();
-  renderRoteiroDia();
-  document.getElementById('rot-titulo').value = '';
-  document.getElementById('rot-desc').value = '';
-}
-
-function renderRoteiroDia(){
-  var el = document.getElementById('conteudo-dia-selecionado');
-  if(!el) return;
-
-  var ativs = (estado.roteiro || []).filter(a => a.diaIdx === diaAtivoIndex);
-  ativs.sort((a,b) => a.hora.localeCompare(b.hora));
-
-  if(!ativs.length){
-    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhuma atividade agendada para este dia.</div>';
-    return;
-  }
-
-  var turnos = { 'Manhã': [], 'Tarde': [], 'Noite': [] };
-  ativs.forEach(a => {
-    var h = parseInt(a.hora.split(':')[0]);
-    if(h < 12) turnos['Manhã'].push(a);
-    else if(h < 18) turnos['Tarde'].push(a);
-    else turnos['Noite'].push(a);
+  var categorias = {};
+  (estado.check || []).forEach(item => {
+    var cat = item.cat || 'Geral';
+    if (!categorias[cat]) categorias[cat] = { total: 0, concluidas: 0 };
+    categorias[cat].total++;
+    if (item.done) categorias[cat].concluidas++;
   });
 
   var html = '';
-  Object.keys(turnos).forEach(t => {
-    if(turnos[t].length > 0){
-      html += `<div class="turno-title">🌅 ${t.toUpperCase()}</div>`;
-      turnos[t].forEach(a => {
-        html += `<div class="act-item">
-          <div>
-            <span style="font-size:11px;font-weight:700;color:var(--accent);">${a.hora}</span>
-            <strong style="font-size:12px;margin-left:6px;">${a.titulo}</strong>
-            ${a.desc ? `<div style="font-size:11px;color:var(--muted);">${a.desc}</div>` : ''}
-          </div>
-          <button class="btn-sm" onclick="excluirAtividade('${a.id}')">✕</button>
-        </div>`;
-      });
-    }
+  Object.keys(categorias).forEach(cat => {
+    var info = categorias[cat];
+    var pct = info.total > 0 ? Math.round((info.concluidas / info.total) * 100) : 0;
+    html += `
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px;color:#374151;">
+          <span>${cat}</span>
+          <span>${pct}% (${info.concluidas}/${info.total})</span>
+        </div>
+        <div style="background:#E5E7EB;height:8px;border-radius:4px;overflow:hidden;">
+          <div style="background:#2563EB;height:100%;width:${pct}%;transition:width 0.3s;"></div>
+        </div>
+      </div>
+    `;
   });
 
-  el.innerHTML = html;
+  el.innerHTML = html || '<div style="font-size:12px;color:#6B7280;">Nenhuma tarefa cadastrada</div>';
 }
 
-function excluirAtividade(id){
-  estado.roteiro = (estado.roteiro || []).filter(a => a.id !== id);
-  salvarEstado();
-  renderRoteiroDia();
-}
+function countdown(){
+  var c = estado.config || {};
+  if(!c.ida){
+    ['cd-dias','cd-hrs','cd-min'].forEach(id => set(id, '--'));
+    return;
+  }
+  var partes = c.ida.split('-');
+  var ida = new Date(partes[0], partes[1] - 1, partes[2], 0, 0, 0);
+  var agora = new Date();
+  var diff = ida - agora;
 
-/* ORÇAMENTO E CRONOGRAMA POR MÊS */
-function adicionarOrc(){
-  var nome = get('o-nome').trim();
-  var cat = get('o-cat');
-  var val = parseFloat(get('o-val')) || 0;
-  var valPago = parseFloat(get('o-val-pago')) || 0;
-  var mes = get('o-mes');
-  var status = get('o-status');
-
-  if(!nome) return alert('Informe a descrição.');
-
-  if(!estado.orc) estado.orc = [];
-  estado.orc.push({ id: Date.now(), nome, cat, val, valPago, mes, status });
-  salvarEstado();
-  renderOrc();
-  calcResumo();
-
-  document.getElementById('o-nome').value = '';
-  document.getElementById('o-val').value = '';
-  document.getElementById('o-val-pago').value = '';
-}
-
-function renderOrc(){
-  var el = document.getElementById('lista-orc-meses');
-  var distEl = document.getElementById('distribuicao-categoria');
-  if(!el) return;
-
-  var items = estado.orc || [];
-  items.sort((a,b) => (a.mes || '').localeCompare(b.mes || ''));
-
-  var fmt = n => 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2});
-
-  var cats = {};
-  items.forEach(i => {
-    cats[i.cat] = (cats[i.cat] || 0) + i.val;
-  });
-  distEl.innerHTML = Object.keys(cats).map(c => `
-    <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);">
-      <span>${c}</span><strong>${fmt(cats[c])}</strong>
-    </div>
-  `).join('') || '<div style="font-size:11px;color:var(--muted)">Nenhum item adicionado.</div>';
-
-  if(!items.length){
-    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhum item orçado.</div>';
+  if(diff <= 0){
+    ['cd-dias','cd-hrs','cd-min'].forEach(id => set(id, '0'));
     return;
   }
 
-  el.innerHTML = items.map(o => `
-    <div class="orc-row">
-      <div style="flex:1">
-        <div class="item-nome">${o.nome}</div>
-        <div class="item-sub">${o.cat} · Mês: ${o.mes || 'Não definido'}</div>
-      </div>
-      <div>
-        <span class="${o.status==='pago'?'badge-pago':'badge-pend'}">${o.status.toUpperCase()}</span>
-        <div style="font-size:12px;font-weight:700;margin-top:2px;">${fmt(o.val)}</div>
-      </div>
-      <button class="btn-sm" onclick="excluirOrc(${o.id})">✕</button>
-    </div>
-  `).join('');
+  set('cd-dias', Math.floor(diff / (1000 * 60 * 60 * 24)));
+  set('cd-hrs', Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+  set('cd-min', Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)));
 }
 
-function excluirOrc(id){
-  estado.orc = (estado.orc || []).filter(o => o.id !== id);
-  salvarEstado();
-  renderOrc();
-  calcResumo();
+function fmt(v) {
+  return 'R$ ' + (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function calcResumo(){
-  var items = estado.orc || [];
-  var total = items.reduce((a,o) => a + o.val, 0);
-  var pago = items.filter(o => o.status === 'pago').reduce((a,o) => a + (o.valPago || o.val), 0);
-  var pendente = total - pago;
-  var v = parseInt((estado.config||{}).viajantes) || 1;
-
-  var fmt = n => 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2});
-
-  set('res-total', fmt(total));
-  set('res-pessoa', fmt(total/v));
-  set('res-pago', fmt(pago));
-  set('res-pendente', fmt(pendente > 0 ? pendente : 0));
-}
-
-/* CHECKLIST COM EDICAO E ORDENAÇÃO ALFABÉTICA */
-function adicionarCheck(){
-  var nome = get('chk-nome').trim();
-  var cat = get('chk-cat');
-  if(!nome) return alert('Digite a tarefa.');
-
-  if(!estado.check) estado.check = [];
-  estado.check.push({ id: 'chk-' + Date.now(), nome, cat, done: false });
-  salvarEstado();
-  renderCheck();
-  document.getElementById('chk-nome').value = '';
-}
-
-function renderCheck(){
-  var el = document.getElementById('lista-check');
-  var catProgEl = document.getElementById('progresso-categorias');
-  if(!el) return;
-
-  var items = estado.check || [];
-  items.sort((a,b) => a.nome.localeCompare(b.nome));
-
-  var cats = {};
-  items.forEach(c => {
-    if(!cats[c.cat]) cats[c.cat] = { total: 0, concluidos: 0 };
-    cats[c.cat].total++;
-    if(c.done) cats[c.cat].concluidos++;
-  });
-
-  if(catProgEl){
-    catProgEl.innerHTML = Object.keys(cats).map(k => {
-      var pct = Math.round((cats[k].concluidos / cats[k].total) * 100);
-      return `<div style="margin-bottom:8px;">
-        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;">
-          <span>${k}</span><strong>${pct}% (${cats[k].concluidos}/${cats[k].total})</strong>
-        </div>
-        <div style="background:var(--sand);height:6px;border-radius:3px;overflow:hidden;">
-          <div style="background:var(--accent);width:${pct}%;height:100%;"></div>
-        </div>
-      </div>`;
-    }).join('') || '<div style="font-size:11px;color:var(--muted)">Nenhum checklist configurado.</div>';
-  }
-
-  el.innerHTML = items.map(c => {
-    if(editCheckId === c.id){
-      return `<div class="edit-box">
-        <input type="text" id="eck-${c.id}" value="${c.nome}">
-        <div class="edit-actions">
-          <button class="edit-save" onclick="salvarEditCheck('${c.id}')">Salvar</button>
-          <button class="edit-cancel" onclick="editCheckId=null;renderCheck()">Cancelar</button>
-        </div>
-      </div>`;
-    }
-    return `<div class="check-item ${c.done ? 'done' : ''}">
-      <div class="ci-circle" onclick="toggleCheck('${c.id}')">${c.done ? '✓' : ''}</div>
-      <div style="flex:1"><div class="ci-name">${c.nome}</div><div style="font-size:9px;color:var(--muted);">${c.cat}</div></div>
-      <button class="btn-sm" onclick="editCheckId='${c.id}';renderCheck()">✏</button>
-      <button class="btn-sm" onclick="excluirCheck('${c.id}')">✕</button>
-    </div>`;
-  }).join('');
-}
-
-function toggleCheck(id){
-  var c = (estado.check || []).find(x => x.id === id);
-  if(c) c.done = !c.done;
-  salvarEstado();
-  renderCheck();
-}
-
-function salvarEditCheck(id){
-  var c = (estado.check || []).find(x => x.id === id);
-  if(c){
-    var n = document.getElementById('eck-' + id);
-    if(n) c.nome = n.value.trim() || c.nome;
-  }
-  editCheckId = null;
-  salvarEstado();
-  renderCheck();
-}
-
-function excluirCheck(id){
-  estado.check = (estado.check || []).filter(c => c.id !== id);
-  salvarEstado();
-  renderCheck();
-}
-
-/* FERRAMENTAS */
-function calcularUberCarro(){
-  var dias = parseFloat(get('calc-dias')) || 0;
-  var carroDia = parseFloat(get('calc-carro-dia')) || 0;
-  var estac = parseFloat(get('calc-estac')) || 0;
-  var uberDia = parseFloat(get('calc-uber')) || 0;
-
-  var totalCarro = (carroDia + estac) * dias;
-  var totalUber = uberDia * dias;
-
-  var res = document.getElementById('res-calc-transporte');
-  if(!res) return;
-
-  if(totalUber < totalCarro){
-    res.innerHTML = `🚗 Uber é mais econômico! (Economia de R$ ${(totalCarro - totalUber).toFixed(2)})`;
-  } else {
-    res.innerHTML = `🚙 Alugar carro compensa mais! (Economia de R$ ${(totalUber - totalCarro).toFixed(2)})`;
-  }
-}
-
-function resetarTudo(){
-  if(confirm('Tem certeza que deseja apagar todos os dados registrados?')){
-    localStorage.removeItem('flowi-disney-data');
-    location.reload();
-  }
-}
-
-carregar();
+document.addEventListener('DOMContentLoaded', carregar);
 </script>
 </body>
 </html>
