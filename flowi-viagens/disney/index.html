@@ -322,11 +322,11 @@ function salvar(){
   estado.config={nome:get('cfg-nome'),ida:get('cfg-ida'),volta:get('cfg-volta'),viajantes:get('cfg-viajantes')};
   salvarEstado();atualizarHeader();calcResumo();countdown();
 }
-function salvarEstado(){try{localStorage.setItem('flowi-disney-free',JSON.stringify(estado));}catch(e){}}
+function salvarEstado(){try{localStorage.setItem('flowi-disney-data',JSON.stringify(estado));}catch(e){}}
 function atualizarHeader(){
   var c=estado.config||{};
   set('hdr-nome',c.nome||'Minha Viagem Disney');
-  var sub=[];
+  var s = localStorage.getItem('flowi-disney-data');
   if(c.viajantes)sub.push(c.viajantes+' viajante'+(c.viajantes!=='1'?'s':''));
   if(c.ida)sub.push(new Date(c.ida+'T12:00:00').toLocaleDateString('pt-BR'));
   set('hdr-sub',sub.join(' · ')||'Configure na aba Início');
