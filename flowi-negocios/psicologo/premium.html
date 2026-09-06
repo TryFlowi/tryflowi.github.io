@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowi Negócios - Psicólogo Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --night:#111827;--accent:#16a34a;--accent-light:#DCFCE7;--accent-mid:#86efac;
+  --cream:#F9FAFB;--sand:#F3F4F6;--white:#fff;
+  --text:#111827;--muted:#6B7280;--border:#E5E7EB;
+  --warn:#FEF9C3;--warn-border:#FDE047;
+  --red:#DC2626;--red-light:#FEE2E2;--green:#16a34a;--green-light:#DCFCE7;
+}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+.flowi-menu-overlay{position:fixed;inset:0;z-index:200;display:none;}
+.flowi-menu-overlay.open{display:block;}
+.flowi-menu-bg{position:absolute;inset:0;background:rgba(0,0,0,0.5);}
+.flowi-menu-panel{position:absolute;top:0;left:0;bottom:0;width:260px;background:#111827;padding:24px 20px;overflow-y:auto;}
+.flowi-menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.flowi-menu-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px;}
+.flowi-menu-item{display:flex;align-items:center;padding:11px 12px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.8);font-size:12px;font-weight:500;margin-bottom:4px;transition:background .2s;font-family:'Inter',sans-serif;}
+.flowi-menu-item:hover{background:rgba(255,255,255,0.1);}
+.header{background:var(--night);position:sticky;top:0;z-index:100;}
+.header-inner{max-width:640px;margin:0 auto;padding:20px 20px 0;}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.brand-icon{display:flex;flex-direction:column;gap:3px;cursor:pointer;}
+.brand-icon span{display:block;background:white;border-radius:2px;}
+.brand-icon span:nth-child(1){width:28px;height:3px;}
+.brand-icon span:nth-child(2){width:19px;height:3px;}
+.brand-icon span:nth-child(3){width:12px;height:3px;}
+.brand-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;margin-left:-6px;margin-top:8px;}
+.brand-name{font-size:18px;font-weight:700;color:white;letter-spacing:2px;}
+.brand-tag{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:3px;margin-left:2px;}
+.mes-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.mes-btn{background:rgba(255,255,255,0.08);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.mes-atual{font-size:14px;font-weight:600;color:white;flex:1;text-align:center;letter-spacing:1px;}
+.tabs{display:flex;border-top:1px solid rgba(255,255,255,0.08);overflow-x:auto;}
+.tab-btn{flex:1;min-width:56px;padding:12px 4px;background:none;border:none;color:rgba(255,255,255,0.45);font-size:10px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab-btn.active{color:white;border-bottom-color:var(--accent);}
+.content{max-width:640px;margin:0 auto;padding:20px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.card{background:white;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;}
+.card h3{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;margin-bottom:14px;}
+.resumo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.resumo-item{background:var(--sand);border-radius:12px;padding:14px;}
+.resumo-label{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:4px;}
+.resumo-val{font-size:20px;font-weight:700;color:var(--text);}
+.resumo-val.pos{color:var(--green);}
+.resumo-val.neg{color:var(--red);}
+.resumo-val.acc{color:var(--accent);}
+.meta-bar-bg{background:var(--sand);border-radius:8px;height:10px;margin:10px 0 6px;}
+.meta-bar-fill{height:10px;border-radius:8px;background:var(--accent);transition:width .5s ease;}
+.meta-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
+.field{margin-bottom:12px;}
+.field label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:500;letter-spacing:.5px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;background:var(--cream);}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.field-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.btn-add{width:100%;padding:12px;background:var(--night);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-reset{background:var(--red-light);color:var(--red);border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-sm{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--muted);cursor:pointer;font-family:inherit;}
+.btn-del{background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:inherit;}
+.item-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--sand);border-radius:10px;margin-bottom:7px;}
+.item-nome{font-size:12px;font-weight:500;color:var(--text);}
+.item-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.edit-box{background:var(--sand);border-radius:10px;padding:12px;margin-bottom:8px;}
+.edit-box input,.edit-box select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px;font-family:'Inter',sans-serif;color:var(--text);}
+.edit-actions{display:flex;gap:6px;margin-top:6px;}
+.edit-save{flex:1;padding:7px;background:var(--night);color:white;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.edit-cancel{flex:1;padding:7px;background:white;color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
+.edit-del{padding:7px 12px;background:var(--red-light);color:var(--red);border:none;border-radius:8px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.check-item:last-child{border-bottom:none;}
+.check-item.done .ci-name{text-decoration:line-through;color:var(--muted);}
+.ci-circle{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .2s;margin-top:1px;cursor:pointer;}
+.check-item.done .ci-circle{background:var(--accent);border-color:var(--accent);color:white;}
+.ci-name{font-size:12px;font-weight:500;color:var(--text);}
+.ci-detail{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;}
+.ci-quando{font-size:10px;color:var(--accent);font-weight:600;margin-top:4px;}
+.premium-card{background:linear-gradient(135deg,var(--night) 0%,#1a1a2e 100%);border-radius:20px;padding:24px;color:white;text-align:center;}
+.pf-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;text-align:left;}
+.pf-check{width:16px;height:16px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px;color:white;}
+.pf-text{font-size:12px;color:rgba(255,255,255,0.8);}
+.premium-btn{display:block;background:var(--accent);color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:13px;font-weight:700;letter-spacing:1px;margin-top:16px;}
+.section-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:2px;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.flowi-footer{text-align:center;padding:16px 0 8px;font-size:10px;color:var(--muted);letter-spacing:2px;}
+.countdown{display:flex;gap:12px;margin-bottom:16px;}
+.cd-box{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;text-align:center;flex:1;}
+.cd-num{font-size:28px;font-weight:700;color:white;line-height:1;}
+.cd-label{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:2px;margin-top:4px;}
+.badge-premium{margin-left:auto;background:rgba(22,163,74,0.25);border:1px solid rgba(22,163,74,0.5);border-radius:20px;padding:3px 10px;font-size:9px;color:#86efac;letter-spacing:2px;font-weight:600;}
+.tipo-particular{background:#DCFCE7;color:#14532d;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;}
+.tipo-convenio{background:#dbeafe;color:#1e3a8a;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;}
+.alerta-vermelho{background:#FFF5F5;border:1px solid #fca5a5;border-radius:12px;padding:14px;margin-bottom:8px;}
+.alerta-amarelo{background:#FFFBEB;border:1px solid #fde68a;border-radius:12px;padding:14px;margin-bottom:8px;}
+.bar-wrap{margin-bottom:16px;}
+.bar-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;}
+.bar-bg{background:var(--sand);border-radius:8px;height:12px;overflow:hidden;}
+.bar-fill{height:12px;border-radius:8px;transition:width .5s;}
+.hist-row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--sand);border-radius:10px;margin-bottom:7px;}
+.dica-card{background:var(--sand);border-radius:12px;padding:14px;margin-bottom:10px;border-left:3px solid #16a34a;}
+.pac-card{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:var(--sand);border-radius:10px;margin-bottom:7px;}
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-wrap input{padding-left:36px;}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);}
+.pac-select-list{position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--border);border-radius:10px;max-height:200px;overflow-y:auto;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,0.1);display:none;}
+.pac-select-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);}
+.pac-select-item:last-child{border-bottom:none;}
+.pac-select-item:hover{background:var(--sand);}
+.inad-row{padding:12px 14px;background:#FFF5F5;border:1px solid #fca5a5;border-radius:10px;margin-bottom:7px;}
+</style>
+</head>
+<body>
+<div style="position:fixed;inset:0;background:rgba(17,24,39,0.97);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;" id="activation-overlay">
+  <div style="background:white;border-radius:20px;padding:28px;max-width:420px;width:100%;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <svg width="36" height="13" viewBox="0 0 36 13"><rect x="0" y="1" width="22" height="2.5" rx="1.25" fill="#111827"/><rect x="0" y="5.5" width="15" height="2.5" rx="1.25" fill="#111827"/><rect x="0" y="10" width="9" height="2.5" rx="1.25" fill="#111827"/><circle cx="15" cy="11.25" r="2.8" fill="#16a34a"/></svg>
+      <span style="font-size:16px;font-weight:700;letter-spacing:2px;color:#111827;">flowi</span>
+    </div>
+    <div style="font-size:10px;color:#9CA3AF;letter-spacing:2px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #F3F4F6;">ATIVANDO: <strong style="color:#374151;">Negócios · Psicólogo Premium</strong></div>
+    <h2 style="font-size:16px;font-weight:700;color:#111827;margin-bottom:5px;">Ative sua licença</h2>
+    <p style="font-size:12px;color:#6B7280;line-height:1.6;margin-bottom:16px;">Informe seu nome e e-mail. Ficam salvos apenas no seu dispositivo.</p>
+    <div style="margin-bottom:12px;"><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">SEU NOME</label><input type="text" id="act-nome" placeholder="Como você se chama?" oninput="verificarAtivacao()" style="width:100%;padding:10px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;color:#111827;"></div>
+    <div style="margin-bottom:14px;"><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">SEU E-MAIL</label><input type="email" id="act-email" placeholder="seu@email.com" oninput="verificarAtivacao()" style="width:100%;padding:10px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;color:#111827;"></div>
+    <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:12px;margin-bottom:14px;max-height:130px;overflow-y:auto;"><p style="font-size:11px;color:#6B7280;line-height:1.8;"><strong style="color:#374151;">Termos de uso</strong><br><br>Esta licença é de uso pessoal e intransferível.<br><br>
+Ao ativar, você concorda que:<br>
+· Este arquivo é de uso exclusivo seu<br>
+· É proibido compartilhar, revender ou distribuir<br>
+· Seus dados ficam salvos apenas neste dispositivo<br>
+· Se trocar de dispositivo, baixe o arquivo offline antes<br>
+· Seu nome e e-mail identificam esta licença<br><br>
+Dúvidas: <a href="https://instagram.com/tryflowi" target="_blank" style="color:#374151;">@tryflowi</a></p></div>
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:18px;"><input type="checkbox" id="act-aceite" onchange="verificarAtivacao()" style="margin-top:2px;width:16px;height:16px;cursor:pointer;flex-shrink:0;"><label for="act-aceite" style="font-size:12px;color:#374151;cursor:pointer;line-height:1.5;">Li e aceito os termos. Esta licença é pessoal e não pode ser compartilhada.</label></div>
+    <button id="act-btn" onclick="ativar()" disabled style="width:100%;padding:13px;background:#111827;color:white;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:not-allowed;font-family:'Inter',sans-serif;opacity:0.4;">Ativar meu acesso</button>
+  </div>
+</div>
+<div id="watermark" style="position:fixed;bottom:12px;right:16px;font-size:10px;color:rgba(0,0,0,0.15);letter-spacing:1px;z-index:50;pointer-events:none;text-align:right;line-height:1.6;display:none;"></div>
+<div class="flowi-menu-overlay" id="flowi-menu">
+  <div class="flowi-menu-bg" onclick="fecharMenu()"></div>
+  <div class="flowi-menu-panel">
+    <div class="flowi-menu-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="28" height="11" viewBox="0 0 28 11"><rect x="0" y="0" width="18" height="2.5" rx="1.25" fill="white" opacity="0.8"/><rect x="0" y="4.5" width="12" height="2.5" rx="1.25" fill="white" opacity="0.8"/><rect x="0" y="9" width="7" height="2.5" rx="1.25" fill="white" opacity="0.8"/><circle cx="12" cy="10.25" r="2.5" fill="#16a34a"/></svg>
+        <span style="font-size:13px;font-weight:700;color:white;letter-spacing:2px;">flowi</span>
+      </div>
+      <button class="flowi-menu-close" onclick="fecharMenu()">✕</button>
+    </div>
+    <a href="https://tryflowi.github.io/" class="flowi-menu-item">🏠 Início</a>
+    <a href="https://tryflowi.github.io/flowi-viagens/" class="flowi-menu-item">✈ Flowi Viagens</a>
+    <a href="https://tryflowi.github.io/flowi-negocios/" class="flowi-menu-item">💼 Flowi Negócios</a>
+    <a href="https://tryflowi.github.io/flowi-festas/" class="flowi-menu-item">🎉 Flowi Festas</a>
+    <a href="https://tryflowi.github.io/flowi-financas/" class="flowi-menu-item">💰 Flowi Finanças</a>
+    <div style="border-top:1px solid rgba(255,255,255,0.08);margin-top:16px;padding-top:14px;text-align:center;">
+      <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:10px;color:rgba(255,255,255,0.35);text-decoration:none;letter-spacing:2px;">@tryflowi</a>
+    </div>
+  </div>
+</div>
+<div style="background:#FEF9C3;border-bottom:1px solid #FDE047;padding:9px 20px;text-align:center;font-size:11px;color:#854d0e;line-height:1.5;">💾 Seus dados ficam salvos <strong>apenas neste dispositivo e navegador</strong>. Se trocar de aparelho, baixe o arquivo offline primeiro.</div>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon" onclick="abrirMenu()"><span></span><span></span><span></span></div>
+      <div class="brand-dot"></div>
+      <div><div class="brand-name">flowi</div><div class="brand-tag">NEGÓCIOS · PSICÓLOGO</div></div>
+      <div class="badge-premium">PREMIUM</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:22px;font-weight:700;color:white" id="hdr-nome">Meu Consultório</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px" id="hdr-sub">Configure na aba Início</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('inicio',this)">Início</button>
+      <button class="tab-btn" onclick="switchTab('sessoes',this)">Sessões</button>
+      <button class="tab-btn" onclick="switchTab('pacientes',this)">Pacientes</button>
+      <button class="tab-btn" onclick="switchTab('analise',this)">Análise</button>
+      <button class="tab-btn" onclick="switchTab('custos',this)">Custos</button>
+      <button class="tab-btn" onclick="switchTab('precificar',this)">Preço</button>
+      <button class="tab-btn" onclick="switchTab('historico',this)">Histórico</button>
+      <button class="tab-btn" onclick="switchTab('dicas',this)">Dicas</button>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ===== INÍCIO ===== -->
+<div class="tab-panel active" id="tab-inicio">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="margin-bottom:0">MEU CONSULTÓRIO</h3>
+      <button class="btn-reset" onclick="resetarTudo()">↺ Resetar</button>
+    </div>
+    <div class="field"><label>Nome do consultório</label><input type="text" id="cfg-nome" placeholder="Ex: Consultório Dra. Ana Lima" oninput="salvar()"></div>
+    <div class="field-row">
+      <div class="field"><label>Sessão particular (R$)</label><input type="number" id="cfg-vpart" placeholder="Ex: 180" oninput="salvar()"></div>
+      <div class="field"><label>Sessão convênio (R$)</label><input type="number" id="cfg-vconv" placeholder="Ex: 90" oninput="salvar()"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Meta mensal (R$)</label><input type="number" id="cfg-meta" placeholder="Ex: 5000" oninput="salvar()"></div>
+      <div class="field"><label>Horas/dia de atendimento</label><input type="number" id="cfg-horas" placeholder="Ex: 6" step="0.5" oninput="salvar()"></div>
+    </div>
+    <div class="field"><label>Política de cancelamento</label>
+      <select id="cfg-cancel" oninput="salvar()">
+        <option value="nao">Não cobro cancelamentos</option>
+        <option value="24h">Cobro se cancelar com menos de 24h</option>
+        <option value="48h">Cobro se cancelar com menos de 48h</option>
+        <option value="sempre">Cobro qualquer cancelamento</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card" style="padding:14px 16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:2px">PERÍODO</div>
+      <input type="month" id="resumo-mes" 
+        style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:var(--sand);cursor:pointer;"
+        oninput="atualizarResumoInicio()">
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 id="resumo-titulo">RESUMO DO MÊS</h3>
+    <div class="resumo-grid">
+      <div class="resumo-item"><div class="resumo-label">Faturado</div><div class="resumo-val pos" id="res-fat">R$ 0</div></div>
+      <div class="resumo-item"><div class="resumo-label">Pendente</div><div class="resumo-val neg" id="res-inad">R$ 0</div></div>
+      <div class="resumo-item"><div class="resumo-label">Custos fixos</div><div class="resumo-val neg" id="res-custos">R$ 0</div></div>
+      <div class="resumo-item"><div class="resumo-label">Resultado líquido</div><div class="resumo-val" id="res-result">R$ 0</div></div>
+    </div>
+    <div style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px"><span>Meta mensal</span><span id="meta-pct">0%</span></div>
+      <div class="meta-bar-bg"><div class="meta-bar-fill" id="meta-bar" style="width:0%"></div></div>
+      <div class="meta-labels"><span id="meta-fat">R$ 0 faturado</span><span id="meta-val">Meta: R$ 0</span></div>
+    </div>
+  </div>
+
+  <div id="card-alertas" style="display:none">
+    <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:2px;margin-bottom:8px">⚠️ ALERTAS</div>
+    <div id="lista-alertas"></div>
+  </div>
+
+  <div class="card" style="text-align:center">
+    <div style="font-size:26px;margin-bottom:8px">📥</div>
+    <h3 style="margin-bottom:6px;font-size:13px;color:var(--text)">SALVAR PARA USO OFFLINE</h3>
+    <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Baixe com seus dados salvos. Se trocar de dispositivo, abra este arquivo para recuperar tudo.</p>
+    <button onclick="baixarOffline()" class="btn-add">⬇ Baixar para usar offline</button>
+  </div>
+</div>
+
+<!-- ===== SESSÕES ===== -->
+<div class="tab-panel" id="tab-sessoes">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;background:white;border:1px solid var(--border);border-radius:12px;padding:12px 16px;">
+    <button class="mes-btn" style="background:var(--sand);color:var(--text);border:1px solid var(--border);" onclick="mudarMes(-1)">‹</button>
+    <div style="flex:1;text-align:center;font-size:14px;font-weight:600;color:var(--text);letter-spacing:1px" id="mes-display-sessoes">--</div>
+    <button class="mes-btn" style="background:var(--sand);color:var(--text);border:1px solid var(--border);" onclick="mudarMes(1)">›</button>
+  </div>
+  <div class="card">
+    <h3>REGISTRAR SESSÃO</h3>
+    <div class="field" style="position:relative">
+      <label>Paciente</label>
+      <div class="search-wrap" style="margin-bottom:0">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="s-pac-busca" placeholder="Buscar por nome ou CPF..." oninput="buscarPacienteParaSessao()" autocomplete="off">
+        <div class="pac-select-list" id="pac-dropdown"></div>
+      </div>
+      <input type="hidden" id="s-pac-id">
+      <input type="hidden" id="s-pac-nome">
+      <div id="pac-selecionado" style="display:none;margin-top:6px;background:#DCFCE7;border-radius:8px;padding:8px 12px;font-size:12px;color:#14532d;display:flex;justify-content:space-between;align-items:center">
+        <span id="pac-selecionado-nome"></span>
+        <button onclick="limparPacienteSelecionado()" style="background:none;border:none;cursor:pointer;font-size:12px;color:#14532d">✕</button>
+      </div>
+    </div>
+    <div class="field-row" style="margin-top:12px">
+      <div class="field"><label>Data</label><input type="date" id="s-data"></div>
+      <div class="field"><label>Tipo</label>
+        <select id="s-tipo">
+          <option value="particular">Particular</option>
+          <option value="convenio">Convênio</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Valor (R$)</label><input type="number" id="s-val" placeholder="Preenche automático"></div>
+      <div class="field"><label>Status</label>
+        <select id="s-status">
+          <option value="pago">Pago</option>
+          <option value="pendente">Pendente</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-add" onclick="adicionarSessao()">Registrar sessão</button>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="margin-bottom:0">SESSÕES DO MÊS</h3>
+      <span style="font-size:11px;color:var(--muted)" id="cnt-sessoes">0 sessões</span>
+    </div>
+    <div id="lista-sessoes"></div>
+  </div>
+</div>
+
+<!-- ===== PACIENTES ===== -->
+<div class="tab-panel" id="tab-pacientes">
+  <div class="card">
+    <h3>CADASTRAR PACIENTE</h3>
+    <div class="field-row">
+      <div class="field"><label>Nome completo</label><input type="text" id="p-nome" placeholder="Ex: Maria Silva"></div>
+      <div class="field"><label>CPF</label><input type="text" id="p-cpf" placeholder="000.000.000-00" oninput="mascaraCPF(this)" maxlength="14"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Telefone</label><input type="text" id="p-tel" placeholder="(00) 00000-0000" oninput="mascaraTel(this)" maxlength="15"></div>
+      <div class="field"><label>E-mail</label><input type="email" id="p-email" placeholder="email@exemplo.com"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Tipo padrão</label>
+        <select id="p-tipo"><option value="particular">Particular</option><option value="convenio">Convênio</option></select>
+      </div>
+      <div class="field"><label>Valor padrão (R$)</label><input type="number" id="p-val" placeholder="Deixe vazio para usar o geral"></div>
+    </div>
+    <button class="btn-add" onclick="adicionarPaciente()">Cadastrar paciente</button>
+  </div>
+
+  <div class="card">
+    <h3>LISTA DE PACIENTES</h3>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="p-busca" placeholder="Buscar por nome ou CPF..." oninput="renderPacientes()">
+    </div>
+    <div id="lista-pacientes"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Nenhum paciente cadastrado</div></div>
+  </div>
+</div>
+
+<!-- ===== ANÁLISE ===== -->
+<div class="tab-panel" id="tab-analise">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;background:white;border:1px solid var(--border);border-radius:12px;padding:12px 16px;">
+    <button class="mes-btn" style="background:var(--sand);border:none;color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;" onclick="mudarMes(-1)">‹</button>
+    <div style="flex:1;text-align:center;font-size:14px;font-weight:600;color:var(--text);letter-spacing:1px" id="mes-display-a">--</div>
+    <button class="mes-btn" style="background:var(--sand);border:none;color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;" onclick="mudarMes(1)">›</button>
+  </div>
+  <div class="card">
+    <h3>PARTICULAR vs. CONVÊNIO — ESTE MÊS</h3>
+    <div id="analise-dist"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Registre sessões dos dois tipos para ver a análise.</div></div>
+  </div>
+  <div class="card">
+    <h3>RENTABILIDADE POR SESSÃO</h3>
+    <div id="analise-rent"><div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Configure os valores na aba Início.</div></div>
+  </div>
+  <div class="card">
+    <h3>SIMULADOR DE AGENDA</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:14px">Com 20 sessões por mês, quanto você faturaria com cada combinação?</p>
+    <div id="analise-simulador"><div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Configure os valores na aba Início.</div></div>
+  </div>
+  <div class="card">
+    <h3>ALERTA DE DEPENDÊNCIA DE CONVÊNIO</h3>
+    <div id="analise-alerta"><div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Registre sessões para ver o alerta.</div></div>
+  </div>
+</div>
+
+<!-- ===== CUSTOS ===== -->
+<div class="tab-panel" id="tab-custos">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;background:white;border:1px solid var(--border);border-radius:12px;padding:12px 16px;">
+    <button style="background:var(--sand);border:none;color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;" onclick="mudarMes(-1)">‹</button>
+    <div style="flex:1;text-align:center;font-size:14px;font-weight:600;color:var(--text);letter-spacing:1px" id="mes-display-custos">--</div>
+    <button style="background:var(--sand);border:none;color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;" onclick="mudarMes(1)">›</button>
+  </div>
+  <div class="card">
+    <h3>ADICIONAR CUSTO FIXO</h3>
+    <div class="field"><label>Descrição</label><input type="text" id="c-desc" placeholder="Ex: Aluguel, CRP, Supervisão..."></div>
+    <div class="field-row">
+      <div class="field"><label>Valor (R$)</label><input type="number" id="c-val" placeholder="0"></div>
+      <div class="field"><label>Frequência</label>
+        <select id="c-freq">
+          <option value="mensal">Mensal</option>
+          <option value="anual12">Anual ÷ 12</option>
+          <option value="anual">Anual</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Dia do vencimento (opcional)</label><input type="number" id="c-dia" placeholder="Ex: 5" min="1" max="31"></div>
+      <div class="field"><label>Mês de início</label><input type="month" id="c-inicio"></div>
+    </div>
+    <button class="btn-add" onclick="adicionarCusto()">Adicionar custo</button>
+  </div>
+  <div class="card">
+    <h3>CUSTOS ATIVOS NESTE MÊS</h3>
+    <div id="lista-custos"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Nenhum custo ativo neste mês</div></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-precificar">
+  <div class="card">
+    <h3>CALCULADORA DE PRECIFICAÇÃO</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6">Quanto você precisa cobrar por sessão para cobrir todos os custos e ter o lucro que deseja?</p>
+    <div class="field"><label>Custos fixos mensais (R$)</label><input type="number" id="prec-custos" placeholder="Ex: 1500" oninput="calcPreco()"></div>
+    <div class="field-row">
+      <div class="field"><label>Sessões por mês</label><input type="number" id="prec-sessoes" placeholder="Ex: 30" oninput="calcPreco()"></div>
+      <div class="field"><label>Lucro desejado (R$)</label><input type="number" id="prec-lucro" placeholder="Ex: 3000" oninput="calcPreco()"></div>
+    </div>
+    <div class="field"><label>Regime tributário</label>
+      <select id="prec-imposto" oninput="calcPreco()">
+        <option value="0">Autônomo — Carnê Leão</option>
+        <option value="6">MEI — aprox. 6%</option>
+        <option value="10">Simples Nacional — aprox. 10%</option>
+        <option value="15">Lucro Presumido — aprox. 15%</option>
+      </select>
+    </div>
+    <div id="prec-resultado" style="display:none;margin-top:16px;background:#DCFCE7;border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:#166534;font-weight:700;letter-spacing:1px;margin-bottom:10px">RESULTADO</div>
+      <div id="prec-texto" style="font-size:13px;color:#14532d;line-height:2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HISTÓRICO ===== -->
+<div class="tab-panel" id="tab-historico">
+  <div class="card">
+    <h3>HISTÓRICO MENSAL</h3>
+    <div id="lista-historico"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Registre sessões ao longo dos meses para construir seu histórico.</div></div>
+  </div>
+  <div class="card">
+    <h3 style="color:var(--red)">🔴 INADIMPLENTES — TODOS OS MESES</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6">Sessões com status pendente há mais de 30 dias.</p>
+    <div id="lista-inadimplentes"><div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhum inadimplente identificado.</div></div>
+  </div>
+</div>
+
+<!-- ===== DICAS ===== -->
+<div class="tab-panel" id="tab-dicas">
+  <div class="card">
+    <h3>GESTÃO DO CONSULTÓRIO</h3>
+    <div class="dica-card"><div style="font-size:12px;font-weight:600;margin-bottom:4px">Política de cancelamento: como comunicar</div><div style="font-size:11px;color:var(--muted);line-height:1.7">Inclua no contrato terapêutico desde a primeira sessão. Sessões canceladas com menos de 24h serão cobradas integralmente. Isso é profissionalismo, não rigidez.</div></div>
+    <div class="dica-card"><div style="font-size:12px;font-weight:600;margin-bottom:4px">Separe conta PJ da pessoal</div><div style="font-size:11px;color:var(--muted);line-height:1.7">Abra uma conta separada para o consultório. Pague seus custos por ela e transfira sua remuneração mensalmente como pró-labore.</div></div>
+    <div class="dica-card"><div style="font-size:12px;font-weight:600;margin-bottom:4px">Reajuste anual é obrigação, não favor</div><div style="font-size:11px;color:var(--muted);line-height:1.7">Corrija sua sessão pelo IPCA todo ano. Um paciente pagando o mesmo valor há 3 anos está pagando menos em termos reais.</div></div>
+    <div class="dica-card"><div style="font-size:12px;font-weight:600;margin-bottom:4px">Supervisão é custo fixo, não luxo</div><div style="font-size:11px;color:var(--muted);line-height:1.7">Inclua supervisão como custo fixo mensal. É essencial para qualidade do trabalho e proteção ética.</div></div>
+    <div class="dica-card"><div style="font-size:12px;font-weight:600;margin-bottom:4px">Carnê-leão: organize ao longo do ano</div><div style="font-size:11px;color:var(--muted);line-height:1.7">Se autônomo, o carnê-leão precisa ser preenchido todo mês. Deixar para o fim do ano gera multa.</div></div>
+  </div>
+</div>
+
+</div>
+<div style="max-width:640px;margin:0 auto;padding:0 20px 20px;text-align:center;font-size:11px;color:var(--muted);">Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none;">@tryflowi</a> &nbsp;·&nbsp; <a href="https://tryflowi.github.io/#votar" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none;">Sugerir melhoria</a></div>
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})" id="back-top" title="Voltar ao topo" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(17,24,39,0.85);border:1px solid rgba(255,255,255,0.15);color:white;font-size:16px;cursor:pointer;z-index:99;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);">↑</button>
+
+<script>
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+let mesAtual=new Date().getMonth(), anoAtual=new Date().getFullYear();
+let mesResumo=new Date().getMonth(), anoResumo=new Date().getFullYear();
+let estado={config:{},sessoes:[],custos:[],pacientes:[]};
+let editSessaoId=null,editCustoId=null,editPacId=null;
+let pacSelecionado=null;
+
+function abrirMenu(){document.getElementById('flowi-menu').classList.add('open');}
+function fecharMenu(){document.getElementById('flowi-menu').classList.remove('open');}
+function get(id){return(document.getElementById(id)||{}).value||'';}
+function set(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function baixarOffline(){
+  var h=document.documentElement.outerHTML,
+      b=new Blob([h],{type:'text/html'}),
+      u=URL.createObjectURL(b),
+      a=document.createElement('a');
+  a.href=u;a.download='flowi-psicologo-premium.html';a.click();URL.revokeObjectURL(u);
+}
+function confirmarExclusao(msg,fn){if(confirm(msg||'Excluir este item?'))fn();}
+window.addEventListener('scroll',function(){var b=document.getElementById('back-top');if(b)b.style.display=window.scrollY>300?'flex':'none';});
+window.addEventListener('beforeunload',function(e){
+  var k=Object.keys(localStorage).some(function(k){return k.startsWith('flowi-');});
+  if(k){e.preventDefault();e.returnValue='Seus dados ficam salvos apenas neste navegador. Baixe o arquivo offline antes de trocar de dispositivo.';return e.returnValue;}
+});
+function verificarAtivacao(){
+  var n=(document.getElementById('act-nome')||{}).value,
+      e=(document.getElementById('act-email')||{}).value,
+      a=(document.getElementById('act-aceite')||{}).checked,
+      b=document.getElementById('act-btn'),
+      ok=!!(n&&n.trim()&&e&&/^[^@]+@[^@]+\.[^@]+$/.test(e)&&a);
+  if(b){b.disabled=!ok;b.style.opacity=ok?'1':'0.4';b.style.cursor=ok?'pointer':'not-allowed';}
+}
+function ativar(){
+  var n=(document.getElementById('act-nome')||{}).value.trim(),
+      e=(document.getElementById('act-email')||{}).value.trim();
+  if(!n||!e)return;
+  var l={nome:n,email:e,data:new Date().toLocaleDateString('pt-BR'),ativado:true};
+  try{localStorage.setItem('flowi-psicologo-premium-licenca',JSON.stringify(l));}catch(ex){}
+  aplicarLicenca(l);
+  var o=document.getElementById('activation-overlay');if(o)o.style.display='none';
+}
+function aplicarLicenca(l){
+  var w=document.getElementById('watermark');
+  if(w){w.style.display='block';w.innerHTML='Licença: '+l.nome+' · '+l.email+'<br>Flowi Premium · Uso pessoal';}
+}
+function checarLicenca(){
+  try{
+    var s=localStorage.getItem('flowi-psicologo-premium-licenca');
+    if(s){var l=JSON.parse(s);if(l&&l.ativado){var o=document.getElementById('activation-overlay');if(o)o.style.display='none';aplicarLicenca(l);return;}}
+  }catch(ex){}
+  var o=document.getElementById('activation-overlay');if(o)o.style.display='flex';
+}
+
+function atualizarResumoInicio(){
+  var el=document.getElementById('resumo-mes');
+  if(el&&el.value){
+    var p=el.value.split('-');
+    anoResumo=parseInt(p[0]);mesResumo=parseInt(p[1])-1;
+  } else {
+    anoResumo=new Date().getFullYear();mesResumo=new Date().getMonth();
+  }
+  var titulo=document.getElementById('resumo-titulo');
+  if(titulo)titulo.textContent='RESUMO DE '+MESES[mesResumo].toUpperCase()+' '+anoResumo;
+  calcResumo();
+}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  atualizarMes();
+  if(id==='analise')renderAnalise();
+  if(id==='custos')renderCustos();
+  if(id==='historico'){renderHistorico();renderInadimplentes();}
+  if(id==='pacientes')renderPacientes();
+}
+
+function carregar(){
+  try{var s=localStorage.getItem('flowi-psicologo-free');if(s)estado=JSON.parse(s);}catch(e){}
+  if(!estado.pacientes)estado.pacientes=[];
+  var c=estado.config||{};
+  var mapa={'cfg-nome':'nome','cfg-vpart':'vpart','cfg-vconv':'vconv','cfg-meta':'meta','cfg-horas':'horas','cfg-cancel':'cancel'};
+  Object.entries(mapa).forEach(([el,key])=>{var e=document.getElementById(el);if(e&&c[key])e.value=c[key];});
+  atualizarHeader();atualizarMes();renderSessoes();renderCustos();calcResumo();gerarAlertas();
+  var sd=document.getElementById('s-data');if(sd)sd.valueAsDate=new Date();
+  checarLicenca();
+  // Inicializar seletor de mês do resumo com mês atual
+  var rm=document.getElementById('resumo-mes');
+  if(rm){
+    var hoje=new Date();
+    rm.value=hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+  }
+  var titulo=document.getElementById('resumo-titulo');
+  if(titulo)titulo.textContent='RESUMO DE '+MESES[mesResumo].toUpperCase()+' '+anoResumo;
+}
+
+function salvar(){
+  estado.config={nome:get('cfg-nome'),vpart:get('cfg-vpart'),vconv:get('cfg-vconv'),meta:get('cfg-meta'),horas:get('cfg-horas'),cancel:get('cfg-cancel')};
+  salvarEstado();atualizarHeader();calcResumo();gerarAlertas();
+}
+function salvarEstado(){try{localStorage.setItem('flowi-psicologo-free',JSON.stringify(estado));}catch(e){}}
+function atualizarHeader(){
+  var c=estado.config||{};
+  set('hdr-nome',c.nome||'Meu Consultório');
+  var sub=[];
+  if(c.vpart)sub.push('Part: R$ '+parseFloat(c.vpart).toLocaleString('pt-BR',{minimumFractionDigits:2}));
+  if(c.vconv)sub.push('Conv: R$ '+parseFloat(c.vconv).toLocaleString('pt-BR',{minimumFractionDigits:2}));
+  set('hdr-sub',sub.join(' · ')||'Configure na aba Início');
+}
+function atualizarMes(){
+  var txt=MESES[mesAtual]+' '+anoAtual;
+  ['mes-display-sessoes','mes-display-custos','mes-display-a'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.textContent=txt;
+  });
+}
+function mudarMes(d){
+  mesAtual+=d;if(mesAtual>11){mesAtual=0;anoAtual++;}if(mesAtual<0){mesAtual=11;anoAtual--;}
+  atualizarMes();renderSessoes();renderCustos();calcResumo();gerarAlertas();
+  // Atualizar análise se estiver visível
+  var analise=document.getElementById('tab-analise');
+  if(analise&&analise.classList.contains('active'))renderAnalise();
+}
+function isMes(data){var d=new Date(data+'T00:00:00');return d.getMonth()===mesAtual&&d.getFullYear()===anoAtual;}
+function isMesResumo(data){var d=new Date(data+'T00:00:00');return d.getMonth()===mesResumo&&d.getFullYear()===anoResumo;}
+function fmt(v){return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});}
+
+// ===== MÁSCARAS =====
+function mascaraCPF(el){
+  var v=el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>9)v=v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
+  else if(v.length>6)v=v.replace(/(\d{3})(\d{3})(\d{1,3})/,'$1.$2.$3');
+  else if(v.length>3)v=v.replace(/(\d{3})(\d{1,3})/,'$1.$2');
+  el.value=v;
+}
+function mascaraTel(el){
+  var v=el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>10)v=v.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+  else if(v.length>6)v=v.replace(/(\d{2})(\d{4,5})(\d{0,4})/,'($1) $2-$3');
+  else if(v.length>2)v=v.replace(/(\d{2})(\d*)/,'($1) $2');
+  el.value=v;
+}
+
+// ===== PACIENTES =====
+function adicionarPaciente(){
+  var nome=get('p-nome').trim(),cpf=get('p-cpf').trim(),tel=get('p-tel').trim(),email=get('p-email').trim(),tipo=get('p-tipo'),val=get('p-val');
+  if(!nome)return alert('Preencha o nome do paciente.');
+  if(!estado.pacientes)estado.pacientes=[];
+  estado.pacientes.push({id:Date.now(),nome,cpf,tel,email,tipo,val:val?parseFloat(val):null});
+  salvarEstado();renderPacientes();
+  ['p-nome','p-cpf','p-tel','p-email','p-val'].forEach(id=>{var el=document.getElementById(id);if(el)el.value='';});
+}
+
+function renderPacientes(){
+  var el=document.getElementById('lista-pacientes');if(!el)return;
+  var buscaRaw=(document.getElementById('p-busca')||{}).value||'';
+  var buscaTxt=buscaRaw.toLowerCase().trim();
+  var buscaCPF=buscaTxt.replace(/\D/g,'');
+  var items=(estado.pacientes||[]).filter(p=>{
+    if(!buscaTxt)return true;
+    var nomeOk=p.nome.toLowerCase().includes(buscaTxt);
+    var cpfOk=buscaCPF&&p.cpf&&p.cpf.replace(/\D/g,'').includes(buscaCPF);
+    return nomeOk||cpfOk;
+  });
+  if(!items.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">'+(busca?'Nenhum resultado encontrado.':'Nenhum paciente cadastrado.')+'</div>';return;}
+  el.innerHTML=items.map(p=>{
+    if(editPacId===p.id)return `<div class="edit-box">
+      <input type="text" id="ep-nome-${p.id}" value="${p.nome.replace(/"/g,'&quot;')}">
+      <div class="field-row" style="margin-bottom:6px">
+        <input type="text" id="ep-cpf-${p.id}" value="${p.cpf||''}" placeholder="CPF" oninput="mascaraCPF(this)" maxlength="14">
+        <input type="text" id="ep-tel-${p.id}" value="${p.tel||''}" placeholder="Telefone" oninput="mascaraTel(this)" maxlength="15">
+      </div>
+      <input type="email" id="ep-email-${p.id}" value="${p.email||''}" placeholder="E-mail" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px;font-family:'Inter',sans-serif;">
+      <div class="field-row" style="margin-bottom:6px">
+        <select id="ep-tipo-${p.id}" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;">
+          <option value="particular" ${p.tipo==='particular'?'selected':''}>Particular</option>
+          <option value="convenio" ${p.tipo==='convenio'?'selected':''}>Convênio</option>
+        </select>
+        <input type="number" id="ep-val-${p.id}" value="${p.val||''}" placeholder="Valor padrão R$" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;">
+      </div>
+      <div class="edit-actions">
+        <button class="edit-save" onclick="salvarEditPac(${p.id})">Salvar</button>
+        <button class="edit-cancel" onclick="editPacId=null;renderPacientes()">Cancelar</button>
+        <button class="edit-del" onclick="confirmarExclusao('Excluir este paciente?',()=>excluirPac(${p.id}))">Excluir</button>
+      </div></div>`;
+    var tipoEl=p.tipo==='convenio'?'<span class="tipo-convenio">Convênio</span>':'<span class="tipo-particular">Particular</span>';
+    return `<div class="pac-card">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <div class="item-nome">${p.nome}</div>
+          ${tipoEl}
+        </div>
+        ${p.cpf?`<div class="item-sub">CPF: ${p.cpf}</div>`:''}
+        ${p.tel?`<div class="item-sub">Tel: ${p.tel}</div>`:''}
+        ${p.email?`<div class="item-sub">${p.email}</div>`:''}
+        ${p.val?`<div class="item-sub">Valor padrão: ${fmt(p.val)}</div>`:''}
+      </div>
+      <button class="btn-sm" onclick="editPacId=${p.id};renderPacientes()">✏</button>
+    </div>`;
+  }).join('');
+}
+function salvarEditPac(id){
+  var p=(estado.pacientes||[]).find(x=>x.id===id);
+  if(p){
+    var n=document.getElementById('ep-nome-'+id);if(n)p.nome=n.value.trim()||p.nome;
+    var c=document.getElementById('ep-cpf-'+id);if(c)p.cpf=c.value.trim();
+    var t=document.getElementById('ep-tel-'+id);if(t)p.tel=t.value.trim();
+    var e=document.getElementById('ep-email-'+id);if(e)p.email=e.value.trim();
+    var tp=document.getElementById('ep-tipo-'+id);if(tp)p.tipo=tp.value;
+    var v=document.getElementById('ep-val-'+id);if(v)p.val=v.value?parseFloat(v.value):null;
+  }
+  editPacId=null;salvarEstado();renderPacientes();
+}
+function excluirPac(id){estado.pacientes=(estado.pacientes||[]).filter(p=>p.id!==id);editPacId=null;salvarEstado();renderPacientes();}
+
+// ===== BUSCA PACIENTE PARA SESSÃO =====
+function buscarPacienteParaSessao(){
+  var buscaTxt=document.getElementById('s-pac-busca').value.toLowerCase().trim();
+  var buscaCPF=buscaTxt.replace(/\D/g,'');
+  var dropdown=document.getElementById('pac-dropdown');if(!dropdown)return;
+  if(!buscaTxt){dropdown.style.display='none';return;}
+  var pacs=(estado.pacientes||[]).filter(p=>{
+    var nomeOk=p.nome.toLowerCase().includes(buscaTxt);
+    var cpfOk=buscaCPF&&p.cpf&&p.cpf.replace(/\D/g,'').includes(buscaCPF);
+    return nomeOk||cpfOk;
+  }).slice(0,8);
+  if(!pacs.length||!buscaTxt){dropdown.style.display='none';return;}
+  dropdown.style.display='block';
+  dropdown.innerHTML=pacs.map(p=>`<div class="pac-select-item" onclick="selecionarPaciente(${p.id})">
+    <strong>${p.nome}</strong>${p.cpf?' · '+p.cpf:''}
+    <span style="font-size:10px;color:var(--muted);margin-left:6px">${p.tipo==='convenio'?'Convênio':'Particular'}</span>
+  </div>`).join('');
+}
+
+function selecionarPaciente(id){
+  var p=(estado.pacientes||[]).find(x=>x.id===id);if(!p)return;
+  pacSelecionado=p;
+  var el=document.getElementById('pac-selecionado');
+  var nome=document.getElementById('pac-selecionado-nome');
+  if(el)el.style.display='flex';
+  if(nome)nome.textContent=p.nome+(p.cpf?' · '+p.cpf:'');
+  var busca=document.getElementById('s-pac-busca');if(busca)busca.value='';
+  var dropdown=document.getElementById('pac-dropdown');if(dropdown)dropdown.style.display='none';
+  // Preencher tipo e valor automaticamente
+  var tipo=document.getElementById('s-tipo');if(tipo)tipo.value=p.tipo||'particular';
+  var val=document.getElementById('s-val');
+  if(val&&p.val)val.value=p.val;
+  else if(val){
+    var c=estado.config||{};
+    val.value=p.tipo==='convenio'?(c.vconv||''):(c.vpart||'');
+  }
+}
+function limparPacienteSelecionado(){
+  pacSelecionado=null;
+  var el=document.getElementById('pac-selecionado');if(el)el.style.display='none';
+  var busca=document.getElementById('s-pac-busca');if(busca)busca.value='';
+}
+
+// ===== SESSÕES =====
+function calcResumo(){
+  var ses=(estado.sessoes||[]).filter(s=>isMesResumo(s.data));
+  var fat=ses.filter(s=>s.status==='pago').reduce((a,s)=>a+parseFloat(s.val||0),0);
+  var inad=ses.filter(s=>s.status==='pendente').reduce((a,s)=>a+parseFloat(s.val||0),0);
+  var custos=(estado.custos||[]).filter(function(c){return custoAtivoNoMes(c,anoResumo,mesResumo);}).reduce(function(a,c){return a+valorCustoNoMes(c,anoResumo,mesResumo);},0);
+  var result=fat-custos;
+  var meta=parseFloat((estado.config||{}).meta||0);
+  var pct=meta>0?Math.min(100,Math.round(fat/meta*100)):0;
+  set('res-fat',fmt(fat));set('res-inad',fmt(inad));set('res-custos',fmt(custos));
+  var re=document.getElementById('res-result');
+  if(re){re.textContent=fmt(result);re.className='resumo-val '+(result>=0?'pos':'neg');}
+  set('meta-pct',pct+'%');
+  var mb=document.getElementById('meta-bar');if(mb)mb.style.width=pct+'%';
+  set('meta-fat',fmt(fat)+' faturado');set('meta-val','Meta: '+fmt(meta));
+  set('cnt-sessoes',ses.filter(s=>s.status!=='cancelado').length+' sessão(ões)');
+}
+
+function gerarAlertas(){
+  var ses=estado.sessoes||[];
+  var hoje=new Date();
+  var alertas=[];
+
+  // Inadimplentes >30 dias
+  var inad30=ses.filter(s=>{
+    if(s.status!=='pendente')return false;
+    var diff=(hoje-new Date(s.data+'T00:00:00'))/(1000*60*60*24);
+    return diff>30;
+  });
+  if(inad30.length){
+    var porPac={};
+    inad30.forEach(s=>{porPac[s.pac]=(porPac[s.pac]||0)+parseFloat(s.val||0);});
+    Object.entries(porPac).forEach(([pac,val])=>{
+      alertas.push({tipo:'vermelho',texto:'<strong>'+pac+'</strong> tem sessão(ões) pendente(s) há mais de 30 dias. Total: '+fmt(val)+'. Veja o histórico de inadimplentes.'});
+    });
+  }
+
+  // Dependência de convênio no mês atual
+  var sesMes=ses.filter(s=>isMes(s.data));
+  var fat=sesMes.filter(s=>s.status==='pago').reduce((a,s)=>a+parseFloat(s.val||0),0);
+  var fatConv=sesMes.filter(s=>s.status==='pago'&&s.tipo==='convenio').reduce((a,s)=>a+parseFloat(s.val||0),0);
+  if(fat>0&&fatConv/fat>0.4){
+    alertas.push({tipo:'amarelo',texto:Math.round(fatConv/fat*100)+'% da receita deste mês vem de convênio. Veja a aba Análise.'});
+  }
+
+  // Resultado negativo
+  var custos=(estado.custos||[]).filter(function(c){return custoAtivoNoMes(c,anoAtual,mesAtual);}).reduce(function(a,c){return a+valorCustoNoMes(c,anoAtual,mesAtual);},0);
+  if(custos>0&&fat<custos&&fat>0){
+    alertas.push({tipo:'vermelho',texto:'Custos fixos ('+fmt(custos)+') acima do faturamento ('+fmt(fat)+') este mês.'});
+  }
+
+  // Alertas de custos com vencimento nos próximos 7 dias
+  var hojeReal=new Date();
+  (estado.custos||[]).forEach(function(custo){
+    if(!custo.diaVenc)return;
+    if(!custoAtivoNoMes(custo,hojeReal.getFullYear(),hojeReal.getMonth()))return;
+    var dtRef=new Date(hojeReal.getFullYear(),hojeReal.getMonth(),custo.diaVenc);
+    var diff=Math.round((dtRef-hojeReal)/(1000*60*60*24));
+    if(diff>=0&&diff<=7){
+      alertas.push({tipo:'amarelo',texto:'Custo <strong>'+custo.desc+'</strong> vence em '+diff+' dia(s) (dia '+custo.diaVenc+')'});
+    }
+  });
+
+  var card=document.getElementById('card-alertas');
+  var lista=document.getElementById('lista-alertas');
+  if(!card||!lista)return;
+  if(!alertas.length){card.style.display='none';return;}
+  card.style.display='block';
+  lista.innerHTML=alertas.map(a=>`<div class="alerta-${a.tipo}"><div style="font-size:12px;line-height:1.6">${a.tipo==='vermelho'?'🔴':'🟡'} ${a.texto}</div></div>`).join('');
+}
+
+function adicionarSessao(){
+  var data=get('s-data'),tipo=get('s-tipo'),status=get('s-status');
+  var pacNome=pacSelecionado?pacSelecionado.nome:get('s-pac-busca').trim();
+  if(!pacNome||!data)return alert('Selecione ou digite o paciente e preencha a data.');
+  var c=estado.config||{};
+  var valDefault=pacSelecionado&&pacSelecionado.val?pacSelecionado.val:(tipo==='convenio'?(parseFloat(c.vconv)||0):(parseFloat(c.vpart)||0));
+  var val=parseFloat(get('s-val'))||valDefault;
+  if(!estado.sessoes)estado.sessoes=[];
+  estado.sessoes.push({id:Date.now(),pac:pacNome,pacId:pacSelecionado?pacSelecionado.id:null,val,data,status,tipo});
+  salvarEstado();renderSessoes();calcResumo();gerarAlertas();
+  limparPacienteSelecionado();
+  var el=document.getElementById('s-val');if(el)el.value='';
+}
+
+function renderSessoes(){
+  var el=document.getElementById('lista-sessoes');if(!el)return;
+  var items=(estado.sessoes||[]).filter(s=>isMes(s.data)).sort((a,b)=>new Date(b.data)-new Date(a.data));
+  if(!items.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Nenhuma sessão neste mês</div>';return;}
+  var corStatus={pago:'var(--green)',pendente:'var(--red)',cancelado:'var(--muted)'};
+  var lblStatus={pago:'Pago',pendente:'Pendente',cancelado:'Cancelado'};
+  el.innerHTML=items.map(s=>{
+    if(editSessaoId===s.id)return `<div class="edit-box">
+      <input type="text" id="es-pac-${s.id}" value="${s.pac}">
+      <div class="field-row" style="margin-bottom:6px">
+        <input type="date" id="es-data-${s.id}" value="${s.data}">
+        <input type="number" id="es-val-${s.id}" value="${s.val}">
+      </div>
+      <select id="es-status-${s.id}" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px;font-family:'Inter',sans-serif;">
+        <option value="pago" ${s.status==='pago'?'selected':''}>Pago</option>
+        <option value="pendente" ${s.status==='pendente'?'selected':''}>Pendente</option>
+        <option value="cancelado" ${s.status==='cancelado'?'selected':''}>Cancelado</option>
+      </select>
+      <div class="edit-actions">
+        <button class="edit-save" onclick="salvarEditSessao(${s.id})">Salvar</button>
+        <button class="edit-cancel" onclick="editSessaoId=null;renderSessoes()">Cancelar</button>
+        <button class="edit-del" onclick="confirmarExclusao('Excluir esta sessão?',()=>excluirSessao(${s.id}))">Excluir</button>
+      </div></div>`;
+    var tipoEl=s.tipo==='convenio'?'<span class="tipo-convenio">Convênio</span>':'<span class="tipo-particular">Particular</span>';
+    return `<div class="item-row">
+      <div><div class="item-nome">${s.pac} ${tipoEl}</div><div class="item-sub">${new Date(s.data+'T00:00:00').toLocaleDateString('pt-BR')}</div></div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:10px;background:${corStatus[s.status]}18;color:${corStatus[s.status]};padding:2px 8px;border-radius:8px;font-weight:600">${lblStatus[s.status]}</span>
+        <div style="font-size:13px;font-weight:700;color:${s.status==='cancelado'?'var(--muted)':'var(--green)'}">${s.status!=='cancelado'?fmt(parseFloat(s.val||0)):'—'}</div>
+        <button class="btn-sm" onclick="editSessaoId=${s.id};renderSessoes()">✏</button>
+      </div></div>`;
+  }).join('');
+}
+function salvarEditSessao(id){
+  var s=(estado.sessoes||[]).find(x=>x.id===id);
+  if(s){
+    var p=document.getElementById('es-pac-'+id);if(p)s.pac=p.value.trim()||s.pac;
+    var d=document.getElementById('es-data-'+id);if(d)s.data=d.value||s.data;
+    var v=document.getElementById('es-val-'+id);if(v)s.val=parseFloat(v.value)||s.val;
+    var st=document.getElementById('es-status-'+id);if(st)s.status=st.value;
+  }
+  editSessaoId=null;salvarEstado();renderSessoes();calcResumo();gerarAlertas();
+}
+function excluirSessao(id){estado.sessoes=(estado.sessoes||[]).filter(s=>s.id!==id);editSessaoId=null;salvarEstado();renderSessoes();calcResumo();gerarAlertas();}
+
+// ===== CUSTOS =====
+// Estrutura do custo:
+// { id, desc, freq, diaVenc, inicio:{ano,mes}, fim:{ano,mes}|null,
+//   historico:[{ano,mes,val}] }
+// Ao editar valor → pergunta a partir de qual mês
+
+function mesAtualStr(){return anoAtual+'-'+String(mesAtual).padStart(2,'0');}
+function mesStr(ano,mes){return ano+'-'+String(mes).padStart(2,'0');}
+
+function custoAtivoNoMes(custo, ano, mes){
+  // Verifica se custo está ativo no mês/ano dado
+  var ini=custo.inicio;
+  if(!ini)return true; // legado sem inicio
+  var mesRef=mesStr(ano,mes);
+  var mesIni=mesStr(ini.ano,ini.mes);
+  if(mesRef<mesIni)return false; // antes do início
+
+  if(custo.fim){
+    var mesFim=mesStr(custo.fim.ano,custo.fim.mes);
+    if(mesRef>mesFim)return false; // após encerramento
+  }
+
+  // Verificar frequência
+  if(custo.freq==='anual'){
+    // Só aparece no mesmo mês do início
+    return mes===ini.mes;
+  }
+  if(custo.freq==='anual12'){
+    // Aparece por 12 meses a partir do início
+    var totalMeses=(ano-ini.ano)*12+(mes-ini.mes);
+    return totalMeses>=0&&totalMeses<12;
+  }
+  return true; // mensal
+}
+
+function valorCustoNoMes(custo, ano, mes){
+  // Pega o valor vigente no mês/ano dado
+  if(!custo.historico||!custo.historico.length)return custo.val||0;
+  var mesRef=mesStr(ano,mes);
+  // Pega o último valor cujo início <= mesRef
+  var val=custo.historico[0].val;
+  custo.historico.forEach(function(h){
+    if(mesStr(h.ano,h.mes)<=mesRef)val=h.val;
+  });
+  return val;
+}
+
+function toggleMesEspecifico(id){
+  var el=document.getElementById('ec-partir-'+id);
+  var wrap=document.getElementById('ec-mes-wrap-'+id);
+  if(el&&wrap)wrap.style.display=el.value==='especifico'?'block':'none';
+}
+function adicionarCusto(){
+  var desc=get('c-desc').trim(),val=get('c-val'),freq=get('c-freq');
+  var dia=parseInt(get('c-dia'))||null;
+  var inicioStr=get('c-inicio');
+  if(!desc||!val)return alert('Preencha descrição e valor.');
+  var v=freq==='anual12'?Math.round(parseFloat(val)/12*100)/100:parseFloat(val);
+  var ini={ano:anoAtual,mes:mesAtual};
+  if(inicioStr){var p=inicioStr.split('-');ini={ano:parseInt(p[0]),mes:parseInt(p[1])-1};}
+  if(!estado.custos)estado.custos=[];
+  var novo={id:Date.now(),desc,freq,diaVenc:dia,inicio:ini,fim:null,
+    historico:[{ano:ini.ano,mes:ini.mes,val:v}]};
+  estado.custos.push(novo);
+  salvarEstado();renderCustos();calcResumo();gerarAlertas();
+  ['c-desc','c-val','c-dia','c-inicio'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+}
+
+function renderCustos(){
+  var el=document.getElementById('lista-custos');if(!el)return;
+  var ativos=( estado.custos||[]).filter(function(c){return custoAtivoNoMes(c,anoAtual,mesAtual);});
+  if(!ativos.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Nenhum custo ativo neste mês</div>';return;}
+  var hoje=new Date();
+  el.innerHTML=ativos.map(function(custo){
+    if(editCustoId===custo.id){
+      return '<div class="edit-box">'+
+        '<input type="text" id="ec-desc-'+custo.id+'" value="'+custo.desc.replace(/"/g,'&quot;')+'">'+
+        '<div class="field-row" style="margin-bottom:6px">'+
+          '<input type="number" id="ec-val-'+custo.id+'" value="'+valorCustoNoMes(custo,anoAtual,mesAtual)+'" placeholder="Novo valor R$">'+
+          '<select id="ec-partir-'+custo.id+'" onchange="toggleMesEspecifico('+custo.id+')" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:Inter,sans-serif;">'+
+            '<option value="agora">A partir deste mês</option>'+
+            '<option value="especifico">A partir de mês específico</option>'+
+          '</select>'+
+        '</div>'+
+        '<div id="ec-mes-wrap-'+custo.id+'" style="display:none;margin-bottom:6px">'+
+          '<input type="month" id="ec-mes-'+custo.id+'" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:Inter,sans-serif;">'+
+        '</div>'+
+
+        '<div class="edit-actions">'+
+          '<button class="edit-save" onclick="salvarEditCusto('+custo.id+')">Salvar</button>'+
+          '<button class="edit-cancel" onclick="editCustoId=null;renderCustos()">Cancelar</button>'+
+          '<button class="edit-del" onclick="encerrarCusto('+custo.id+')">Encerrar</button>'+
+          '<button class="edit-del" style="background:#6B7280" onclick="confirmarExclusao(this)">Excluir permanentemente</button>'+
+        '</div></div>';
+    }
+
+    var val=valorCustoNoMes(custo,anoAtual,mesAtual);
+    var freqLabels={mensal:'Mensal',anual12:'Anual ÷12',anual:'Anual'};
+    var vencInfo='';
+    if(custo.diaVenc){
+      var dtRef=new Date(anoAtual,mesAtual,custo.diaVenc);
+      var diff=Math.round((dtRef-hoje)/(1000*60*60*24));
+      var cor=diff<=7?'var(--red)':diff<=30?'#d97706':'var(--muted)';
+      var ico=diff<=7&&diff>=0?' ⚠️':diff<=30&&diff>=0?' 🔔':'';
+      vencInfo='<div class="item-sub" style="color:'+cor+'">Vence dia '+custo.diaVenc+ico+'</div>';
+    }
+    return '<div class="item-row">'+
+      '<div>'+
+        '<div class="item-nome">'+custo.desc+' <span style="font-size:10px;color:var(--muted)">('+( freqLabels[custo.freq]||custo.freq)+')</span></div>'+
+        vencInfo+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:6px">'+
+        '<div style="font-size:13px;font-weight:700;color:var(--red)">'+fmt(val)+'</div>'+
+        '<button class="btn-sm" onclick="editCustoId='+custo.id+';renderCustos()">✏</button>'+
+      '</div></div>';
+  }).join('');
+}
+
+function salvarEditCusto(id){
+  var custo=(estado.custos||[]).find(function(x){return x.id===id;});
+  if(!custo)return;
+  var dEl=document.getElementById('ec-desc-'+id);
+  if(dEl)custo.desc=dEl.value.trim()||custo.desc;
+
+  var vEl=document.getElementById('ec-val-'+id);
+  var novoVal=vEl?parseFloat(vEl.value):null;
+  if(novoVal&&!isNaN(novoVal)){
+    // Determinar a partir de qual mês
+    var partirEl=document.getElementById('ec-partir-'+id);
+    var partir=partirEl?partirEl.value:'agora';
+    var anoH=anoAtual,mesH=mesAtual;
+    if(partir==='especifico'){
+      var mEl=document.getElementById('ec-mes-'+id);
+      if(mEl&&mEl.value){var p=mEl.value.split('-');anoH=parseInt(p[0]);mesH=parseInt(p[1])-1;}
+    }
+    // Remover entradas futuras ao novo mês e adicionar nova
+    if(!custo.historico)custo.historico=[];
+    custo.historico=custo.historico.filter(function(h){
+      return mesStr(h.ano,h.mes)<mesStr(anoH,mesH);
+    });
+    custo.historico.push({ano:anoH,mes:mesH,val:novoVal});
+    custo.historico.sort(function(a,b){return mesStr(a.ano,a.mes).localeCompare(mesStr(b.ano,b.mes));});
+  }
+  editCustoId=null;salvarEstado();renderCustos();calcResumo();gerarAlertas();
+}
+
+document.addEventListener('click', function(e){
+  if(e.target&&e.target.getAttribute('onclick')==='confirmarExclusao(this)'){
+    var btn=e.target;
+    var row=btn.closest('.edit-box');
+    if(!row)return;
+    var saveBtn=row.querySelector('.edit-save');
+    if(!saveBtn)return;
+    var onclickSave=saveBtn.getAttribute('onclick');
+    var match=onclickSave&&onclickSave.match(/salvarEditCusto\((\d+)\)/);
+    if(!match)return;
+    var id=parseInt(match[1]);
+    confirmarExclusao('Excluir permanentemente? O histórico será perdido.',function(){excluirCusto(id);});
+  }
+});
+
+function encerrarCusto(id){
+  confirmarExclusao('Encerrar este custo a partir do próximo mês? O histórico será preservado.',function(){
+    var custo=(estado.custos||[]).find(function(x){return x.id===id;});
+    if(custo){
+      // Fim = mês atual
+      custo.fim={ano:anoAtual,mes:mesAtual};
+    }
+    editCustoId=null;salvarEstado();renderCustos();calcResumo();gerarAlertas();
+  });
+}
+
+function excluirCusto(id){
+  estado.custos=(estado.custos||[]).filter(function(c){return c.id!==id;});
+  editCustoId=null;salvarEstado();renderCustos();calcResumo();gerarAlertas();
+}
+
+// ===== ANÁLISE =====
+function renderAnalise(){
+  var ses=(estado.sessoes||[]).filter(s=>isMes(s.data)&&s.status!=='cancelado');
+  var part=ses.filter(s=>s.tipo==='particular'||!s.tipo);
+  var conv=ses.filter(s=>s.tipo==='convenio');
+  var fatPart=part.filter(s=>s.status==='pago').reduce((a,s)=>a+parseFloat(s.val||0),0);
+  var fatConv=conv.filter(s=>s.status==='pago').reduce((a,s)=>a+parseFloat(s.val||0),0);
+  var total=fatPart+fatConv;
+  var pctPart=total>0?Math.round(fatPart/total*100):0;
+  var pctConv=total>0?Math.round(fatConv/total*100):0;
+
+  var elD=document.getElementById('analise-dist');
+  if(elD){
+    if(!ses.length){elD.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Registre sessões para ver a análise.</div>';}
+    else{
+      elD.innerHTML=`
+        <div class="bar-wrap">
+          <div class="bar-label"><span style="font-weight:600;color:#14532d">Particular</span><span>${part.length} sess. · ${fmt(fatPart)} (${pctPart}%)</span></div>
+          <div class="bar-bg"><div class="bar-fill" style="width:${pctPart}%;background:#16a34a"></div></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-label"><span style="font-weight:600;color:#1e3a8a">Convênio</span><span>${conv.length} sess. · ${fmt(fatConv)} (${pctConv}%)</span></div>
+          <div class="bar-bg"><div class="bar-fill" style="width:${pctConv}%;background:#2563EB"></div></div>
+        </div>
+        <div style="background:var(--sand);border-radius:10px;padding:12px;font-size:12px;line-height:1.7;margin-top:8px">
+          ${fatPart>=fatConv?'✅ Particular está gerando <strong>'+fmt(fatPart-fatConv)+'</strong> a mais que convênio este mês.':'⚠️ Convênio está gerando <strong>'+fmt(fatConv-fatPart)+'</strong> a mais. Avalie se vale manter essa proporção.'}
+        </div>`;
+    }
+  }
+
+  var c=estado.config||{};
+  var vp=parseFloat(c.vpart)||0,vc=parseFloat(c.vconv)||0;
+  var elR=document.getElementById('analise-rent');
+  if(elR){
+    if(!vp||!vc){elR.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Configure os valores na aba Início.</div>';}
+    else{
+      var diff=Math.abs(vp-vc),melhor=vp>vc?'Particular':'Convênio';
+      elR.innerHTML=`
+        <div style="display:flex;justify-content:space-around;text-align:center;margin-bottom:16px">
+          <div style="background:#DCFCE7;border-radius:12px;padding:16px;flex:1;margin-right:6px">
+            <div style="font-size:22px;font-weight:700;color:#16a34a">${fmt(vp)}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px">PARTICULAR</div>
+          </div>
+          <div style="background:#dbeafe;border-radius:12px;padding:16px;flex:1;margin-left:6px">
+            <div style="font-size:22px;font-weight:700;color:#2563EB">${fmt(vc)}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px">CONVÊNIO</div>
+          </div>
+        </div>
+        <div style="background:var(--sand);border-radius:10px;padding:12px;font-size:12px;line-height:1.8">
+          <strong>${melhor}</strong> paga ${fmt(diff)} a mais por sessão.<br>
+          Em 10 sessões: +${fmt(diff*10)} · Em 20 sessões: +${fmt(diff*20)}
+        </div>`;
+    }
+  }
+
+  var elS=document.getElementById('analise-simulador');
+  if(elS){
+    if(!vp||!vc){elS.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Configure os valores na aba Início.</div>';}
+    else{
+      elS.innerHTML=`
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#DCFCE7;border-radius:10px">
+            <span style="font-size:12px;font-weight:500">100% particular (20 sess.)</span>
+            <span style="font-size:13px;font-weight:700;color:#16a34a">${fmt(vp*20)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--sand);border-radius:10px">
+            <span style="font-size:12px;font-weight:500">50% / 50% (20 sess.)</span>
+            <span style="font-size:13px;font-weight:700">${fmt(vp*10+vc*10)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#dbeafe;border-radius:10px">
+            <span style="font-size:12px;font-weight:500">100% convênio (20 sess.)</span>
+            <span style="font-size:13px;font-weight:700;color:#2563EB">${fmt(vc*20)}</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">De 50/50 para 100% particular: +${fmt((vp-vc)*10)} por mês.</div>`;
+    }
+  }
+
+  var elA=document.getElementById('analise-alerta');
+  if(elA){
+    if(!total){elA.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Registre sessões para ver o alerta.</div>';}
+    else if(pctConv>40){
+      elA.innerHTML=`<div class="alerta-amarelo"><div style="font-size:12px;line-height:1.6">⚠️ <strong>${pctConv}% da receita vem de convênio</strong> este mês. Convênio tem reajuste limitado e pode ser suspenso. Considere aumentar pacientes particulares.</div></div>`;
+    }else{
+      elA.innerHTML=`<div style="background:var(--green-light);border-radius:10px;padding:12px;font-size:12px;color:#14532d;line-height:1.6">✅ Convênio representa ${pctConv}% da receita. Proporção saudável.</div>`;
+    }
+  }
+}
+
+// ===== PRECIFICAR =====
+function calcPreco(){
+  var custos=parseFloat(get('prec-custos'))||0;
+  var sessoes=parseFloat(get('prec-sessoes'))||0;
+  var lucro=parseFloat(get('prec-lucro'))||0;
+  var imp=parseFloat(get('prec-imposto'))||0;
+  var el=document.getElementById('prec-resultado');if(!el)return;
+  if(!sessoes){el.style.display='none';return;}
+  el.style.display='block';
+  var fator=1-(imp/100);
+  var minimo=Math.ceil(custos/sessoes/fator);
+  var recomendado=Math.ceil((custos+lucro)/sessoes/fator);
+  var txt=document.getElementById('prec-texto');if(!txt)return;
+  txt.innerHTML=`Valor mínimo: <strong>R$ ${minimo.toLocaleString('pt-BR')}</strong> <span style="font-size:10px">(só cobre custos)</span><br>
+  Valor recomendado: <strong>R$ ${recomendado.toLocaleString('pt-BR')}</strong> <span style="font-size:10px">(+ lucro desejado${imp>0?', imposto '+imp+'% incluso':''})</span><br><br>
+  Com ${sessoes} sessões a R$ ${recomendado.toLocaleString('pt-BR')}: faturamento de <strong>${fmt(sessoes*recomendado)}</strong> · líquido: <strong>${fmt(sessoes*recomendado*fator-custos)}</strong>`;
+}
+
+// ===== HISTÓRICO + INADIMPLENTES =====
+function renderHistorico(){
+  var el=document.getElementById('lista-historico');if(!el)return;
+  // Agrupar por ano e por mês dentro de cada ano
+  var porAno={};
+  (estado.sessoes||[]).forEach(function(s){
+    var d=new Date(s.data+'T00:00:00');
+    var ano=d.getFullYear();
+    var mes=d.getMonth();
+    if(!porAno[ano])porAno[ano]={fat:0,inad:0,part:0,conv:0,meses:{}};
+    if(!porAno[ano].meses[mes])porAno[ano].meses[mes]={fat:0,inad:0,part:0,conv:0};
+    var refs=[porAno[ano],porAno[ano].meses[mes]];
+    refs.forEach(function(r){
+      if(s.status==='pago'){
+        r.fat+=parseFloat(s.val||0);
+        if(s.tipo==='convenio')r.conv+=parseFloat(s.val||0);
+        else r.part+=parseFloat(s.val||0);
+      }
+      if(s.status==='pendente')r.inad+=parseFloat(s.val||0);
+    });
+  });
+
+  var anos=Object.keys(porAno).sort().reverse();
+  if(!anos.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">Nenhum histórico ainda.</div>';return;}
+
+  el.innerHTML=anos.map(function(ano){
+    var a=porAno[ano];
+    var custosAno=0;
+    for(var m=0;m<12;m++){
+      (estado.custos||[]).forEach(function(ct){
+        if(custoAtivoNoMes(ct,parseInt(ano),m))custosAno+=valorCustoNoMes(ct,parseInt(ano),m);
+      });
+    }
+    var mesesHTML=Object.keys(a.meses).sort(function(x,y){return y-x;}).map(function(mes){
+      var m=a.meses[mes];
+      var custosMes=(estado.custos||[]).filter(function(ct){return custoAtivoNoMes(ct,parseInt(ano),parseInt(mes));}).reduce(function(acc,ct){return acc+valorCustoNoMes(ct,parseInt(ano),parseInt(mes));},0);
+      return '<div style="display:flex;justify-content:space-between;padding:8px 12px;background:white;border-radius:8px;margin-bottom:4px;font-size:12px">'+
+        '<div>'+
+          '<span style="font-weight:500">'+MESES[mes]+'</span>'+
+          '<span style="color:var(--muted);margin-left:8px">Part: '+fmt(m.part)+' · Conv: '+fmt(m.conv)+(m.inad>0?' · Pend: '+fmt(m.inad):'')+' · Custos: '+fmt(custosMes)+'</span>'+
+        '</div>'+
+        '<div style="font-weight:700;color:'+(m.fat-custosMes>=0?'var(--green)':'var(--red)')+'">'+fmt(m.fat-custosMes)+'</div>'+
+      '</div>';
+    }).join('');
+
+    return '<div style="background:var(--sand);border-radius:12px;overflow:hidden;margin-bottom:12px">'+
+      '<div onclick="toggleAno(this)" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer">'+
+        '<div>'+
+          '<div style="font-size:15px;font-weight:700;color:var(--text)">'+ano+'</div>'+
+          '<div style="font-size:11px;color:var(--muted);margin-top:2px">'+
+            'Faturado: '+fmt(a.fat)+' · Custos: '+fmt(custosAno)+' · Pend: '+fmt(a.inad)+
+          '</div>'+
+        '</div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-size:15px;font-weight:700;color:'+(a.fat-custosAno>=0?'var(--green)':'var(--red)')+'">'+fmt(a.fat-custosAno)+'</div>'+
+          '<div style="font-size:10px;color:var(--muted)">resultado líquido</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="ano-meses" style="display:none;padding:0 12px 12px">'+mesesHTML+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function toggleAno(el){
+  var meses=el.nextElementSibling;
+  if(meses)meses.style.display=meses.style.display==='none'?'block':'none';
+}
+
+function renderInadimplentes(){
+  var el=document.getElementById('lista-inadimplentes');if(!el)return;
+  var hoje=new Date();
+  var pendentes=(estado.sessoes||[]).filter(s=>{
+    if(s.status!=='pendente')return false;
+    var diff=(hoje-new Date(s.data+'T00:00:00'))/(1000*60*60*24);
+    return diff>30;
+  });
+  if(!pendentes.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhum inadimplente identificado.</div>';return;}
+
+  // Agrupar por paciente
+  var porPac={};
+  pendentes.forEach(s=>{
+    if(!porPac[s.pac])porPac[s.pac]={nome:s.pac,total:0,dataMin:s.data,sessoes:[]};
+    porPac[s.pac].total+=parseFloat(s.val||0);
+    porPac[s.pac].sessoes.push(s);
+    if(s.data<porPac[s.pac].dataMin)porPac[s.pac].dataMin=s.data;
+  });
+
+  el.innerHTML=Object.values(porPac).map(p=>`
+    <div class="inad-row">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="item-nome" style="color:#991b1b">${p.nome}</div>
+          <div class="item-sub">Desde: ${new Date(p.dataMin+'T00:00:00').toLocaleDateString('pt-BR')} · ${p.sessoes.length} sessão(ões)</div>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:var(--red)">${fmt(p.total)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function resetarTudo(){confirmarExclusao('Apagar TODOS os dados?',function(){localStorage.removeItem('flowi-psicologo-free');localStorage.removeItem('flowi-psicologo-premium-licenca');location.reload();});}
+carregar();
+</script>
+</body>
+</html>
