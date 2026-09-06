@@ -114,6 +114,16 @@
     }
   }
 </script>
+  <script>
+  // Insira logo no início do script
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('status') === 'sucesso') {
+      alert('Pagamento confirmado com sucesso! Verifique seu e-mail para acessar seu painel Premium.');
+    }
+  });
 
+  // ... (o restante dos seus códigos do Supabase / Login continuam aqui abaixo)
+</script>
 </body>
 </html>
