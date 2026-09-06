@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flowi - Entrar ou Cadastrar</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background-color: #0a0a0a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    .card { background: #111827; border-radius: 16px; padding: 36px; width: 100%; max-width: 380px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .logo { text-align: center; margin-bottom: 24px; font-weight: 700; font-size: 18px; letter-spacing: 2px; }
+    h2 { text-align: center; margin-bottom: 20px; font-size: 20px; font-weight: 600; }
+    .field { margin-bottom: 16px; }
+    label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
+    input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #374151; background: #1f2937; color: #fff; font-size: 14px; outline: none; }
+    input:focus { border-color: #3b82f6; }
+    button { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #2563eb; color: white; font-weight: 600; cursor: pointer; font-size: 14px; margin-top: 8px; transition: opacity 0.2s; }
+    button:hover { opacity: 0.9; }
+    .toggle { text-align: center; margin-top: 20px; font-size: 12px; color: #94a3b8; }
+    .toggle a { color: #60a5fa; text-decoration: none; font-weight: 600; cursor: pointer; }
+    .msg { margin-top: 14px; font-size: 13px; text-align: center; color: #ef4444; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">flowi</div>
+  <h2 id="titulo">Acessar Conta</h2>
+  
+  <div class="field">
+    <label>E-mail</label>
+    <input type="email" id="email" placeholder="seu@email.com">
+  </div>
+  
+  <div class="field">
+    <label>Senha</label>
+    <input type="password" id="senha" placeholder="••••••••">
+  </div>
+
+  <button id="btn-acao" onclick="executarAcao()">Entrar</button>
+
+  <div id="msg" class="msg"></div>
+
+  <div class="toggle">
+    <span id="txt-toggle">Ainda não tem conta?</span> 
+    <a id="link-toggle" onclick="alternarModo()">Cadastre-se</a>
+  </div>
+</div>
+
+<script>
+  // Insira suas credenciais do Supabase aqui
+  const SUPABASE_URL = 'https://gkvanakreiiiprriyats.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_1Lx3D9jBwegVvvqTK39JAg_yV6zuw3s'; 
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let modoCadastro = false;
+
+  function alternarModo() {
+    modoCadastro = !modoCadastro;
+    document.getElementById('titulo').textContent = modoCadastro ? 'Criar Conta' : 'Acessar Conta';
+    document.getElementById('btn-acao').textContent = modoCadastro ? 'Cadastrar e Continuar' : 'Entrar';
+    document.getElementById('txt-toggle').textContent = modoCadastro ? 'Já tem uma conta?' : 'Ainda não tem conta?';
+    document.getElementById('link-toggle').textContent = modoCadastro ? 'Faça login' : 'Cadastre-se';
+    document.getElementById('msg').textContent = '';
+  }
+
+  async function executarAcao() {
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+    const msg = document.getElementById('msg');
+    msg.style.color = '#ef4444';
+
+    if (!email || !senha) {
+      msg.textContent = 'Preencha todos os campos.';
+      return;
+    }
+
+    if (modoCadastro) {
+      // Cadastro
+      const { data, error } = await supabaseClient.auth.signUp({ email, password: senha });
+      if (error) {
+        msg.textContent = error.message;
+      } else {
+        if (data.user) {
+          await supabaseClient.from('usuarios_dados').insert({
+            id: data.user.id,
+            dados: {}
+          });
+        }
+        msg.style.color = '#10b981';
+        msg.textContent = 'Conta criada com sucesso!';
+        
+        // Redireciona conforme a origem
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('origem') === 'checkout') {
+          window.location.href = 'LINK_DO_SEU_MERCADO_PAGO';
+        } else {
+          window.location.href = 'premium.html';
+        }
+      }
+    } else {
+      // Login
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
+      if (error) {
+        msg.textContent = 'E-mail ou senha inválidos.';
+      } else {
+        window.location.href = 'premium.html';
+      }
+    }
+  }
+</script>
+
+</body>
+</html>
