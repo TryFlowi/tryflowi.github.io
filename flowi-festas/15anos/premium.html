@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowi Festas - 15 Anos Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --night:#111827;--accent:#be185d;--accent-light:#fce7f3;--accent-mid:#f9a8d4;
+  --cream:#F9FAFB;--sand:#F3F4F6;--white:#fff;
+  --text:#111827;--muted:#6B7280;--border:#E5E7EB;
+  --warn:#FEF9C3;--warn-border:#FDE047;
+  --red:#DC2626;--red-light:#FEE2E2;--green:#16a34a;--green-light:#DCFCE7;
+}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+.flowi-menu-overlay{position:fixed;inset:0;z-index:200;display:none;}
+.flowi-menu-overlay.open{display:block;}
+.flowi-menu-bg{position:absolute;inset:0;background:rgba(0,0,0,0.5);}
+.flowi-menu-panel{position:absolute;top:0;left:0;bottom:0;width:260px;background:#111827;padding:24px 20px;overflow-y:auto;}
+.flowi-menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.flowi-menu-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px;}
+.flowi-menu-item{display:flex;align-items:center;padding:11px 12px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.8);font-size:12px;font-weight:500;margin-bottom:4px;transition:background .2s;font-family:'Inter',sans-serif;}
+.flowi-menu-item:hover{background:rgba(255,255,255,0.1);}
+.header{background:var(--night);position:sticky;top:0;z-index:100;}
+.header-inner{max-width:640px;margin:0 auto;padding:20px 20px 0;}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.brand-icon{display:flex;flex-direction:column;gap:3px;cursor:pointer;}
+.brand-icon span{display:block;background:white;border-radius:2px;}
+.brand-icon span:nth-child(1){width:28px;height:3px;}
+.brand-icon span:nth-child(2){width:19px;height:3px;}
+.brand-icon span:nth-child(3){width:12px;height:3px;}
+.brand-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;margin-left:-6px;margin-top:8px;}
+.brand-name{font-size:18px;font-weight:700;color:white;letter-spacing:2px;}
+.brand-tag{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:3px;margin-left:2px;}
+.mes-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.mes-btn{background:rgba(255,255,255,0.08);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.mes-atual{font-size:14px;font-weight:600;color:white;flex:1;text-align:center;letter-spacing:1px;}
+.tabs{display:flex;border-top:1px solid rgba(255,255,255,0.08);overflow-x:auto;}
+.tab-btn{flex:1;min-width:56px;padding:12px 4px;background:none;border:none;color:rgba(255,255,255,0.45);font-size:10px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab-btn.active{color:white;border-bottom-color:var(--accent);}
+.content{max-width:640px;margin:0 auto;padding:20px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.card{background:white;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;}
+.card h3{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;margin-bottom:14px;}
+.resumo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.resumo-item{background:var(--sand);border-radius:12px;padding:14px;}
+.resumo-label{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:4px;}
+.resumo-val{font-size:20px;font-weight:700;color:var(--text);}
+.resumo-val.pos{color:var(--green);}
+.resumo-val.neg{color:var(--red);}
+.resumo-val.acc{color:var(--accent);}
+.meta-bar-bg{background:var(--sand);border-radius:8px;height:10px;margin:10px 0 6px;}
+.meta-bar-fill{height:10px;border-radius:8px;background:var(--accent);transition:width .5s ease;}
+.meta-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
+.field{margin-bottom:12px;}
+.field label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:500;letter-spacing:.5px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;background:var(--cream);}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.field-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.btn-add{width:100%;padding:12px;background:var(--night);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-reset{background:var(--red-light);color:var(--red);border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-sm{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--muted);cursor:pointer;font-family:inherit;}
+.btn-del{background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:inherit;}
+.item-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--sand);border-radius:10px;margin-bottom:7px;}
+.item-nome{font-size:12px;font-weight:500;color:var(--text);}
+.item-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.edit-box{background:var(--sand);border-radius:10px;padding:12px;margin-bottom:8px;}
+.edit-box input,.edit-box select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px;font-family:'Inter',sans-serif;color:var(--text);}
+.edit-actions{display:flex;gap:6px;margin-top:6px;}
+.edit-save{flex:1;padding:7px;background:var(--night);color:white;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.edit-cancel{flex:1;padding:7px;background:white;color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
+.edit-del{padding:7px 12px;background:var(--red-light);color:var(--red);border:none;border-radius:8px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.check-item:last-child{border-bottom:none;}
+.check-item.done .ci-name{text-decoration:line-through;color:var(--muted);}
+.ci-circle{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .2s;margin-top:1px;cursor:pointer;}
+.check-item.done .ci-circle{background:var(--accent);border-color:var(--accent);color:white;}
+.ci-name{font-size:12px;font-weight:500;color:var(--text);}
+.ci-detail{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;}
+.ci-quando{font-size:10px;color:var(--accent);font-weight:600;margin-top:4px;}
+.premium-card{background:linear-gradient(135deg,var(--night) 0%,#1a1a2e 100%);border-radius:20px;padding:24px;color:white;text-align:center;}
+.pf-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;text-align:left;}
+.pf-check{width:16px;height:16px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px;color:white;}
+.pf-text{font-size:12px;color:rgba(255,255,255,0.8);}
+.premium-btn{display:block;background:var(--accent);color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:13px;font-weight:700;letter-spacing:1px;margin-top:16px;}
+.section-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:2px;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.flowi-footer{text-align:center;padding:16px 0 8px;font-size:10px;color:var(--muted);letter-spacing:2px;}
+.countdown{display:flex;gap:12px;margin-bottom:16px;}
+.cd-box{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;text-align:center;flex:1;}
+.cd-num{font-size:28px;font-weight:700;color:white;line-height:1;}
+.cd-label{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:2px;margin-top:4px;}
+.badge-premium{margin-left:auto;background:rgba(190,24,93,0.25);border:1px solid rgba(190,24,93,0.5);border-radius:20px;padding:3px 10px;font-size:9px;color:#f9a8d4;letter-spacing:2px;font-weight:600;}
+.crono-item{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--sand);border-radius:10px;margin-bottom:7px;cursor:pointer;border-left:3px solid var(--border);}
+.crono-item.urgente{border-left-color:var(--red);background:#FFF5F5;}
+.crono-item.feito{border-left-color:var(--green);background:var(--green-light);opacity:0.7;}
+.conv-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--sand);border-radius:10px;margin-bottom:6px;}
+.status-confirmado{background:var(--green-light);color:var(--green);font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600;}
+.status-pendente{background:var(--warn);color:#854d0e;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600;}
+.status-recusado{background:var(--red-light);color:var(--red);font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600;}
+.ordem-row{display:flex;gap:12px;padding:11px 14px;background:var(--sand);border-radius:10px;margin-bottom:6px;align-items:flex-start;}
+.ordem-hora{font-size:13px;font-weight:700;color:#be185d;min-width:44px;}
+.orc-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--sand);border-radius:10px;margin-bottom:6px;}
+.status-badge{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:600;}
+.s-pesquisando{background:#F3F4F6;color:#6B7280;}.s-orcado{background:#DBEAFE;color:#1d4ed8;}
+.s-contratado{background:#DCFCE7;color:#16a34a;}.s-pago{background:#D1FAE5;color:#065f46;}
+</style>
+</head>
+<body>
+<div style="position:fixed;inset:0;background:rgba(17,24,39,0.97);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;" id="activation-overlay">
+  <div style="background:white;border-radius:20px;padding:28px;max-width:420px;width:100%;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <svg width="36" height="13" viewBox="0 0 36 13"><rect x="0" y="1" width="22" height="2.5" rx="1.25" fill="#111827"/><rect x="0" y="5.5" width="15" height="2.5" rx="1.25" fill="#111827"/><rect x="0" y="10" width="9" height="2.5" rx="1.25" fill="#111827"/><circle cx="15" cy="11.25" r="2.8" fill="#be185d"/></svg>
+      <span style="font-size:16px;font-weight:700;letter-spacing:2px;color:#111827;">flowi</span>
+    </div>
+    <div style="font-size:10px;color:#9CA3AF;letter-spacing:2px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #F3F4F6;">ATIVANDO: <strong style="color:#374151;">Festas · 15 Anos Premium</strong></div>
+    <h2 style="font-size:16px;font-weight:700;color:#111827;margin-bottom:5px;">Ative sua licença</h2>
+    <p style="font-size:12px;color:#6B7280;line-height:1.6;margin-bottom:16px;">Informe seu nome e e-mail. Ficam salvos apenas no seu dispositivo.</p>
+    <div style="margin-bottom:12px;"><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">SEU NOME</label><input type="text" id="act-nome" placeholder="Como você se chama?" oninput="verificarAtivacao()" style="width:100%;padding:10px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;color:#111827;"></div>
+    <div style="margin-bottom:14px;"><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">SEU E-MAIL</label><input type="email" id="act-email" placeholder="seu@email.com" oninput="verificarAtivacao()" style="width:100%;padding:10px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;color:#111827;"></div>
+    <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:12px;margin-bottom:14px;max-height:130px;overflow-y:auto;"><p style="font-size:11px;color:#6B7280;line-height:1.8;"><strong style="color:#374151;">Termos de uso</strong><br><br>Esta licença é de uso pessoal e intransferível.<br><br>
+Ao ativar, você concorda que:<br>
+· Este arquivo é de uso exclusivo seu<br>
+· É proibido compartilhar, revender ou distribuir<br>
+· Seus dados ficam salvos apenas neste dispositivo<br>
+· Se trocar de dispositivo, baixe o arquivo offline antes<br>
+· Seu nome e e-mail identificam esta licença<br><br>
+Dúvidas: <a href="https://instagram.com/tryflowi" target="_blank" style="color:#374151;">@tryflowi</a></p></div>
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:18px;"><input type="checkbox" id="act-aceite" onchange="verificarAtivacao()" style="margin-top:2px;width:16px;height:16px;cursor:pointer;flex-shrink:0;"><label for="act-aceite" style="font-size:12px;color:#374151;cursor:pointer;line-height:1.5;">Li e aceito os termos. Esta licença é pessoal e não pode ser compartilhada.</label></div>
+    <button id="act-btn" onclick="ativar()" disabled style="width:100%;padding:13px;background:#111827;color:white;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:not-allowed;font-family:'Inter',sans-serif;opacity:0.4;">Ativar meu acesso</button>
+  </div>
+</div>
+<div id="watermark" style="position:fixed;bottom:12px;right:16px;font-size:10px;color:rgba(0,0,0,0.15);letter-spacing:1px;z-index:50;pointer-events:none;text-align:right;line-height:1.6;display:none;"></div>
+<div class="flowi-menu-overlay" id="flowi-menu">
+  <div class="flowi-menu-bg" onclick="fecharMenu()"></div>
+  <div class="flowi-menu-panel">
+    <div class="flowi-menu-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="28" height="11" viewBox="0 0 28 11"><rect x="0" y="0" width="18" height="2.5" rx="1.25" fill="white" opacity="0.8"/><rect x="0" y="4.5" width="12" height="2.5" rx="1.25" fill="white" opacity="0.8"/><rect x="0" y="9" width="7" height="2.5" rx="1.25" fill="white" opacity="0.8"/><circle cx="12" cy="10.25" r="2.5" fill="#be185d"/></svg>
+        <span style="font-size:13px;font-weight:700;color:white;letter-spacing:2px;">flowi</span>
+      </div>
+      <button class="flowi-menu-close" onclick="fecharMenu()">✕</button>
+    </div>
+    <a href="https://tryflowi.github.io/" class="flowi-menu-item">🏠 Início</a>
+    <a href="https://tryflowi.github.io/flowi-viagens/" class="flowi-menu-item">✈ Flowi Viagens</a>
+    <a href="https://tryflowi.github.io/flowi-negocios/" class="flowi-menu-item">💼 Flowi Negócios</a>
+    <a href="https://tryflowi.github.io/flowi-festas/" class="flowi-menu-item">🎉 Flowi Festas</a>
+    <a href="https://tryflowi.github.io/flowi-financas/" class="flowi-menu-item">💰 Flowi Finanças</a>
+    <div style="border-top:1px solid rgba(255,255,255,0.08);margin-top:16px;padding-top:14px;text-align:center;">
+      <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:10px;color:rgba(255,255,255,0.35);text-decoration:none;letter-spacing:2px;">@tryflowi</a>
+    </div>
+  </div>
+</div>
+<div style="background:#FEF9C3;border-bottom:1px solid #FDE047;padding:9px 20px;text-align:center;font-size:11px;color:#854d0e;line-height:1.5;">💾 Seus dados ficam salvos <strong>apenas neste dispositivo e navegador</strong>. Se trocar de aparelho, baixe o arquivo offline primeiro.</div>
+<div class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div style="display:flex;align-items:flex-end;gap:2px">
+        <div class="brand-icon" onclick="abrirMenu()"><span></span><span></span><span></span></div>
+        <div class="brand-dot"></div>
+      </div>
+      <div><div class="brand-name">flowi</div><div class="brand-tag">FESTAS · 15 ANOS</div></div>
+      <div class="badge-premium">PREMIUM</div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:22px;font-weight:700;color:white;" id="hdr-nome">Minha Festa</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px;" id="hdr-sub">Configure na aba Início</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;">
+      <div class="cd-box"><div class="cd-num" id="cd-dias">--</div><div class="cd-label">DIAS</div></div>
+      <div class="cd-box"><div class="cd-num" id="cd-hrs">--</div><div class="cd-label">HORAS</div></div>
+      <div class="cd-box"><div class="cd-num" id="cd-min">--</div><div class="cd-label">MIN</div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('inicio',this)">Início</button>
+      <button class="tab-btn" onclick="switchTab('cronograma',this)">Cronograma</button>
+      <button class="tab-btn" onclick="switchTab('orcamento',this)">Orçamento</button>
+      <button class="tab-btn" onclick="switchTab('convidados',this)">Convidados</button>
+      <button class="tab-btn" onclick="switchTab('ordemdia',this)">Ordem</button>
+      <button class="tab-btn" onclick="switchTab('checklist',this)">Checklist</button>
+    </div>
+  </div>
+</div>
+<div class="content">
+
+<div class="tab-panel active" id="tab-inicio">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="margin-bottom:0">MINHA FESTA</h3>
+      <button class="btn-reset" onclick="resetarTudo()">↺ Resetar</button>
+    </div>
+    <div class="field"><label>Nome da debutante</label><input type="text" id="cfg-nome" placeholder="Ex: Isabela" oninput="salvar()"></div>
+    <div class="field"><label>Data da festa</label><input type="date" id="cfg-data" oninput="salvar()"></div>
+    <div class="field"><label>Local</label><input type="text" id="cfg-local" placeholder="Ex: Espaço Villa Garden" oninput="salvar()"></div>
+    <div class="field"><label>Orçamento total (R$)</label><input type="number" id="cfg-orcamento" placeholder="Ex: 30000" oninput="salvar()"></div>
+  </div>
+  <div class="card">
+    <h3>RESUMO</h3>
+    <div class="resumo-grid">
+      <div class="resumo-item"><div class="resumo-label">Total orçado</div><div class="resumo-val acc" id="res-orcado">R$ 0</div></div>
+      <div class="resumo-item"><div class="resumo-label">Total pago</div><div class="resumo-val pos" id="res-pago">R$ 0</div></div>
+      <div class="resumo-item"><div class="resumo-label">Convidados</div><div class="resumo-val" id="res-conv">0</div></div>
+      <div class="resumo-item"><div class="resumo-label">Checklist</div><div class="resumo-val" id="res-check">0 / 24</div></div>
+    </div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div style="font-size:26px;margin-bottom:8px">📥</div>
+    <h3 style="margin-bottom:6px;font-size:13px;color:var(--text)">SALVAR PARA USO OFFLINE</h3>
+    <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Baixe com seus dados salvos. Se trocar de dispositivo, abra este arquivo para recuperar tudo.</p>
+    <button onclick="baixarOffline()" class="btn-add">⬇ Baixar para usar offline</button>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-cronograma">
+  <div class="card">
+    <h3>ADICIONAR ITEM AO CRONOGRAMA</h3>
+    <div class="field-row">
+      <div class="field"><label>Tarefa</label><input type="text" id="cr-nome" placeholder="Ex: Contratar DJ"></div>
+      <div class="field"><label>Meses antes</label><input type="number" id="cr-prazo" placeholder="Ex: 6" step="0.5"></div>
+    </div>
+    <button class="btn-add" onclick="adicionarCrono()">Adicionar ao cronograma</button>
+  </div>
+  <div class="card"><h3>CRONOGRAMA</h3><div id="lista-cronograma"></div></div>
+</div>
+
+<div class="tab-panel" id="tab-orcamento">
+  <div class="card">
+    <h3>ADICIONAR ITEM</h3>
+    <div class="field"><label>Fornecedor / Item</label><input type="text" id="o-nome" placeholder="Ex: Buffet Estrela"></div>
+    <div class="field-row">
+      <div class="field"><label>Categoria</label>
+        <select id="o-cat"><option>Local</option><option>Alimentação</option><option>Música</option><option>Decoração</option><option>Moda</option><option>Foto & Vídeo</option><option>Beleza</option><option>Papelaria</option><option>Mimos</option><option>Outro</option></select>
+      </div>
+      <div class="field"><label>Valor (R$)</label><input type="number" id="o-val" placeholder="0"></div>
+    </div>
+    <div class="field"><label>Status</label>
+      <select id="o-status"><option value="pesquisando">Pesquisando</option><option value="orcado">Orçado</option><option value="contratado">Contratado</option><option value="pago">Pago</option></select>
+    </div>
+    <button class="btn-add" onclick="adicionarOrc()">Adicionar item</button>
+  </div>
+  <div class="card"><h3>ORÇAMENTO</h3><div id="lista-orc"></div></div>
+</div>
+
+<div class="tab-panel" id="tab-convidados">
+  <div class="card">
+    <h3>ADICIONAR CONVIDADO</h3>
+    <div class="field-row">
+      <div class="field"><label>Nome</label><input type="text" id="cv-nome" placeholder="Ex: Maria Lima"></div>
+      <div class="field"><label>Status</label><select id="cv-status"><option value="pendente">Pendente</option><option value="confirmado">Confirmado</option><option value="recusado">Recusado</option></select></div>
+    </div>
+    <div class="field"><label>Observação</label><input type="text" id="cv-obs" placeholder="Ex: Mesa 3, família da mãe..."></div>
+    <button class="btn-add" onclick="adicionarConvidado()">Adicionar convidado</button>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="margin-bottom:0">LISTA DE CONVIDADOS</h3>
+      <div style="font-size:11px;color:var(--muted)" id="resumo-conv">0 total</div>
+    </div>
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <h3 style="margin-bottom:0">LISTA DE CONVIDADOS</h3>
+    <div style="font-size:11px;color:var(--muted)" id="resumo-conv">0 total</div>
+  </div>
+  <!-- CAMPO DE PESQUISA -->
+  <div class="field" style="margin-bottom:12px;">
+    <input type="text" id="cv-busca" placeholder="🔍 Pesquisar convidado por nome..." oninput="renderConvidados()">
+  </div>
+  <div id="lista-convidados"></div>
+</div>
+    <div id="lista-convidados"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-ordemdia">
+  <div class="card">
+    <h3>ADICIONAR MOMENTO</h3>
+    <div class="field-row">
+      <div class="field"><label>Horário</label><input type="time" id="od-hora"></div>
+      <div class="field"><label>Descrição</label><input type="text" id="od-desc" placeholder="Ex: Entrada da debutante"></div>
+    </div>
+    <div class="field"><label>Detalhes</label><input type="text" id="od-det" placeholder="Ex: Música, responsável..."></div>
+    <button class="btn-add" onclick="adicionarOrdem()">Adicionar momento</button>
+  </div>
+  <div class="card"><h3>ORDEM DO DIA</h3><div id="lista-ordem"></div></div>
+</div>
+
+<div class="tab-panel" id="tab-checklist">
+  <div class="card">
+    <h3>ADICIONAR TAREFA</h3>
+    <div class="field"><label>Tarefa</label><input type="text" id="chk-nome" placeholder="Ex: Confirmar decoração"></div>
+    <div class="field"><label>Categoria</label>
+      <select id="chk-cat">
+        <option value="Alimentação">Alimentação</option>
+        <option value="Beleza">Beleza</option>
+        <option value="Decoração">Decoração</option>
+        <option value="Evento">Evento</option>
+        <option value="Foto & Vídeo">Foto & Vídeo</option>
+        <option value="Local">Local</option>
+        <option value="Mimos">Mimos</option>
+        <option value="Moda">Moda</option>
+        <option value="Música">Música</option>
+        <option value="Organização">Organização</option>
+        <option value="Papelaria">Papelaria</option>
+        <option value="Outros">Outros</option>
+      </select>
+    </div>
+    <button class="btn-add" onclick="adicionarCheck()">Adicionar tarefa</button>
+  </div>
+  <div class="card"><h3>CHECKLIST COMPLETO</h3><div id="lista-check"></div></div>
+</div>
+
+</div>
+<div style="max-width:640px;margin:0 auto;padding:0 20px 20px;text-align:center;font-size:11px;color:var(--muted);">Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none;">@tryflowi</a> &nbsp;·&nbsp; <a href="https://tryflowi.github.io/#votar" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none;">Sugerir melhoria</a></div>
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})" id="back-top" title="Voltar ao topo" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(17,24,39,0.85);border:1px solid rgba(255,255,255,0.15);color:white;font-size:16px;cursor:pointer;z-index:99;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);">↑</button>
+
+<script>
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+let estado={config:{},crono:[{"id": "cr1", "nome": "Definir data e local", "cat": "Local", "prazo": 12, "done": false}, {"id": "cr2", "nome": "Contratar cerimonialista", "cat": "Organização", "prazo": 12, "done": false}, {"id": "cr3", "nome": "Escolher vestido", "cat": "Moda", "prazo": 10, "done": false}, {"id": "cr4", "nome": "Contratar buffet", "cat": "Alimentação", "prazo": 10, "done": false}, {"id": "cr5", "nome": "Contratar DJ ou banda", "cat": "Música", "prazo": 8, "done": false}, {"id": "cr6", "nome": "Contratar fotógrafo", "cat": "Foto & Vídeo", "prazo": 8, "done": false}, {"id": "cr7", "nome": "Contratar filmagem", "cat": "Foto & Vídeo", "prazo": 8, "done": false}, {"id": "cr8", "nome": "Definir decoração", "cat": "Decoração", "prazo": 6, "done": false}, {"id": "cr9", "nome": "Enviar convites", "cat": "Papelaria", "prazo": 4, "done": false}, {"id": "cr10", "nome": "Agendar maquiagem e cabelo", "cat": "Beleza", "prazo": 2, "done": false}, {"id": "cr11", "nome": "Provar vestido final", "cat": "Moda", "prazo": 1, "done": false}, {"id": "cr12", "nome": "Confirmar todos fornecedores", "cat": "Organização", "prazo": 0.5, "done": false}, {"id": "cr13", "nome": "Preparar lembrançinhas", "cat": "Mimos", "prazo": 2, "done": false}, {"id": "cr14", "nome": "Ensaio de valsa", "cat": "Evento", "prazo": 3, "done": false}],orc:[],convidados:[],ordem:[{"id": "od0", "hora": "18:00", "desc": "Abertura do salão e recepção dos convidados", "det": ""}, {"id": "od1", "hora": "19:00", "desc": "Chegada da debutante", "det": "Música: escolher tema de entrada"}, {"id": "od2", "hora": "19:30", "desc": "Valsa com o pai", "det": ""}, {"id": "od3", "hora": "19:45", "desc": "Valsa dos 15 casais", "det": ""}, {"id": "od4", "hora": "20:00", "desc": "Discursos e homenagens", "det": ""}, {"id": "od5", "hora": "20:30", "desc": "Jantar e confraternização", "det": ""}, {"id": "od6", "hora": "22:00", "desc": "Hora do bolo", "det": ""}, {"id": "od7", "hora": "22:30", "desc": "Festa e música", "det": ""}, {"id": "od8", "hora": "01:00", "desc": "Encerramento", "det": ""}],check:[{"id": "chk0", "nome": "Definir data e local da festa", "cat": "Local", "done": false}, {"id": "chk1", "nome": "Montar lista de convidados", "cat": "Organização", "done": false}, {"id": "chk2", "nome": "Contratar cerimonialista", "cat": "Organização", "done": false}, {"id": "chk3", "nome": "Escolher e contratar buffet", "cat": "Alimentação", "done": false}, {"id": "chk4", "nome": "Escolher vestido de debutante", "cat": "Moda", "done": false}, {"id": "chk5", "nome": "Contratar DJ ou banda", "cat": "Música", "done": false}, {"id": "chk6", "nome": "Contratar fotógrafo", "cat": "Foto & Vídeo", "done": false}, {"id": "chk7", "nome": "Contratar filmagem", "cat": "Foto & Vídeo", "done": false}, {"id": "chk8", "nome": "Fazer convites", "cat": "Papelaria", "done": false}, {"id": "chk9", "nome": "Definir decoração", "cat": "Decoração", "done": false}, {"id": "chk10", "nome": "Contratar make e cabelo", "cat": "Beleza", "done": false}, {"id": "chk11", "nome": "Preparar lembrançinhas", "cat": "Mimos", "done": false}, {"id": "chk12", "nome": "Ensaiar valsa com o pai", "cat": "Evento", "done": false}, {"id": "chk13", "nome": "Escolher os 15 casais", "cat": "Evento", "done": false}, {"id": "chk14", "nome": "Confirmar cardápio do buffet", "cat": "Alimentação", "done": false}, {"id": "chk15", "nome": "Provar vestido final", "cat": "Moda", "done": false}, {"id": "chk16", "nome": "Confirmar todos os fornecedores", "cat": "Organização", "done": false}, {"id": "chk17", "nome": "Preparar discursos e homenagens", "cat": "Evento", "done": false}, {"id": "chk18", "nome": "Organizar ordem do dia com cerimonialista", "cat": "Organização", "done": false}, {"id": "chk19", "nome": "Preparar música de entrada", "cat": "Música", "done": false}, {"id": "chk20", "nome": "Confirmar confirmações dos convidados", "cat": "Organização", "done": false}, {"id": "chk21", "nome": "Organizar transporte", "cat": "Geral", "done": false}, {"id": "chk22", "nome": "Ter plano B (chuva)", "cat": "Geral", "done": false}, {"id": "chk23", "nome": "Preparar kit de emergência no dia", "cat": "Geral", "done": false}]};
+let editCronoId=null,editOrcId=null,editConvId=null,editOrdemId=null,editCheckId=null;
+
+function abrirMenu(){document.getElementById('flowi-menu').classList.add('open');}
+function fecharMenu(){document.getElementById('flowi-menu').classList.remove('open');}
+function get(id){return(document.getElementById(id)||{}).value||'';}
+function set(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function baixarOffline(){
+  var h=document.documentElement.outerHTML,
+      b=new Blob([h],{type:'text/html'}),
+      u=URL.createObjectURL(b),
+      a=document.createElement('a');
+  a.href=u;a.download='flowi-15anos-premium.html';a.click();URL.revokeObjectURL(u);
+}
+function confirmarExclusao(msg,fn){if(confirm(msg||'Excluir este item?'))fn();}
+window.addEventListener('scroll',function(){var b=document.getElementById('back-top');if(b)b.style.display=window.scrollY>300?'flex':'none';});
+window.addEventListener('beforeunload',function(e){
+  var k=Object.keys(localStorage).some(function(k){return k.startsWith('flowi-');});
+  if(k){e.preventDefault();e.returnValue='Seus dados ficam salvos apenas neste navegador. Baixe o arquivo offline antes de trocar de dispositivo.';return e.returnValue;}
+});
+function verificarAtivacao(){
+  var n=(document.getElementById('act-nome')||{}).value,
+      e=(document.getElementById('act-email')||{}).value,
+      a=(document.getElementById('act-aceite')||{}).checked,
+      b=document.getElementById('act-btn'),
+      ok=!!(n&&n.trim()&&e&&/^[^@]+@[^@]+\.[^@]+$/.test(e)&&a);
+  if(b){b.disabled=!ok;b.style.opacity=ok?'1':'0.4';b.style.cursor=ok?'pointer':'not-allowed';}
+}
+function ativar(){
+  var n=(document.getElementById('act-nome')||{}).value.trim(),
+      e=(document.getElementById('act-email')||{}).value.trim();
+  if(!n||!e)return;
+  var l={nome:n,email:e,data:new Date().toLocaleDateString('pt-BR'),ativado:true};
+  try{localStorage.setItem('flowi-15anos-premium-licenca',JSON.stringify(l));}catch(ex){}
+  aplicarLicenca(l);
+  var o=document.getElementById('activation-overlay');
+  if(o){o.style.display='none';o.style.visibility='hidden';o.style.pointerEvents='none';}
+}
+function aplicarLicenca(l){
+  var w=document.getElementById('watermark');
+  if(w){w.style.display='block';w.innerHTML='Licença: '+l.nome+' · '+l.email+'<br>Flowi Premium · Uso pessoal';}
+}
+function checarLicenca(){
+  try{
+    var s=localStorage.getItem('flowi-15anos-premium-licenca');
+    if(s){var l=JSON.parse(s);if(l&&l.ativado){var o=document.getElementById('activation-overlay');if(o)o.style.display='none';aplicarLicenca(l);return;}}
+  }catch(ex){}
+  var o=document.getElementById('activation-overlay');if(o)o.style.display='flex';
+}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+
+function carregar(){
+  try{var s=localStorage.getItem('flowi-15anos-free');if(s)estado=JSON.parse(s);}catch(e){}
+  var c=estado.config||{};
+  if(c.nome){var el=document.getElementById('cfg-nome');if(el)el.value=c.nome;}
+  if(c.data){var el=document.getElementById('cfg-data');if(el)el.value=c.data;}
+  if(c.local){var el=document.getElementById('cfg-local');if(el)el.value=c.local;}
+  if(c.orcamento){var el=document.getElementById('cfg-orcamento');if(el)el.value=c.orcamento;}
+  atualizarHeader();renderCronograma();renderOrc();renderConvidados();renderOrdem();renderCheck();calcResumo();countdown();
+  setInterval(countdown,30000);checarLicenca();
+}
+
+function salvar(){
+  estado.config={nome:get('cfg-nome'),data:get('cfg-data'),local:get('cfg-local'),orcamento:get('cfg-orcamento')};
+  salvarEstado();atualizarHeader();countdown();calcResumo();
+}
+function salvarEstado(){try{localStorage.setItem('flowi-15anos-free',JSON.stringify(estado));}catch(e){}}
+
+function atualizarHeader(){
+  var c=estado.config||{};
+  set('hdr-nome',c.nome?'Festa de '+c.nome:'Minha Festa');
+  set('hdr-sub',c.local||'Configure na aba Início');
+}
+function countdown(){
+  var c=estado.config||{};
+  if(!c.data){['cd-dias','cd-hrs','cd-min'].forEach(id=>set(id,'--'));return;}
+  var festa=new Date(c.data+'T20:00:00'),agora=new Date(),diff=festa-agora;
+  if(diff<=0){['cd-dias','cd-hrs','cd-min'].forEach(id=>set(id,'0'));return;}
+  set('cd-dias',Math.floor(diff/86400000));
+  set('cd-hrs',Math.floor((diff%86400000)/3600000));
+  set('cd-min',Math.floor((diff%3600000)/60000));
+}
+function calcResumo(){
+  var orc=estado.orc||[];
+  var orcado=orc.reduce((a,o)=>a+parseFloat(o.val||0),0);
+  var pago=orc.filter(o=>o.status==='pago').reduce((a,o)=>a+parseFloat(o.val||0),0);
+  var conv=(estado.convidados||[]).length;
+  var done=(estado.check||[]).filter(c=>c.done).length;
+  var tot=(estado.check||[]).length;
+  var fmt=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
+  set('res-orcado',fmt(orcado));set('res-pago',fmt(pago));
+  set('res-conv',conv);set('res-check',done+' / '+tot);
+}
+
+// CRONOGRAMA
+function adicionarCrono(){
+  var nome=get('cr-nome').trim(),prazo=parseFloat(get('cr-prazo'));
+  if(!nome)return alert('Preencha a tarefa.');
+  if(!estado.crono)estado.crono=[];
+  estado.crono.push({id:'cr'+Date.now(),nome,cat:'Personalizado',prazo:prazo||3,done:false});
+  salvarEstado();renderCronograma();
+  var el=document.getElementById('cr-nome');if(el)el.value='';
+}
+function renderCronograma(){
+  var el=document.getElementById('lista-cronograma');if(!el)return;
+  var items=estado.crono||[];
+  var c=estado.config||{};
+  var hoje=new Date();
+  var dataFesta=c.data?new Date(c.data+'T20:00:00'):null;
+  el.innerHTML=items.map(cr=>{
+    var mesesRestantes=dataFesta?((dataFesta-hoje)/(1000*60*60*24*30)):999;
+    var urgente=!cr.done&&dataFesta&&mesesRestantes<=cr.prazo;
+    if(editCronoId===cr.id)return `<div class="edit-box">
+      <input type="text" id="ec-nome-${cr.id}" value="${cr.nome.replace(/"/g,'&quot;')}">
+      <input type="number" id="ec-prazo-${cr.id}" value="${cr.prazo}" placeholder="Meses antes" step="0.5">
+      <div class="edit-actions">
+        <button class="edit-save" onclick="salvarEditCrono('${cr.id}')">Salvar</button>
+        <button class="edit-cancel" onclick="editCronoId=null;renderCronograma()">Cancelar</button>
+        <button class="edit-del" onclick="confirmarExclusao('Excluir?',()=>excluirCrono('${cr.id}'))">Excluir</button>
+      </div></div>`;
+    return `<div class="crono-item ${cr.done?'feito':urgente?'urgente':''}" onclick="toggleCrono('${cr.id}')">
+      <div style="width:18px;height:18px;border-radius:50%;border:2px solid ${cr.done?'var(--green)':urgente?'var(--red)':'var(--border)'}; background:${cr.done?'var(--green)':'white'};display:flex;align-items:center;justify-content:center;font-size:10px;color:white;flex-shrink:0;margin-top:1px">${cr.done?'✓':''}</div>
+      <div style="flex:1">
+        <div class="ci-name" style="${cr.done?'text-decoration:line-through;color:var(--muted)':''}">${cr.nome}</div>
+        <div class="ci-quando">${cr.prazo>=1?cr.prazo+' meses antes':Math.round(cr.prazo*4)+' semanas antes'}${urgente?' · ⚠️ Atenção!':''}</div>
+      </div>
+      <button class="btn-sm" onclick="event.stopPropagation();editCronoId='${cr.id}';renderCronograma()">✏</button>
+    </div>`;
+  }).join('');
+}
+function toggleCrono(id){var c=(estado.crono||[]).find(x=>x.id===id);if(c)c.done=!c.done;salvarEstado();renderCronograma();calcResumo();}
+function salvarEditCrono(id){
+  var c=(estado.crono||[]).find(x=>x.id===id);
+  if(c){var n=document.getElementById('ec-nome-'+id);if(n)c.nome=n.value.trim()||c.nome;var p=document.getElementById('ec-prazo-'+id);if(p)c.prazo=parseFloat(p.value)||c.prazo;}
+  editCronoId=null;salvarEstado();renderCronograma();
+}
+function excluirCrono(id){estado.crono=(estado.crono||[]).filter(c=>c.id!==id);editCronoId=null;salvarEstado();renderCronograma();}
+
+// ORÇAMENTO
+function adicionarOrc(){
+  var nome=get('o-nome').trim(),cat=get('o-cat'),val=get('o-val'),status=get('o-status');
+  if(!nome)return alert('Preencha a descrição.');
+  if(!estado.orc)estado.orc=[];
+  estado.orc.push({id:Date.now(),nome,cat,val:parseFloat(val)||0,status});
+  salvarEstado();renderOrc();calcResumo();
+  var el=document.getElementById('o-nome');if(el)el.value='';
+}
+function renderOrc(){
+  var el=document.getElementById('lista-orc');if(!el)return;
+  var items=estado.orc||[];
+  if(!items.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhum item adicionado</div>';return;}
+  var cls={pesquisando:'s-pesquisando',orcado:'s-orcado',contratado:'s-contratado',pago:'s-pago'};
+  var lbl={pesquisando:'Pesquisando',orcado:'Orçado',contratado:'Contratado',pago:'Pago'};
+  el.innerHTML=items.map(o=>{
+    if(editOrcId===o.id)return `<div class="edit-box">
+      <input type="text" id="eo-nome-${o.id}" value="${o.nome.replace(/"/g,'&quot;')}">
+      <div class="field-row" style="margin-bottom:6px"><input type="number" id="eo-val-${o.id}" value="${o.val}">
+      <select id="eo-status-${o.id}" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;">
+        <option value="pesquisando">Pesquisando</option><option value="orcado">Orçado</option>
+        <option value="contratado">Contratado</option><option value="pago">Pago</option>
+      </select></div>
+      <div class="edit-actions">
+        <button class="edit-save" onclick="salvarEditOrc(${o.id})">Salvar</button>
+        <button class="edit-cancel" onclick="editOrcId=null;renderOrc()">Cancelar</button>
+        <button class="edit-del" onclick="confirmarExclusao('Excluir?',()=>excluirOrc(${o.id}))">Excluir</button>
+      </div></div>`;
+    return `<div class="orc-row">
+      <div style="flex:1"><div class="item-nome">${o.nome}</div><div class="item-sub">${o.cat}</div></div>
+      <span class="status-badge ${cls[o.status]}">${lbl[o.status]}</span>
+      <div style="font-size:13px;font-weight:700;color:#be185d">R$ ${parseFloat(o.val||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+      <button class="btn-sm" onclick="editOrcId=${o.id};renderOrc()">✏</button>
+    </div>`;
+  }).join('');
+}
+function salvarEditOrc(id){
+  var o=(estado.orc||[]).find(x=>x.id===id);
+  if(o){var n=document.getElementById('eo-nome-'+id);if(n)o.nome=n.value.trim()||o.nome;var v=document.getElementById('eo-val-'+id);if(v)o.val=parseFloat(v.value)||0;var s=document.getElementById('eo-status-'+id);if(s)o.status=s.value;}
+  editOrcId=null;salvarEstado();renderOrc();calcResumo();
+}
+function excluirOrc(id){estado.orc=(estado.orc||[]).filter(o=>o.id!==id);editOrcId=null;salvarEstado();renderOrc();calcResumo();}
+
+// CONVIDADOS
+function adicionarConvidado(){
+  var nome=get('cv-nome').trim(),status=get('cv-status'),obs=get('cv-obs');
+  if(!nome)return alert('Preencha o nome.');
+  if(!estado.convidados)estado.convidados=[];
+  estado.convidados.push({id:Date.now(),nome,status,obs});
+  salvarEstado();renderConvidados();calcResumo();
+  var el=document.getElementById('cv-nome');if(el)el.value='';
+  var el2=document.getElementById('cv-obs');if(el2)el2.value='';
+}
+function renderConvidados(){
+  var el=document.getElementById('lista-convidados');if(!el)return;
+  var items=estado.convidados||[];
+  var busca=(get('cv-busca')||'').toLowerCase().trim();
+  
+  var conf=items.filter(c=>c.status==='confirmado').length;
+  var pend=items.filter(c=>c.status==='pendente').length;
+  var rec=items.filter(c=>c.status==='recusado').length;
+  set('resumo-conv',items.length+' total · '+conf+' confirmados · '+pend+' pendentes · '+rec+' recusados');
+  
+  // Filtragem pela busca
+  var filtrados = items.filter(c => c.nome.toLowerCase().includes(busca));
+
+  if(!filtrados.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">'+(busca?'Nenhum convidado encontrado':'Nenhum convidado adicionado')+'</div>';
+    return;
+  }
+  
+  el.innerHTML=filtrados.map(c=>{
+    if(editConvId===c.id)return `<div class="edit-box">
+      <input type="text" id="ecv-nome-${c.id}" value="${c.nome.replace(/"/g,'&quot;')}">
+      <input type="text" id="ecv-obs-${c.id}" value="${(c.obs||'').replace(/"/g,'&quot;')}" placeholder="Observação">
+      <select id="ecv-status-${c.id}" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px;font-family:'Inter',sans-serif;">
+        <option value="pendente" ${c.status==='pendente'?'selected':''}>Pendente</option>
+        <option value="confirmado" ${c.status==='confirmado'?'selected':''}>Confirmado</option>
+        <option value="recusado" ${c.status==='recusado'?'selected':''}>Recusado</option>
+      </select>
+      <div class="edit-actions">
+        <button class="edit-save" onclick="salvarEditConv(${c.id})">Salvar</button>
+        <button class="edit-cancel" onclick="editConvId=null;renderConvidados()">Cancelar</button>
+        <button class="edit-del" onclick="confirmarExclusao('Excluir este convidado?',()=>excluirConv(${c.id}))">Excluir</button>
+      </div></div>`;
+    return `<div class="conv-row">
+      <div style="flex:1"><div class="item-nome">${c.nome}</div>${c.obs?`<div class="item-sub">${c.obs}</div>`:''}
+      </div>
+      <span class="status-${c.status}">${c.status==='confirmado'?'Confirmado':c.status==='recusado'?'Recusado':'Pendente'}</span>
+      <button class="btn-sm" onclick="editConvId=${c.id};renderConvidados()">✏</button>
+    </div>`;
+  }).join('');
+}function salvarEditConv(id){
+  var c=(estado.convidados||[]).find(x=>x.id===id);
+  if(c){var n=document.getElementById('ecv-nome-'+id);if(n)c.nome=n.value.trim()||c.nome;var o=document.getElementById('ecv-obs-'+id);if(o)c.obs=o.value.trim();var s=document.getElementById('ecv-status-'+id);if(s)c.status=s.value;}
+  editConvId=null;salvarEstado();renderConvidados();calcResumo();
+}
+function excluirConv(id){estado.convidados=(estado.convidados||[]).filter(c=>c.id!==id);editConvId=null;salvarEstado();renderConvidados();calcResumo();}
+
+// ORDEM DO DIA
+function adicionarOrdem(){
+  var hora=get('od-hora'),desc=get('od-desc').trim(),det=get('od-det').trim();
+  if(!hora||!desc)return alert('Preencha horário e descrição.');
+  if(!estado.ordem)estado.ordem=[];
+  estado.ordem.push({id:Date.now(),hora,desc,det});
+  estado.ordem.sort((a,b)=>a.hora.localeCompare(b.hora));
+  salvarEstado();renderOrdem();
+  var el=document.getElementById('od-desc');if(el)el.value='';
+  var el2=document.getElementById('od-det');if(el2)el2.value='';
+}
+function renderOrdem(){
+  var el=document.getElementById('lista-ordem');if(!el)return;
+  var items=estado.ordem||[];
+  if(!items.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhum momento adicionado</div>';return;}
+  el.innerHTML=items.map(o=>{
+    if(editOrdemId===o.id)return `<div class="edit-box">
+      <div class="field-row" style="margin-bottom:6px"><input type="time" id="eo-hora-${o.id}" value="${o.hora}"><input type="text" id="eo-desc-${o.id}" value="${o.desc.replace(/"/g,'&quot;')}"></div>
+      <input type="text" id="eo-det-${o.id}" value="${(o.det||'').replace(/"/g,'&quot;')}" placeholder="Detalhes">
+      <div class="edit-actions">
+        <button class="edit-save" onclick="salvarEditOrdem('${o.id}')">Salvar</button>
+        <button class="edit-cancel" onclick="editOrdemId=null;renderOrdem()">Cancelar</button>
+        <button class="edit-del" onclick="confirmarExclusao('Excluir este momento?',()=>excluirOrdem('${o.id}'))">Excluir</button>
+      </div></div>`;
+    return `<div class="ordem-row">
+      <div class="ordem-hora">${o.hora}</div>
+      <div style="flex:1"><div class="item-nome">${o.desc}</div>${o.det?`<div class="item-sub">${o.det}</div>`:''}
+      </div>
+      <button class="btn-sm" onclick="editOrdemId='${o.id}';renderOrdem()">✏</button>
+    </div>`;
+  }).join('');
+}
+
+function salvarEditOrdem(id){
+  var o=(estado.ordem||[]).find(x=>String(x.id)===String(id));
+  if(o){
+    var h=document.getElementById('eo-hora-'+id);if(h)o.hora=h.value||o.hora;
+    var d=document.getElementById('eo-desc-'+id);if(d)o.desc=d.value.trim()||o.desc;
+    var det=document.getElementById('eo-det-'+id);if(det)o.det=det.value.trim();
+  }
+  estado.ordem.sort((a,b)=>a.hora.localeCompare(b.hora));
+  editOrdemId=null;salvarEstado();renderOrdem();
+}
+
+function excluirOrdem(id){
+  estado.ordem=(estado.ordem||[]).filter(o=>String(o.id)!==String(id));
+  editOrdemId=null;salvarEstado();renderOrdem();
+}
+// CHECKLIST
+function adicionarCheck(){
+  var nome=get('chk-nome').trim();
+  var cat=get('chk-cat')||'Outros';
+  if(!nome)return alert('Preencha a tarefa.');
+  if(!estado.check)estado.check=[];
+  estado.check.push({id:'chk'+Date.now(),nome,cat,done:false});
+  salvarEstado();renderCheck();
+  var el=document.getElementById('chk-nome');if(el)el.value='';
+}
+function renderCheck(){
+  var el=document.getElementById('lista-check');if(!el)return;
+  var items=estado.check||[];
+  if(!items.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhuma tarefa adicionada</div>';return;}
+
+  var categoriasValidas = ["Alimentação","Beleza","Decoração","Evento","Foto & Vídeo","Local","Mimos","Moda","Música","Organização","Papelaria","Outros"];
+
+  var grupos = {};
+  items.forEach(c => {
+    var cat = c.cat || 'Outros';
+    if(!grupos[cat]) grupos[cat] = [];
+    grupos[cat].push(c);
+  });
+
+  var html = '';
+  Object.keys(grupos).sort().forEach(cat => {
+    html += `<div class="section-lbl">${cat.toUpperCase()}</div>`;
+    grupos[cat].sort((a,b) => a.nome.localeCompare(b.nome)).forEach(c => {
+      if(editCheckId===c.id){
+        var opts = categoriasValidas.map(v => `<option value="${v}" ${(c.cat||'Outros')===v?'selected':''}>${v}</option>`).join('');
+        html += `<div class="edit-box">
+          <input type="text" id="eck-${c.id}" value="${c.nome.replace(/"/g,'&quot;')}">
+          <select id="eck-cat-${c.id}" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px;font-family:'Inter',sans-serif;">${opts}</select>
+          <div class="edit-actions">
+            <button class="edit-save" onclick="salvarEditCheck('${c.id}')">Salvar</button>
+            <button class="edit-cancel" onclick="editCheckId=null;renderCheck()">Cancelar</button>
+            <button class="edit-del" onclick="confirmarExclusao('Excluir?',()=>excluirCheck('${c.id}'))">Excluir</button>
+          </div></div>`;
+      } else {
+        html += `<div class="check-item ${c.done?'done':''}">
+          <div class="ci-circle" onclick="toggleCheck('${c.id}')">${c.done?'✓':''}</div>
+          <div style="flex:1"><div class="ci-name">${c.nome}</div></div>
+          <button class="btn-sm" onclick="editCheckId='${c.id}';renderCheck()">✏</button>
+        </div>`;
+      }
+    });
+  });
+
+  el.innerHTML = html;
+  calcResumo();
+}
+function toggleCheck(id){
+  var c=(estado.check||[]).find(x=>String(x.id)===String(id));
+  if(c)c.done=!c.done;
+  salvarEstado();renderCheck();
+}
+
+function salvarEditCheck(id){
+  var c=(estado.check||[]).find(x=>String(x.id)===String(id));
+  if(c){
+    var n=document.getElementById('eck-'+id);if(n)c.nome=n.value.trim()||c.nome;
+    var cat=document.getElementById('eck-cat-'+id);if(cat)c.cat=cat.value;
+  }
+  editCheckId=null;salvarEstado();renderCheck();
+}
+function excluirCheck(id){
+  estado.check=(estado.check||[]).filter(c=>String(c.id)!==String(id));
+  editCheckId=null;salvarEstado();renderCheck();
+}
+function resetarTudo(){confirmarExclusao('Apagar TODOS os dados?',function(){localStorage.removeItem('flowi-15anos-free');localStorage.removeItem('flowi-15anos-premium-licenca');location.reload();});}
+carregar();
+</script>
+</body>
+</html>
