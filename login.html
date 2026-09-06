@@ -6,11 +6,17 @@
   <title>Flowi - Entrar ou Cadastrar</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background-color: #0a0a0a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }
+    body { background-color: #0a0a0a; color: #f8fafc; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    
+    .nav-voltar { position: absolute; top: 20px; left: 20px; display: flex; align-items: center; gap: 8px; text-decoration: none; color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 500; }
+    .nav-voltar:hover { color: #fff; }
+
     .card { background: #111827; border-radius: 16px; padding: 36px; width: 100%; max-width: 380px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-    .logo { text-align: center; margin-bottom: 24px; font-weight: 700; font-size: 18px; letter-spacing: 2px; }
-    h2 { text-align: center; margin-bottom: 20px; font-size: 20px; font-weight: 600; }
+    .logo { text-align: center; margin-bottom: 24px; font-weight: 700; font-size: 20px; letter-spacing: 2px; }
+    .logo a { color: #fff; text-decoration: none; }
+    
+    h2 { text-align: center; margin-bottom: 20px; font-size: 18px; font-weight: 600; color: #e2e8f0; }
     .field { margin-bottom: 16px; }
     label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
     input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #374151; background: #1f2937; color: #fff; font-size: 14px; outline: none; }
@@ -24,8 +30,12 @@
 </head>
 <body>
 
+<a href="index.html" class="nav-voltar">← Voltar para o início</a>
+
 <div class="card">
-  <div class="logo">flowi</div>
+  <div class="logo">
+    <a href="index.html">flowi</a>
+  </div>
   <h2 id="titulo">Acessar Conta</h2>
   
   <div class="field">
@@ -49,7 +59,6 @@
 </div>
 
 <script>
-  // Insira suas credenciais do Supabase aqui
   const SUPABASE_URL = 'https://gkvanakreiiiprriyats.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_1Lx3D9jBwegVvvqTK39JAg_yV6zuw3s'; 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -77,30 +86,25 @@
     }
 
     if (modoCadastro) {
-      // Cadastro
       const { data, error } = await supabaseClient.auth.signUp({ email, password: senha });
       if (error) {
         msg.textContent = error.message;
       } else {
         if (data.user) {
-          await supabaseClient.from('usuarios_dados').insert({
-            id: data.user.id,
-            dados: {}
-          });
+          await supabaseClient.from('usuarios_dados').insert({ id: data.user.id, dados: {} });
         }
-        msg.style.color = '#10b981';
-        msg.textContent = 'Conta criada com sucesso!';
         
-        // Redireciona conforme a origem
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('origem') === 'checkout') {
-          window.location.href = 'LINK_DO_SEU_MERCADO_PAGO';
-        } else {
+        // Faz o login automático após cadastrar
+        const loginRes = await supabaseClient.auth.signInWithPassword({ email, password: senha });
+        if (!loginRes.error) {
           window.location.href = 'premium.html';
+        } else {
+          msg.style.color = '#10b981';
+          msg.textContent = 'Conta criada! Faça login para continuar.';
+          alternarModo();
         }
       }
     } else {
-      // Login
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
       if (error) {
         msg.textContent = 'E-mail ou senha inválidos.';
