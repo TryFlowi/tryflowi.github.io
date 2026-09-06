@@ -63,14 +63,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:fl
 .votar-btn:hover{opacity:0.85;}
 .votos-lista{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-size:12px;}
 .voto-tag{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:4px 12px;color:rgba(255,255,255,0.4);}
-footer{border-top:1px solid rgba(255,255,255,0.05);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+footer{border-top:1px solid rgba(255,255,255,0.05);padding:40px;display:flex;flex-direction:column;gap:24px;}
+.footer-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.footer-links{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px;border-top:1px solid rgba(255,255,255,0.05);padding-top:20px;}
+.footer-link{font-size:11px;color:rgba(255,255,255,0.35);text-decoration:none;transition:color .2s;}
+.footer-link:hover{color:white;}
 @media(max-width:768px){
   nav{padding:16px 20px;}
   .segs{padding:60px 20px;}
   .segs-grid{grid-template-columns:1fr;}
   .votar-section{padding:60px 20px;}
   .votar-form{flex-direction:column;}
-  footer{padding:24px 20px;flex-direction:column;text-align:center;}
+  footer{padding:32px 20px;text-align:center;}
+  .footer-top{flex-direction:column;}
+  .footer-links{gap:12px;}
 }
 #back-top{position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;font-size:16px;cursor:pointer;z-index:99;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
 </style>
@@ -186,13 +192,23 @@ footer{border-top:1px solid rgba(255,255,255,0.05);padding:32px 40px;display:fle
 </section>
 
 <footer>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <div class="nav-icon" style="gap:2px"><span style="width:16px;height:2px"></span><span style="width:11px;height:2px"></span><span style="width:7px;height:2px"></span></div>
-    <div class="nav-dot" style="width:5px;height:5px;margin-left:-3px;margin-bottom:0"></div>
-    <span style="font-size:13px;font-weight:600;letter-spacing:2px;margin-left:4px;">flowi</span>
+  <div class="footer-top">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="nav-icon" style="gap:2px"><span style="width:16px;height:2px"></span><span style="width:11px;height:2px"></span><span style="width:7px;height:2px"></span></div>
+      <div class="nav-dot" style="width:5px;height:5px;margin-left:-3px;margin-bottom:0"></div>
+      <span style="font-size:13px;font-weight:600;letter-spacing:2px;margin-left:4px;">flowi</span>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.25);">Organize sem complicar</div>
+    <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.3);text-decoration:none;letter-spacing:1px;">@tryflowi</a>
   </div>
-  <div style="font-size:11px;color:rgba(255,255,255,0.25);">Organize sem complicar</div>
-  <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.3);text-decoration:none;letter-spacing:1px;">@tryflowi</a>
+
+  <div class="footer-links">
+    <a href="./privacidade.html" class="footer-link">Política de Privacidade</a>
+    <span style="font-size:10px;color:rgba(255,255,255,0.15)">•</span>
+    <a href="./reembolso.html" class="footer-link">Política de Reembolso</a>
+    <span style="font-size:10px;color:rgba(255,255,255,0.15)">•</span>
+    <a href="./termos.html" class="footer-link">Termos de Uso</a>
+  </div>
 </footer>
 
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
