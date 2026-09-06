@@ -7,79 +7,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flowi - Organize sem complicar</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{--night:#0a0a0a;}
-body{font-family:'Inter',sans-serif;background:var(--night);color:white;overflow-x:hidden;}
-.flowi-menu-overlay{position:fixed;inset:0;z-index:200;display:none;}
-.flowi-menu-overlay.open{display:block;}
-.flowi-menu-bg{position:absolute;inset:0;background:rgba(0,0,0,0.5);}
-.flowi-menu-panel{position:absolute;top:0;left:0;bottom:0;width:260px;background:#111827;padding:24px 20px;overflow-y:auto;}
-.flowi-menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
-.flowi-menu-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px;}
-.flowi-menu-item{display:flex;align-items:center;padding:11px 12px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.8);font-size:12px;font-weight:500;margin-bottom:4px;transition:background .2s;font-family:'Inter',sans-serif;}
-.flowi-menu-item:hover{background:rgba(255,255,255,0.1);}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(10,10,10,0.95),transparent);}
-.nav-logo{display:flex;align-items:flex-end;gap:6px;cursor:pointer;}
-.nav-icon{display:flex;flex-direction:column;gap:3px;}
-.nav-icon span{display:block;background:white;border-radius:2px;}
-.nav-icon span:nth-child(1){width:22px;height:2.5px;}
-.nav-icon span:nth-child(2){width:15px;height:2.5px;}
-.nav-icon span:nth-child(3){width:9px;height:2.5px;}
-.nav-dot{width:7px;height:7px;background:white;border-radius:50%;margin-bottom:1px;margin-left:-4px;}
-.hero{height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 24px;position:relative;overflow:hidden;}
-.hero-bg{position:absolute;inset:0;}
-.hero-bg img{width:100%;height:100%;object-fit:cover;opacity:0.18;filter:saturate(0.4);}
-.hero-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(10,10,10,0.1) 0%, rgba(10,10,10,0.92) 100%);}
-.hero-content{position:relative;z-index:2;}
-.hero-eyebrow{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:6px;margin-bottom:24px;}
-.hero-title{font-family:'Playfair Display',serif;font-size:clamp(52px,8vw,100px);line-height:0.95;margin-bottom:28px;}
-.hero-title em{font-style:italic;color:rgba(255,255,255,0.4);}
-.hero-sub{font-size:clamp(14px,1.5vw,17px);color:rgba(255,255,255,0.4);line-height:1.7;max-width:420px;margin:0 auto 40px;font-weight:300;}
-.hero-cta{display:inline-flex;align-items:center;gap:8px;background:white;color:#0a0a0a;font-size:13px;font-weight:600;letter-spacing:1px;padding:14px 28px;border-radius:40px;text-decoration:none;transition:opacity .2s;}
-.hero-cta:hover{opacity:0.85;}
-.segs{padding:100px 40px;max-width:1100px;margin:0 auto;}
-.segs-title{font-family:'Playfair Display',serif;font-size:clamp(32px,4vw,52px);line-height:1.1;margin-bottom:60px;text-align:center;}
-.segs-title span{font-style:italic;color:rgba(255,255,255,0.35);}
-.segs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;}
-.seg-card{position:relative;overflow:hidden;min-height:340px;display:flex;align-items:flex-end;text-decoration:none;}
-.card-img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:transform .7s;filter:saturate(0.7);}
-.seg-card:hover .card-img{transform:scale(1.05);}
-.card-overlay{position:absolute;inset:0;transition:opacity .3s;}
-.card-content{position:relative;z-index:2;padding:28px;}
-.card-tag{font-size:10px;letter-spacing:4px;margin-bottom:8px;font-weight:500;}
-.card-nome{font-family:'Playfair Display',serif;font-size:clamp(22px,2.5vw,32px);color:white;line-height:1.1;margin-bottom:12px;}
-.card-desc{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;}
-.card-arrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:1px;margin-top:14px;padding:8px 16px;border-radius:20px;font-weight:500;transition:opacity .2s;}
-.card-arrow:hover{opacity:0.8;}
-.votar-section{padding:80px 40px;border-top:1px solid rgba(255,255,255,0.06);}
-.votar-inner{max-width:700px;margin:0 auto;text-align:center;}
-.votar-title{font-family:'Playfair Display',serif;font-size:clamp(24px,3vw,36px);margin-bottom:12px;}
-.votar-sub{font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:32px;}
-.votar-form{display:flex;gap:8px;max-width:460px;margin:0 auto;}
-.votar-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 16px;font-size:13px;color:white;font-family:'Inter',sans-serif;outline:none;}
-.votar-input::placeholder{color:rgba(255,255,255,0.25);}
-.votar-btn{background:white;color:#0a0a0a;border:none;border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;}
-.votar-btn:hover{opacity:0.85;}
-.votos-lista{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-size:12px;}
-.voto-tag{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:4px 12px;color:rgba(255,255,255,0.4);}
-footer{border-top:1px solid rgba(255,255,255,0.05);padding:40px;display:flex;flex-direction:column;gap:24px;}
-.footer-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
-.footer-links{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px;border-top:1px solid rgba(255,255,255,0.05);padding-top:20px;}
-.footer-link{font-size:11px;color:rgba(255,255,255,0.35);text-decoration:none;transition:color .2s;}
-.footer-link:hover{color:white;}
-@media(max-width:768px){
-  nav{padding:16px 20px;}
-  .segs{padding:60px 20px;}
-  .segs-grid{grid-template-columns:1fr;}
-  .votar-section{padding:60px 20px;}
-  .votar-form{flex-direction:column;}
-  footer{padding:32px 20px;text-align:center;}
-  .footer-top{flex-direction:column;}
-  .footer-links{gap:12px;}
+  .btn-header-premium {
+  background-color: transparent;
+  border: 1px solid rgba(59, 130, 246, 0.6);
+  color: #60a5fa;
+  padding: 6px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
 }
-#back-top{position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;font-size:16px;cursor:pointer;z-index:99;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
-</style>
+
+.btn-header-premium:hover {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
 </head>
 <body>
 
@@ -112,7 +57,12 @@ footer{border-top:1px solid rgba(255,255,255,0.05);padding:40px;display:flex;fle
     </div>
     <div style="font-size:16px;font-weight:600;letter-spacing:2px;color:white;margin-left:6px;">flowi</div>
   </div>
-  <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:3px;text-decoration:none;">@tryflowi</a>
+  
+  <!-- Grupo do lado direito do menu -->
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="login.html" class="btn-header-premium">Já sou Premium</a>
+    <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:3px;text-decoration:none;">@tryflowi</a>
+  </div>
 </nav>
 
 <div class="hero">
