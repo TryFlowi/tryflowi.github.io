@@ -36,9 +36,6 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .brand-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;margin-left:-6px;margin-top:8px;}
 .brand-name{font-size:18px;font-weight:700;color:white;letter-spacing:2px;}
 .brand-tag{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:3px;margin-left:2px;}
-.mes-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
-.mes-btn{background:rgba(255,255,255,0.08);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
-.mes-atual{font-size:14px;font-weight:600;color:white;flex:1;text-align:center;letter-spacing:1px;}
 .tabs{display:flex;border-top:1px solid rgba(255,255,255,0.08);overflow-x:auto;}
 .tab-btn{flex:1;min-width:56px;padding:12px 4px;background:none;border:none;color:rgba(255,255,255,0.45);font-size:10px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
 .tab-btn.active{color:white;border-bottom-color:var(--accent);}
@@ -54,22 +51,14 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .resumo-val.pos{color:var(--green);}
 .resumo-val.neg{color:var(--red);}
 .resumo-val.acc{color:var(--accent);}
-.meta-bar-bg{background:var(--sand);border-radius:8px;height:10px;margin:10px 0 6px;}
-.meta-bar-fill{height:10px;border-radius:8px;background:var(--accent);transition:width .5s ease;}
-.meta-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
 .field{margin-bottom:12px;}
 .field label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:500;letter-spacing:.5px;}
 .field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;background:var(--cream);}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.field-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .btn-add{width:100%;padding:12px;background:var(--night);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
 .btn-reset{background:var(--red-light);color:var(--red);border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
 .btn-sm{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--muted);cursor:pointer;font-family:inherit;}
-.btn-del{background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;font-family:inherit;}
-.item-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--sand);border-radius:10px;margin-bottom:7px;}
-.item-nome{font-size:12px;font-weight:500;color:var(--text);}
-.item-sub{font-size:10px;color:var(--muted);margin-top:2px;}
 .edit-box{background:var(--sand);border-radius:10px;padding:12px;margin-bottom:8px;}
 .edit-box input,.edit-box select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px;font-family:'Inter',sans-serif;color:var(--text);}
 .edit-actions{display:flex;gap:6px;margin-top:6px;}
@@ -82,16 +71,12 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .ci-circle{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .2s;margin-top:1px;cursor:pointer;}
 .check-item.done .ci-circle{background:var(--accent);border-color:var(--accent);color:white;}
 .ci-name{font-size:12px;font-weight:500;color:var(--text);}
-.ci-detail{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;}
-.ci-quando{font-size:10px;color:var(--accent);font-weight:600;margin-top:4px;}
 .premium-card{background:linear-gradient(135deg,var(--night) 0%,#1a1a2e 100%);border-radius:20px;padding:24px;color:white;text-align:center;}
 .pf-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;text-align:left;}
 .pf-check{width:16px;height:16px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px;color:white;}
 .pf-text{font-size:12px;color:rgba(255,255,255,0.8);}
 .premium-btn{display:block;background:var(--accent);color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:13px;font-weight:700;letter-spacing:1px;margin-top:16px;}
-.section-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:2px;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 .flowi-footer{text-align:center;padding:16px 0 8px;font-size:10px;color:var(--muted);letter-spacing:2px;}
-.countdown{display:flex;gap:12px;margin-bottom:16px;}
 .cd-box{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;text-align:center;flex:1;}
 .cd-num{font-size:28px;font-weight:700;color:white;line-height:1;}
 .cd-label{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:2px;margin-top:4px;}
@@ -119,12 +104,9 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
     <a href="https://tryflowi.github.io/flowi-negocios/" class="flowi-menu-item">💼 Flowi Negócios</a>
     <a href="https://tryflowi.github.io/flowi-festas/" class="flowi-menu-item">🎉 Flowi Festas</a>
     <a href="https://tryflowi.github.io/flowi-financas/" class="flowi-menu-item">💰 Flowi Finanças</a>
-    <div style="border-top:1px solid rgba(255,255,255,0.08);margin-top:16px;padding-top:14px;text-align:center;">
-      <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:10px;color:rgba(255,255,255,0.35);text-decoration:none;letter-spacing:2px;">@tryflowi</a>
-    </div>
   </div>
 </div>
-<div style="background:#FEF9C3;border-bottom:1px solid #FDE047;padding:9px 20px;text-align:center;font-size:11px;color:#854d0e;line-height:1.5;">💾 Seus dados ficam salvos <strong>apenas neste dispositivo e navegador</strong>. Se trocar de aparelho, baixe o arquivo offline primeiro.</div>
+
 <div class="header">
   <div class="header-inner">
     <div class="brand">
@@ -161,11 +143,11 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
       <h3 style="margin-bottom:0">MINHA FESTA</h3>
       <button class="btn-reset" onclick="resetarTudo()">↺ Resetar</button>
     </div>
-    <div class="field"><label>Nome da debutante</label><input type="text" id="cfg-nome" placeholder="Ex: Isabela" oninput="salvar()"></div>
-    <div class="field"><label>Data da festa</label><input type="date" id="cfg-data" oninput="salvar()"></div>
-    <div class="field"><label>Local</label><input type="text" id="cfg-local" placeholder="Ex: Espaço Villa Garden" oninput="salvar()"></div>
-    <div class="field"><label>Orçamento total (R$)</label><input type="number" id="cfg-orcamento" placeholder="Ex: 30000" oninput="salvar()"></div>
-    <div class="field"><label>Número de convidados (estimativa)</label><input type="number" id="cfg-conv" placeholder="Ex: 150" oninput="salvar()"></div>
+    <div class="field"><label>Nome da debutante</label><input type="text" id="cfg-nome" placeholder="Ex: Isabela" onchange="salvar()"></div>
+    <div class="field"><label>Data da festa</label><input type="date" id="cfg-data" onchange="salvar()"></div>
+    <div class="field"><label>Local</label><input type="text" id="cfg-local" placeholder="Ex: Espaço Villa Garden" onchange="salvar()"></div>
+    <div class="field"><label>Orçamento total (R$)</label><input type="number" id="cfg-orcamento" placeholder="Ex: 30000" onchange="salvar()"></div>
+    <div class="field"><label>Número de convidados (estimativa)</label><input type="number" id="cfg-conv" placeholder="Ex: 150" onchange="salvar()"></div>
   </div>
 
   <div class="card">
@@ -176,24 +158,6 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
       <div class="resumo-item"><div class="resumo-label">Orçamento</div><div class="resumo-val" id="res-budget">R$ 0</div></div>
       <div class="resumo-item"><div class="resumo-label">Checklist</div><div class="resumo-val" id="res-check">0 / 12</div></div>
     </div>
-
-    <!-- PONTINHA: impacto de convidados -->
-    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
-      <div style="font-size:11px;color:var(--muted);margin-bottom:8px" id="conv-resumo">Informe o número de convidados para ver o impacto no orçamento.</div>
-      <div class="preview-lock">
-        <div style="font-size:18px;margin-bottom:6px">🔒</div>
-        <div style="font-size:12px;font-weight:600;color:#9d174d;margin-bottom:4px">Gestão de convidados com confirmação</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.6">Cada convidado confirmado muda o custo do buffet, das lembrançinhas e do espaço. No Premium você controla confirmações individuais e o orçamento se atualiza automaticamente.</div>
-        <button class="btn-add" style="margin-top:10px;font-size:11px;padding:8px 14px" onclick="switchTab('premium',document.querySelectorAll('.tab-btn')[3])">Ver Premium →</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="card" style="text-align:center">
-    <div style="font-size:26px;margin-bottom:8px">📥</div>
-    <h3 style="margin-bottom:6px;font-size:13px;color:var(--text)">SALVAR PARA USO OFFLINE</h3>
-    <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Baixe com seus dados salvos. Se trocar de dispositivo, abra este arquivo para recuperar tudo.</p>
-    <button onclick="baixarOffline()" class="btn-add">⬇ Baixar para usar offline</button>
   </div>
 </div>
 
@@ -216,16 +180,6 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
     <h3>ITENS DO ORÇAMENTO</h3>
     <div id="lista-orc"></div>
   </div>
-
-  <!-- PONTINHA: alerta de prazo bloqueado -->
-  <div class="card" style="background:var(--sand)">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-      <span style="font-size:16px">🔒</span>
-      <h3 style="margin-bottom:0;font-size:13px">Alerta de vencimento de orçamento</h3>
-    </div>
-    <p style="font-size:11px;color:var(--muted);line-height:1.7">Orçamentos de fornecedores têm validade. Se você deixar vencer, pode perder o preço negociado ou a data. O Premium avisa antes de vencer cada orçamento pendente.</p>
-    <button class="btn-add" style="margin-top:10px;font-size:11px;padding:8px 14px" onclick="switchTab('premium',document.querySelectorAll('.tab-btn')[3])">Quero esse alerta →</button>
-  </div>
 </div>
 
 <div class="tab-panel" id="tab-checklist">
@@ -238,59 +192,58 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
     <h3>CHECKLIST DA FESTA</h3>
     <div id="lista-check"></div>
   </div>
-
-  <!-- PONTINHA: cronograma bloqueado -->
-  <div class="card" style="background:var(--sand)">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-      <span style="font-size:16px">🔒</span>
-      <h3 style="margin-bottom:0;font-size:13px">Cronograma inteligente com alertas</h3>
-    </div>
-    <p style="font-size:11px;color:var(--muted);line-height:1.7">Sabia que o local precisa ser reservado com até 12 meses de antecedência? O cronograma do Premium organiza cada decisão no momento certo e avisa quando algum prazo está chegando.</p>
-    <button class="btn-add" style="margin-top:10px;font-size:11px;padding:8px 14px" onclick="switchTab('premium',document.querySelectorAll('.tab-btn')[3])">Ver o cronograma →</button>
-  </div>
 </div>
 
 <div class="tab-panel" id="tab-premium">
-  <div class="premium-card" style="border:1px solid rgba(190,24,93,0.3)">
-    <div style="display:inline-block;background:#be185d;color:white;font-size:10px;font-weight:600;letter-spacing:2px;padding:4px 12px;border-radius:20px;margin-bottom:14px">PREMIUM</div>
-    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px">A festa dos sonhos.<br>Sem susto no orçamento.</h3>
-    <p style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.7;margin-bottom:18px">Do primeiro orçamento ao último detalhe do dia.</p>
-    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Cronograma inteligente:</strong> o que contratar em cada mês, com alerta de urgência automático</div></div>
-    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Lista de convidados:</strong> confirmação individual e impacto no custo total em tempo real</div></div>
-    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Alerta de vencimento:</strong> aviso antes de qualquer orçamento perder a validade</div></div>
-    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Ordem do dia editável:</strong> roteiro completo da festa com horários e responsáveis</div></div>
-    <div class="pf-item"><div class="pf-check">✓</div><div class="pf-text"><strong>Checklist expandido:</strong> 24 itens, incluindo os que toda família esquece</div></div>
-    <div style="margin:18px 0"><div style="font-size:32px;font-weight:700;color:white">R$ 15,90</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">pagamento único · acesso vitalício</div></div>
-    <a href="https://pay.kiwify.com.br/6T1HOjR" target="_blank" class="premium-btn">Garantir o Premium por R$ 15,90 →</a>
+  <div class="premium-card">
+    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px">A festa dos sonhos.</h3>
+    <p style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.7;margin-bottom:18px">Adquira a versão completa para recursos avançados.</p>
+    <a href="https://pay.kiwify.com.br/6T1HOjR" target="_blank" class="premium-btn">Garantir o Premium →</a>
   </div>
-  <div class="flowi-footer">FLOWI · ORGANIZE SEM COMPLICAR · <a href="https://instagram.com/tryflowi" target="_blank" style="color:var(--muted);text-decoration:none">@tryflowi</a></div>
 </div>
 
 </div>
-<div style="max-width:640px;margin:0 auto;padding:0 20px 20px;text-align:center;font-size:11px;color:var(--muted);">Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none;">@tryflowi</a> &nbsp;·&nbsp; <a href="https://tryflowi.github.io/#votar" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none;">Sugerir melhoria</a></div>
-<button onclick="window.scrollTo({top:0,behavior:'smooth'})" id="back-top" title="Voltar ao topo" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(17,24,39,0.85);border:1px solid rgba(255,255,255,0.15);color:white;font-size:16px;cursor:pointer;z-index:99;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);">↑</button>
 
 <script>
-let estado={config:{},orc:[{"id": "orc0", "nome": "Salão de festas", "cat": "Local", "val": 0, "status": "pesquisando"}, {"id": "orc1", "nome": "Buffet / Catering", "cat": "Alimentação", "val": 0, "status": "pesquisando"}, {"id": "orc2", "nome": "Bolo", "cat": "Alimentação", "val": 0, "status": "pesquisando"}, {"id": "orc3", "nome": "DJ / Banda", "cat": "Música", "val": 0, "status": "pesquisando"}, {"id": "orc4", "nome": "Decoração", "cat": "Decoração", "val": 0, "status": "pesquisando"}, {"id": "orc5", "nome": "Vestido de debutante", "cat": "Moda", "val": 0, "status": "pesquisando"}, {"id": "orc6", "nome": "Fotógrafo", "cat": "Foto & Vídeo", "val": 0, "status": "pesquisando"}, {"id": "orc7", "nome": "Filmagem", "cat": "Foto & Vídeo", "val": 0, "status": "pesquisando"}, {"id": "orc8", "nome": "Convites", "cat": "Papelaria", "val": 0, "status": "pesquisando"}, {"id": "orc9", "nome": "Cerimonialista", "cat": "Organização", "val": 0, "status": "pesquisando"}, {"id": "orc10", "nome": "Maquiagem & Cabelo", "cat": "Beleza", "val": 0, "status": "pesquisando"}, {"id": "orc11", "nome": "Lembrançinhas", "cat": "Mimos", "val": 0, "status": "pesquisando"}],check:[{"id": "chk0", "nome": "Definir data e local da festa", "done": false}, {"id": "chk1", "nome": "Montar lista de convidados", "done": false}, {"id": "chk2", "nome": "Contratar cerimonialista", "done": false}, {"id": "chk3", "nome": "Escolher e contratar buffet", "done": false}, {"id": "chk4", "nome": "Escolher vestido", "done": false}, {"id": "chk5", "nome": "Contratar DJ ou banda", "done": false}, {"id": "chk6", "nome": "Contratar fotógrafo e filmagem", "done": false}, {"id": "chk7", "nome": "Enviar convites", "done": false}, {"id": "chk8", "nome": "Definir decoração", "done": false}, {"id": "chk9", "nome": "Agendar maquiagem e cabelo", "done": false}, {"id": "chk10", "nome": "Preparar lembrançinhas", "done": false}, {"id": "chk11", "nome": "Confirmar todos os fornecedores", "done": false}]};
-let editOrcId=null,editCheckId=null;
+let estado = {
+  config: {},
+  orc: [
+    {"id": "orc0", "nome": "Salão de festas", "cat": "Local", "val": 0, "status": "pesquisando"},
+    {"id": "orc1", "nome": "Buffet / Catering", "cat": "Alimentação", "val": 0, "status": "pesquisando"},
+    {"id": "orc2", "nome": "Bolo", "cat": "Alimentação", "val": 0, "status": "pesquisando"},
+    {"id": "orc3", "nome": "DJ / Banda", "cat": "Música", "val": 0, "status": "pesquisando"},
+    {"id": "orc4", "nome": "Decoração", "cat": "Decoração", "val": 0, "status": "pesquisando"},
+    {"id": "orc5", "nome": "Vestido de debutante", "cat": "Moda", "val": 0, "status": "pesquisando"},
+    {"id": "orc6", "nome": "Fotógrafo", "cat": "Foto & Vídeo", "val": 0, "status": "pesquisando"},
+    {"id": "orc7", "nome": "Filmagem", "cat": "Foto & Vídeo", "val": 0, "status": "pesquisando"},
+    {"id": "orc8", "nome": "Convites", "cat": "Papelaria", "val": 0, "status": "pesquisando"},
+    {"id": "orc9", "nome": "Cerimonialista", "cat": "Organização", "val": 0, "status": "pesquisando"},
+    {"id": "orc10", "nome": "Maquiagem & Cabelo", "cat": "Beleza", "val": 0, "status": "pesquisando"},
+    {"id": "orc11", "nome": "Lembrançinhas", "cat": "Mimos", "val": 0, "status": "pesquisando"}
+  ],
+  check: [
+    {"id": "chk0", "nome": "Definir data e local da festa", "done": false},
+    {"id": "chk1", "nome": "Montar lista de convidados", "done": false},
+    {"id": "chk2", "nome": "Contratar cerimonialista", "done": false},
+    {"id": "chk3", "nome": "Escolher e contratar buffet", "done": false},
+    {"id": "chk4", "nome": "Escolher vestido", "done": false},
+    {"id": "chk5", "nome": "Contratar DJ ou banda", "done": false},
+    {"id": "chk6", "nome": "Contratar fotógrafo e filmagem", "done": false},
+    {"id": "chk7", "nome": "Enviar convites", "done": false},
+    {"id": "chk8", "nome": "Definir decoração", "done": false},
+    {"id": "chk9", "nome": "Agendar maquiagem e cabelo", "done": false},
+    {"id": "chk10", "nome": "Preparar lembrançinhas", "done": false},
+    {"id": "chk11", "nome": "Confirmar todos os fornecedores", "done": false}
+  ]
+};
+
+let editOrcId = null;
+let editCheckId = null;
 
 function abrirMenu(){document.getElementById('flowi-menu').classList.add('open');}
 function fecharMenu(){document.getElementById('flowi-menu').classList.remove('open');}
 function get(id){return(document.getElementById(id)||{}).value||'';}
 function set(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
-function baixarOffline(){
-  var h=document.documentElement.outerHTML,
-      b=new Blob([h],{type:'text/html'}),
-      u=URL.createObjectURL(b),
-      a=document.createElement('a');
-  a.href=u;a.download='flowi-15anos-free.html';a.click();URL.revokeObjectURL(u);
-}
-function confirmarExclusao(msg,fn){if(confirm(msg||'Excluir este item?'))fn();}
-window.addEventListener('scroll',function(){var b=document.getElementById('back-top');if(b)b.style.display=window.scrollY>300?'flex':'none';});
-window.addEventListener('beforeunload',function(e){
-  var k=Object.keys(localStorage).some(function(k){return k.startsWith('flowi-');});
-  if(k){e.preventDefault();e.returnValue='Seus dados ficam salvos apenas neste navegador. Baixe o arquivo offline antes de trocar de dispositivo.';return e.returnValue;}
-});
 
 function switchTab(id,btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -298,24 +251,51 @@ function switchTab(id,btn){
   document.getElementById('tab-'+id).classList.add('active');
   if(btn)btn.classList.add('active');
 }
+
 function carregar(){
-  try{var s=localStorage.getItem('flowi-15anos-free');if(s)estado=JSON.parse(s);}catch(e){}
+  try{
+    var s=localStorage.getItem('flowi-15anos-free');
+    if(s) estado=JSON.parse(s);
+  }catch(e){}
+  
   var c=estado.config||{};
   var mapa={'cfg-nome':'nome','cfg-data':'data','cfg-local':'local','cfg-orcamento':'orcamento','cfg-conv':'conv'};
-  Object.entries(mapa).forEach(([id,key])=>{var el=document.getElementById(id);if(el&&c[key])el.value=c[key];});
-  atualizarHeader();renderOrc();renderCheck();calcResumo();countdown();
-  setInterval(countdown,30000);
+  Object.entries(mapa).forEach(([id,key])=>{
+    var el=document.getElementById(id);
+    if(el&&c[key]) el.value=c[key];
+  });
+  
+  atualizarHeader();
+  renderOrc();
+  renderCheck();
+  calcResumo();
+  countdown();
 }
+
 function salvar(){
-  estado.config={nome:get('cfg-nome'),data:get('cfg-data'),local:get('cfg-local'),orcamento:get('cfg-orcamento'),conv:get('cfg-conv')};
-  salvarEstado();atualizarHeader();countdown();calcResumo();
+  estado.config={
+    nome:get('cfg-nome'),
+    data:get('cfg-data'),
+    local:get('cfg-local'),
+    orcamento:get('cfg-orcamento'),
+    conv:get('cfg-conv')
+  };
+  salvarEstado();
+  atualizarHeader();
+  countdown();
+  calcResumo();
 }
-function salvarEstado(){try{localStorage.setItem('flowi-15anos-free',JSON.stringify(estado));}catch(e){}}
+
+function salvarEstado(){
+  try{ localStorage.setItem('flowi-15anos-free',JSON.stringify(estado)); }catch(e){}
+}
+
 function atualizarHeader(){
   var c=estado.config||{};
   set('hdr-nome',c.nome?'Festa de '+c.nome:'Minha Festa');
   set('hdr-sub',c.local||'Configure na aba Início');
 }
+
 function countdown(){
   var c=estado.config||{};
   if(!c.data){['cd-dias','cd-hrs','cd-min'].forEach(id=>set(id,'--'));return;}
@@ -325,100 +305,178 @@ function countdown(){
   set('cd-hrs',Math.floor((diff%86400000)/3600000));
   set('cd-min',Math.floor((diff%3600000)/60000));
 }
+
 function fmt(v){return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});}
+
 function calcResumo(){
   var orc=estado.orc||[];
   var orcado=orc.reduce((a,o)=>a+parseFloat(o.val||0),0);
   var pago=orc.filter(o=>o.status==='pago').reduce((a,o)=>a+parseFloat(o.val||0),0);
   var budget=parseFloat((estado.config||{}).orcamento||0);
   var done=(estado.check||[]).filter(c=>c.done).length;
-  set('res-orcado',fmt(orcado));set('res-pago',fmt(pago));
-  set('res-budget',fmt(budget));set('res-check',done+' / 12');
-
-  // Pontinha: impacto de convidados
-  var conv=parseInt((estado.config||{}).conv)||0;
-  var el=document.getElementById('conv-resumo');
-  if(el){
-    if(!conv){el.textContent='Informe o número de convidados para ver o impacto no orçamento.';}
-    else{
-      var custoPorPessoa=budget>0&&conv>0?Math.round(budget/conv):0;
-      el.innerHTML='Com <strong>'+conv+' convidados</strong> e orçamento de '+fmt(budget)+', cada pessoa representa aproximadamente <strong>'+fmt(custoPorPessoa)+'</strong>. Adicionar 10 convidados = +'+fmt(custoPorPessoa*10)+'.';
-    }
-  }
+  set('res-orcado',fmt(orcado));
+  set('res-pago',fmt(pago));
+  set('res-budget',fmt(budget));
+  set('res-check',done+' / '+(estado.check||[]).length);
 }
 
 function adicionarOrc(){
   var nome=get('o-nome').trim(),cat=get('o-cat'),val=get('o-val'),status=get('o-status');
   if(!nome)return alert('Preencha a descrição.');
   if(!estado.orc)estado.orc=[];
-  estado.orc.push({id:Date.now(),nome,cat,val:parseFloat(val)||0,status});
-  salvarEstado();renderOrc();calcResumo();
-  var el=document.getElementById('o-nome');if(el)el.value='';
+  
+  estado.orc.push({ id: 'orc_' + Date.now(), nome, cat, val:parseFloat(val)||0, status });
+  salvarEstado();
+  renderOrc();
+  calcResumo();
+  
+  var el=document.getElementById('o-nome');
+  if(el) el.value='';
 }
+
 function renderOrc(){
-  var el=document.getElementById('lista-orc');if(!el)return;
+  var el=document.getElementById('lista-orc');
+  if(!el) return;
   var items=estado.orc||[];
-  if(!items.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhum item adicionado ainda</div>';return;}
+  
+  if(!items.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px">Nenhum item adicionado ainda</div>';
+    return;
+  }
+  
   var cls={pesquisando:'s-pesquisando',orcado:'s-orcado',contratado:'s-contratado',pago:'s-pago'};
   var lbl={pesquisando:'Pesquisando',orcado:'Orçado',contratado:'Contratado',pago:'Pago'};
+  
   el.innerHTML=items.map(o=>{
-    if(editOrcId===o.id)return `<div class="edit-box">
-      <input type="text" id="eo-nome-${o.id}" value="${o.nome.replace(/"/g,'&quot;')}">
-      <div class="field-row" style="margin-bottom:6px"><input type="number" id="eo-val-${o.id}" value="${o.val}">
-      <select id="eo-status-${o.id}" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;">
-        <option value="pesquisando">Pesquisando</option><option value="orcado">Orçado</option>
-        <option value="contratado">Contratado</option><option value="pago">Pago</option>
-      </select></div>
-      <div class="edit-actions">
-        <button class="edit-save" onclick="salvarEditOrc(${o.id})">Salvar</button>
-        <button class="edit-cancel" onclick="editOrcId=null;renderOrc()">Cancelar</button>
-        <button class="edit-del" onclick="confirmarExclusao('Excluir?',()=>excluirOrc(${o.id}))">Excluir</button>
-      </div></div>`;
+    var sid = String(o.id);
+    if(String(editOrcId) === sid){
+      return `<div class="edit-box">
+        <input type="text" id="eo-nome-${sid}" value="${o.nome.replace(/"/g,'&quot;')}">
+        <div class="field-row" style="margin-bottom:6px">
+          <input type="number" id="eo-val-${sid}" value="${o.val}">
+          <select id="eo-status-${sid}" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;">
+            <option value="pesquisando" ${o.status==='pesquisando'?'selected':''}>Pesquisando</option>
+            <option value="orcado" ${o.status==='orcado'?'selected':''}>Orçado</option>
+            <option value="contratado" ${o.status==='contratado'?'selected':''}>Contratado</option>
+            <option value="pago" ${o.status==='pago'?'selected':''}>Pago</option>
+          </select>
+        </div>
+        <div class="edit-actions">
+          <button class="edit-save" onclick="salvarEditOrc('${sid}')">Salvar</button>
+          <button class="edit-cancel" onclick="editOrcId=null;renderOrc()">Cancelar</button>
+          <button class="edit-del" onclick="excluirOrc('${sid}')">Excluir</button>
+        </div>
+      </div>`;
+    }
     return `<div class="orc-row">
-      <div style="flex:1"><div class="item-nome">${o.nome}</div><div class="item-sub">${o.cat}</div></div>
-      <span class="status-badge ${cls[o.status]}">${lbl[o.status]}</span>
+      <div style="flex:1">
+        <div class="item-nome">${o.nome}</div>
+        <div class="item-sub">${o.cat}</div>
+      </div>
+      <span class="status-badge ${cls[o.status]||''}">${lbl[o.status]||o.status}</span>
       <div style="font-size:13px;font-weight:700;color:#be185d;min-width:70px;text-align:right">${fmt(parseFloat(o.val||0))}</div>
-      <button class="btn-sm" onclick="editOrcId=${o.id};renderOrc()">✏</button>
+      <button class="btn-sm" onclick="editOrcId='${sid}';renderOrc()">✏</button>
     </div>`;
   }).join('');
 }
+
 function salvarEditOrc(id){
-  var o=(estado.orc||[]).find(x=>x.id===id);
-  if(o){var n=document.getElementById('eo-nome-'+id);if(n)o.nome=n.value.trim()||o.nome;var v=document.getElementById('eo-val-'+id);if(v)o.val=parseFloat(v.value)||0;var s=document.getElementById('eo-status-'+id);if(s)o.status=s.value;}
-  editOrcId=null;salvarEstado();renderOrc();calcResumo();
+  var o=(estado.orc||[]).find(x=>String(x.id)===String(id));
+  if(o){
+    var n=document.getElementById('eo-nome-'+id);
+    if(n) o.nome=n.value.trim()||o.nome;
+    var v=document.getElementById('eo-val-'+id);
+    if(v) o.val=parseFloat(v.value)||0;
+    var s=document.getElementById('eo-status-'+id);
+    if(s) o.status=s.value;
+  }
+  editOrcId=null;
+  salvarEstado();
+  renderOrc();
+  calcResumo();
 }
-function excluirOrc(id){estado.orc=(estado.orc||[]).filter(o=>o.id!==id);editOrcId=null;salvarEstado();renderOrc();calcResumo();}
+
+function excluirOrc(id){
+  estado.orc=(estado.orc||[]).filter(o=>String(o.id)!==String(id));
+  editOrcId=null;
+  salvarEstado();
+  renderOrc();
+  calcResumo();
+}
 
 function adicionarCheck(){
-  var nome=get('chk-nome').trim();if(!nome)return alert('Preencha a tarefa.');
+  var nome=get('chk-nome').trim();
+  if(!nome)return alert('Preencha a tarefa.');
   if(!estado.check)estado.check=[];
-  estado.check.push({id:Date.now(),nome,done:false});
-  salvarEstado();renderCheck();calcResumo();
-  var el=document.getElementById('chk-nome');if(el)el.value='';
+  
+  estado.check.push({ id: 'chk_' + Date.now(), nome, done: false });
+  salvarEstado();
+  renderCheck();
+  calcResumo();
+  
+  var el=document.getElementById('chk-nome');
+  if(el) el.value='';
 }
+
 function renderCheck(){
-  var el=document.getElementById('lista-check');if(!el)return;
+  var el=document.getElementById('lista-check');
+  if(!el) return;
   var items=estado.check||[];
+  
   el.innerHTML=items.map(c=>{
-    if(editCheckId===c.id)return `<div class="edit-box">
-      <input type="text" id="eck-${c.id}" value="${c.nome.replace(/"/g,'&quot;')}">
-      <div class="edit-actions">
-        <button class="edit-save" onclick="salvarEditCheck(${c.id})">Salvar</button>
-        <button class="edit-cancel" onclick="editCheckId=null;renderCheck()">Cancelar</button>
-        <button class="edit-del" onclick="confirmarExclusao('Excluir?',()=>excluirCheck(${c.id}))">Excluir</button>
-      </div></div>`;
+    var sid = String(c.id);
+    if(String(editCheckId) === sid){
+      return `<div class="edit-box">
+        <input type="text" id="eck-${sid}" value="${c.nome.replace(/"/g,'&quot;')}">
+        <div class="edit-actions">
+          <button class="edit-save" onclick="salvarEditCheck('${sid}')">Salvar</button>
+          <button class="edit-cancel" onclick="editCheckId=null;renderCheck()">Cancelar</button>
+          <button class="edit-del" onclick="excluirCheck('${sid}')">Excluir</button>
+        </div>
+      </div>`;
+    }
     return `<div class="check-item ${c.done?'done':''}">
-      <div class="ci-circle" onclick="toggleCheck(${c.id})">${c.done?'✓':''}</div>
+      <div class="ci-circle" onclick="toggleCheck('${sid}')">${c.done?'✓':''}</div>
       <div style="flex:1"><div class="ci-name">${c.nome}</div></div>
-      <button class="btn-sm" onclick="editCheckId=${c.id};renderCheck()">✏</button>
+      <button class="btn-sm" onclick="editCheckId='${sid}';renderCheck()">✏</button>
     </div>`;
   }).join('');
 }
-function toggleCheck(id){var c=(estado.check||[]).find(x=>x.id===id);if(c)c.done=!c.done;salvarEstado();renderCheck();calcResumo();}
-function salvarEditCheck(id){var c=(estado.check||[]).find(x=>x.id===id);if(c){var n=document.getElementById('eck-'+id);if(n)c.nome=n.value.trim()||c.nome;}editCheckId=null;salvarEstado();renderCheck();}
-function excluirCheck(id){estado.check=(estado.check||[]).filter(c=>c.id!==id);editCheckId=null;salvarEstado();renderCheck();calcResumo();}
 
-function resetarTudo(){confirmarExclusao('Apagar TODOS os dados?',function(){localStorage.removeItem('flowi-15anos-free');location.reload();});}
+function toggleCheck(id){
+  var c=(estado.check||[]).find(x=>String(x.id)===String(id));
+  if(c) c.done=!c.done;
+  salvarEstado();
+  renderCheck();
+  calcResumo();
+}
+
+function salvarEditCheck(id){
+  var c=(estado.check||[]).find(x=>String(x.id)===String(id));
+  if(c){
+    var n=document.getElementById('eck-'+id);
+    if(n) c.nome=n.value.trim()||c.nome;
+  }
+  editCheckId=null;
+  salvarEstado();
+  renderCheck();
+}
+
+function excluirCheck(id){
+  estado.check=(estado.check||[]).filter(c=>String(c.id)!==String(id));
+  editCheckId=null;
+  salvarEstado();
+  renderCheck();
+  calcResumo();
+}
+
+function resetarTudo(){
+  if(confirm('Apagar TODOS os dados?')){
+    localStorage.removeItem('flowi-15anos-free');
+    location.reload();
+  }
+}
+
 carregar();
 </script>
 </body>
