@@ -414,13 +414,18 @@ document.getElementById('form-login-premium')?.addEventListener('submit', async 
   const { error } = await supabaseClient.auth.signInWithOtp({
     email: emailInput,
     options: {
+      shouldCreateUser: false,
       emailRedirectTo: window.location.href
     }
   });
 
   if (error) {
     mensagem.style.color = "#fca5a5";
-    mensagem.innerText = "Erro ao enviar. Verifique o e-mail digitado.";
+    if (error.message.includes("Signups not allowed") || error.status === 400) {
+      mensagem.innerText = "E-mail não encontrado em nossa base Premium. Faça a compra ou continue na versão gratuita!";
+    } else {
+      mensagem.innerText = "Erro ao enviar o e-mail. Verifique se digitou corretamente.";
+    }
     btnEnviar.disabled = false;
     btnEnviar.innerText = "Enviar Link de Acesso";
   } else {
