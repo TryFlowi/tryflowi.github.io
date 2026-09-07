@@ -344,10 +344,29 @@ Dúvidas: <a href="https://instagram.com/tryflowi" target="_blank" style="color:
 <button onclick="window.scrollTo({top:0,behavior:'smooth'})" id="back-top" title="Voltar ao topo" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(17,24,39,0.85);border:1px solid rgba(255,255,255,0.15);color:white;font-size:16px;cursor:pointer;z-index:99;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);">↑</button>
 
 <script>
+// CAPTURA E VALIDAÇÃO DE TOKEN (MAGIC LINK / SUPABASE)
+function capturarTokenURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(window.location.hash.substring(1));
+  
+  const token = urlParams.get('token') || urlParams.get('access_token') || hashParams.get('access_token');
+  const type = urlParams.get('type') || hashParams.get('type');
+  
+  if (token || type === 'recovery' || type === 'signup' || type === 'magiclink') {
+    localStorage.setItem('flowi_is_premium', 'true');
+    
+    // Limpar parâmetros sensíveis da URL
+    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+  }
+}
+
+capturarTokenURL();
+
 // ESTADO GLOBAL DA APLICAÇÃO
 let isPremium = localStorage.getItem('flowi_is_premium') === 'true';
 
-let estadoFree = {
+const ESTRUTURA_PADRAO = {
   config: {},
   orc: [
     {"id": "orc0", "nome": "Salão de festas", "cat": "Local", "val": 0, "status": "pesquisando"},
@@ -363,24 +382,6 @@ let estadoFree = {
     {"id": "orc10", "nome": "Maquiagem & Cabelo", "cat": "Beleza", "val": 0, "status": "pesquisando"},
     {"id": "orc11", "nome": "Lembrançinhas", "cat": "Mimos", "val": 0, "status": "pesquisando"}
   ],
-  check: [
-    {"id": "chk0", "nome": "Definir data e local da festa", "done": false},
-    {"id": "chk1", "nome": "Montar lista de convidados", "done": false},
-    {"id": "chk2", "nome": "Contratar cerimonialista", "done": false},
-    {"id": "chk3", "nome": "Escolher e contratar buffet", "done": false},
-    {"id": "chk4", "nome": "Escolher vestido", "done": false},
-    {"id": "chk5", "nome": "Contratar DJ ou banda", "done": false},
-    {"id": "chk6", "nome": "Contratar fotógrafo e filmagem", "done": false},
-    {"id": "chk7", "nome": "Enviar convites", "done": false},
-    {"id": "chk8", "nome": "Definir decoração", "done": false},
-    {"id": "chk9", "nome": "Agendar maquiagem e cabelo", "done": false},
-    {"id": "chk10", "nome": "Preparar lembrançinhas", "done": false},
-    {"id": "chk11", "nome": "Confirmar todos os fornecedores", "done": false}
-  ]
-};
-
-let estadoPremium = {
-  config: {},
   crono: [
     {"id": "cr1", "nome": "Definir data e local", "cat": "Local", "prazo": 12, "done": false},
     {"id": "cr2", "nome": "Contratar cerimonialista", "cat": "Organização", "prazo": 12, "done": false},
@@ -397,7 +398,6 @@ let estadoPremium = {
     {"id": "cr13", "nome": "Preparar lembrançinhas", "cat": "Mimos", "prazo": 2, "done": false},
     {"id": "cr14", "nome": "Ensaio de valsa", "cat": "Evento", "prazo": 3, "done": false}
   ],
-  orc: [],
   convidados: [],
   ordem: [
     {"id": "od0", "hora": "18:00", "desc": "Abertura do salão e recepção dos convidados", "det": ""},
@@ -438,7 +438,7 @@ let estadoPremium = {
   ]
 };
 
-let estado = isPremium ? estadoPremium : estadoFree;
+let estado = JSON.parse(JSON.stringify(ESTRUTURA_PADRAO));
 let editCronoId=null, editOrcId=null, editConvId=null, editOrdemId=null, editCheckId=null;
 
 // NAVEGAÇÃO E INTERFACE
@@ -481,6 +481,10 @@ function configurarAbas(){
 }
 
 function switchTab(id,btn){
+  const abasPremium = ['cronograma', 'convidados', 'ordemdia'];
+  if (!isPremium && abasPremium.includes(id)) {
+    id = 'premium';
+  }
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   var panel = document.getElementById('tab-'+id);
@@ -533,17 +537,27 @@ function checarLicenca(){
       }
     }
   }catch(ex){}
-  var o=document.getElementById('activation-overlay');if(o)o.style.display='flex';
 }
 
 // INICIALIZAÇÃO E CARREGAMENTO
 function carregar(){
   configurarAbas();
-  var key = isPremium ? 'flowi-15anos-premium' : 'flowi-15anos-free';
-  try{
-    var s=localStorage.getItem(key);
-    if(s) estado=JSON.parse(s);
-  }catch(e){}
+  
+  // UNIFICAÇÃO DA CHAVE DO LOCALSTORAGE (MANTÉM INTEGRIDADE DE DADOS)
+  const KEY_UNIFICADA = 'flowi_15anos_dados';
+  try {
+    let dadosSalvos = localStorage.getItem(KEY_UNIFICADA);
+    
+    // Migração de chaves legadas se existirem
+    if (!dadosSalvos) {
+      dadosSalvos = localStorage.getItem('flowi-15anos-free') || localStorage.getItem('flowi-15anos-premium');
+    }
+    
+    if (dadosSalvos) {
+      const parsed = JSON.parse(dadosSalvos);
+      estado = { ...ESTRUTURA_PADRAO, ...parsed };
+    }
+  } catch(e){}
 
   var c=estado.config||{};
   if(c.nome){var el=document.getElementById('cfg-nome');if(el)el.value=c.nome;}
@@ -581,8 +595,7 @@ function salvar(){
 }
 
 function salvarEstado(){
-  var key = isPremium ? 'flowi-15anos-premium' : 'flowi-15anos-free';
-  try{localStorage.setItem(key,JSON.stringify(estado));}catch(e){}
+  try{localStorage.setItem('flowi_15anos_dados', JSON.stringify(estado));}catch(e){}
 }
 
 function atualizarHeader(){
@@ -912,16 +925,18 @@ function baixarOffline(){
 function confirmarExclusao(msg,fn){if(confirm(msg||'Excluir este item?'))fn();}
 function resetarTudo(){
   if(confirm('Apagar TODOS os dados salvos?')){
+    localStorage.removeItem('flowi_15anos_dados');
     localStorage.removeItem('flowi-15anos-free');
     localStorage.removeItem('flowi-15anos-premium');
     localStorage.removeItem('flowi-15anos-premium-licenca');
+    localStorage.removeItem('flowi_is_premium');
     location.reload();
   }
 }
 
 window.addEventListener('scroll',function(){var b=document.getElementById('back-top');if(b)b.style.display=window.scrollY>300?'flex':'none';});
 window.addEventListener('beforeunload',function(e){
-  var k=Object.keys(localStorage).some(function(k){return k.startsWith('flowi-');});
+  var k=Object.keys(localStorage).some(function(k){return k.startsWith('flowi');});
   if(k){e.preventDefault();e.returnValue='Seus dados ficam salvos apenas neste navegador. Baixe o arquivo offline antes de trocar de dispositivo.';return e.returnValue;}
 });
 
