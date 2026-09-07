@@ -1,432 +1,1251 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flowi Viagens - Disney & Universal</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --night:#111827;--accent:#2563EB;--accent-light:#DBEAFE;--accent-mid:#93C5FD;
-  --cream:#F9FAFB;--sand:#F3F4F6;--white:#fff;
-  --text:#111827;--muted:#6B7280;--border:#E5E7EB;
-  --warn:#FEF9C3;--warn-border:#FDE047;
-  --red:#DC2626;--red-light:#FEE2E2;--green:#16a34a;--green-light:#DCFCE7;
-}
-body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
-.flowi-menu-overlay{position:fixed;inset:0;z-index:200;display:none;}
-.flowi-menu-overlay.open{display:block;}
-.flowi-menu-bg{position:absolute;inset:0;background:rgba(0,0,0,0.5);}
-.flowi-menu-panel{position:absolute;top:0;left:0;bottom:0;width:260px;background:#111827;padding:24px 20px;overflow-y:auto;}
-.flowi-menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
-.flowi-menu-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px;}
-.flowi-menu-item{display:flex;align-items:center;padding:11px 12px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.8);font-size:12px;font-weight:500;margin-bottom:4px;transition:background .2s;}
-.flowi-menu-item:hover{background:rgba(255,255,255,0.1);}
-.header{background:var(--night);position:sticky;top:0;z-index:100;}
-.header-inner{max-width:640px;margin:0 auto;padding:20px 20px 0;}
-.brand{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
-.brand-icon{display:flex;flex-direction:column;gap:3px;cursor:pointer;}
-.brand-icon span{display:block;background:white;border-radius:2px;}
-.brand-icon span:nth-child(1){width:28px;height:3px;}
-.brand-icon span:nth-child(2){width:19px;height:3px;}
-.brand-icon span:nth-child(3){width:12px;height:3px;}
-.brand-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;margin-left:-6px;margin-top:8px;}
-.brand-name{font-size:18px;font-weight:700;color:white;letter-spacing:2px;}
-.brand-tag{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:3px;margin-left:2px;}
-.tabs{display:flex;border-top:1px solid rgba(255,255,255,0.08);overflow-x:auto;}
-.tab-btn{flex:1;min-width:64px;padding:12px 4px;background:none;border:none;color:rgba(255,255,255,0.45);font-size:10px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
-.tab-btn.active{color:white;border-bottom-color:var(--accent);}
-.content{max-width:640px;margin:0 auto;padding:20px;}
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
-.card{background:white;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;}
-.card h3{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;margin-bottom:14px;}
-.resumo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.resumo-item{background:var(--sand);border-radius:12px;padding:14px;}
-.resumo-label{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:4px;}
-.resumo-val{font-size:18px;font-weight:700;color:var(--text);}
-.resumo-val.pos{color:var(--green);}
-.resumo-val.neg{color:var(--red);}
-.resumo-val.acc{color:var(--accent);}
-.field{margin-bottom:12px;}
-.field label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:500;letter-spacing:.5px;}
-.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;background:var(--cream);}
-.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.btn-add{width:100%;padding:12px;background:var(--night);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
-.btn-reset{background:var(--red-light);color:var(--red);border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
-.check-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
-.check-item:last-child{border-bottom:none;}
-.check-item.done .ci-name{text-decoration:line-through;color:var(--muted);}
-.ci-circle{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .2s;cursor:pointer;}
-.check-item.done .ci-circle{background:var(--accent);border-color:var(--accent);color:white;}
-.ci-name{font-size:12px;font-weight:500;color:var(--text);}
-.countdown{display:flex;gap:12px;margin-bottom:16px;}
-.cd-box{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;text-align:center;flex:1;}
-.cd-num{font-size:28px;font-weight:700;color:white;line-height:1;}
-.cd-label{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:2px;margin-top:4px;}
-.badge-status{margin-left:auto;border-radius:20px;padding:3px 10px;font-size:9px;letter-spacing:2px;font-weight:600;}
-.badge-free{background:rgba(37,99,235,0.2);border:1px solid rgba(37,99,235,0.4);color:#93C5FD;}
-.badge-premium{background:rgba(37,99,235,0.25);border:1px solid rgba(37,99,235,0.5);color:#93C5FD;}
-.orc-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--sand);border-radius:10px;margin-bottom:6px;}
-.preview-lock{background:rgba(37,99,235,0.05);border:1px dashed rgba(37,99,235,0.3);border-radius:12px;padding:14px;margin-top:10px;}
-.premium-card{background:linear-gradient(135deg,var(--night) 0%,#1a1a2e 100%);border-radius:20px;padding:24px;color:white;text-align:center;}
-.premium-btn{display:block;background:var(--accent);color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:13px;font-weight:700;letter-spacing:1px;margin-top:16px;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowi Viagens - Disney Orlando</title>
+    <!-- Fontes do Ecossistema -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            /* Cores Segmento: Flowi Viagens - Azul */
+            --primary: #2563EB;
+            --primary-hover: #1D4ED8;
+            --primary-light: #60A5FA;
+            --primary-glow: rgba(37, 99, 235, 0.25);
+            
+            /* Dark Mode Theme */
+            --bg-main: #0A0A0A;
+            --bg-card: #0F172A;
+            --bg-card-hover: #1E293B;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-accent: rgba(96, 165, 250, 0.3);
+            
+            /* Textos */
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --text-dim: #64748B;
+            
+            /* Status e Badges */
+            --badge-free-bg: rgba(148, 163, 184, 0.15);
+            --badge-free-text: #94A3B8;
+            --badge-prem-bg: rgba(37, 99, 235, 0.2);
+            --badge-prem-text: #60A5FA;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
 
-/* CONTROLE DE EXIBIÇÃO POR VERSÃO */
-.only-free{display:block;}
-.only-premium{display:none;}
-body.is-premium-active .only-free{display:none !important;}
-body.is-premium-active .only-premium{display:block !important;}
-</style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* --- HEADER & NAV --- */
+        header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .nav-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .badge-status {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .badge-free {
+            background: var(--badge-free-bg);
+            color: var(--badge-free-text);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .badge-premium {
+            background: var(--badge-prem-bg);
+            color: var(--badge-prem-text);
+            border: 1px solid var(--primary-light);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-header {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-header:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary-light);
+        }
+
+        .btn-hamburger {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- MENU HAMBÚRGUER SUSPENSO --- */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .menu-drawer {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100%;
+            background: var(--bg-card);
+            border-left: 1px solid var(--border-color);
+            z-index: 100;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-drawer.active {
+            right: 0;
+        }
+
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .menu-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .menu-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            display: block;
+            transition: all 0.2s;
+        }
+
+        .menu-links a:hover {
+            color: var(--text-main);
+            background: var(--bg-card-hover);
+        }
+
+        /* --- LAYOUT PRINCIPAL & TABS --- */
+        main {
+            flex: 1;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.5rem 1rem;
+        }
+
+        .alert-banner {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-light);
+            padding: 0.85rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .alert-banner button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.85rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* Tabs Navigation */
+        .tabs-nav {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+
+        .tabs-nav::-webkit-scrollbar {
+            height: 4px;
+        }
+        .tabs-nav::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: #FFFFFF;
+            background: var(--bg-card);
+            border-color: var(--border-accent);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tab-btn .lock-icon {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- CARDS & COMPONENTES --- */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .card-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+        }
+
+        /* Formulários e Inputs */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: #0A0A0A;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.65rem 0.85rem;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        /* Lists & Checklists */
+        .checklist-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .checklist-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .checklist-item.completed span {
+            text-decoration: line-through;
+            color: var(--text-dim);
+        }
+
+        /* --- CARD DE VENDA HIGH-CONVERSION (TAB PREMIUM) --- */
+        .premium-sales-card {
+            background: linear-gradient(145deg, #0F172A 0%, #1E1B4B 100%);
+            border: 1px solid var(--border-accent);
+            border-radius: 16px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            max-width: 620px;
+            margin: 2rem auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--primary-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-badge-glow {
+            display: inline-block;
+            background: var(--primary);
+            color: #FFF;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            letter-spacing: 1.5px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 0 12px var(--primary);
+        }
+
+        .sales-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
+            color: #FFFFFF;
+        }
+
+        .sales-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .bullets-list {
+            text-align: left;
+            margin: 0 auto 2rem auto;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .bullet-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .bullet-icon {
+            color: var(--primary-light);
+            font-weight: bold;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .price-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .price-val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #FFFFFF;
+        }
+
+        .price-sub {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-btn-premium {
+            display: block;
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            background: var(--primary);
+            color: #FFFFFF;
+            text-decoration: none;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn-premium:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+
+        /* --- MODAL AUTENTICAÇÃO --- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-accent);
+            border-radius: 14px;
+            width: 90%;
+            max-width: 420px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* --- FOOTER CLEAN --- */
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-top: auto;
+        }
+
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        footer a:hover {
+            color: var(--primary-light);
+        }
+
+        /* Utility classes */
+        .btn-action {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background: var(--primary-hover);
+        }
+
+        .result-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
 </head>
 <body>
 
-<div class="flowi-menu-overlay" id="flowi-menu">
-  <div class="flowi-menu-bg" onclick="fecharMenu()"></div>
-  <div class="flowi-menu-panel">
-    <div class="flowi-menu-header">
-      <span style="font-size:13px;font-weight:700;color:white;letter-spacing:2px;">flowi</span>
-      <button class="flowi-menu-close" onclick="fecharMenu()">✕</button>
-    </div>
-    <a href="#" class="flowi-menu-item">🏠 Início</a>
-    <a href="#" class="flowi-menu-item">✈ Flowi Viagens</a>
-  </div>
-</div>
+    <!-- CABEÇALHO SUPERIOR DINÂMICO -->
+    <header>
+        <div class="nav-left">
+            <div class="nav-logo" onclick="toggleMenu()">
+                <div style="display:flex;align-items:flex-end;gap:2px">
+                    <div class="nav-icon">
+                        <span style="width:22px;height:2.5px;background:white;border-radius:2px;display:block;"></span>
+                        <span style="width:15px;height:2.5px;background:white;border-radius:2px;display:block;"></span>
+                        <span style="width:9px;height:2.5px;background:white;border-radius:2px;display:block;"></span>
+                    </div>
+                    <div style="width:7px;height:7px;background:white;border-radius:50%;margin-bottom:1px;margin-left:-4px;"></div>
+                </div>
+                <div style="font-size:16px;font-weight:600;letter-spacing:2px;color:white;margin-left:6px;">flowi</div>
+            </div>
+            <span id="headerBadge" class="badge-status badge-free">FREE</span>
+        </div>
 
-<div class="header">
-  <div class="header-inner">
-    <div class="brand">
-      <div style="display:flex;align-items:flex-end;gap:2px">
-        <div class="brand-icon" onclick="abrirMenu()"><span></span><span></span><span></span></div>
-        <div class="brand-dot"></div>
-      </div>
-      <div><div class="brand-name">flowi</div><div class="brand-tag">VIAGENS · DISNEY</div></div>
-      <div id="badge-plano" class="badge-status badge-free">FREE</div>
-    </div>
-    <div style="margin-bottom:16px;">
-      <div style="font-size:22px;font-weight:700;color:white;" id="hdr-nome">Minha Viagem Disney</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px;" id="hdr-sub">Configure na aba Início</div>
-    </div>
-    <div class="countdown">
-      <div class="cd-box"><div class="cd-num" id="cd-dias">--</div><div class="cd-label">DIAS</div></div>
-      <div class="cd-box"><div class="cd-num" id="cd-hrs">--</div><div class="cd-label">HORAS</div></div>
-      <div class="cd-box"><div class="cd-num" id="cd-min">--</div><div class="cd-label">MIN</div></div>
-    </div>
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('inicio',this)">Início</button>
-      <button class="tab-btn" onclick="switchTab('checklist',this)">Checklist</button>
-      <button class="tab-btn" onclick="switchTab('orcamento',this)">Orçamento</button>
-      <button class="tab-btn only-premium" onclick="switchTab('roteiro',this)">Roteiro</button>
-      <button class="tab-btn only-premium" onclick="switchTab('guia',this)">Guia</button>
-      <button class="tab-btn only-premium" onclick="switchTab('dicas',this)">Dicas & Tools</button>
-      <button class="tab-btn only-free" onclick="switchTab('premium',this)">✦ Premium</button>
-    </div>
-  </div>
-</div>
+        <div class="nav-actions">
+            <button id="btnHeaderAccess" class="btn-header" onclick="abrirJaSouPremium()">
+                ✦ Já sou Premium
+            </button>
+            <button class="btn-hamburger" onclick="toggleMenu()" aria-label="Abrir Menu">☰</button>
+        </div>
+    </header>
 
-<div class="content">
-
-<!-- TAB 1: INÍCIO -->
-<div class="tab-panel active" id="tab-inicio">
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <h3 style="margin-bottom:0">CONFIGURAÇÃO DA VIAGEM</h3>
-      <button class="btn-reset" onclick="resetarTudo()">↺ Resetar</button>
-    </div>
-    <div class="field"><label>Nome da viagem</label><input type="text" id="cfg-nome" placeholder="Ex: Disney 2026 em Família" oninput="salvar()"></div>
-    <div class="field-row">
-      <div class="field"><label>Data de ida</label><input type="date" id="cfg-ida" oninput="salvar()"></div>
-      <div class="field"><label>Data de volta</label><input type="date" id="cfg-volta" oninput="salvar()"></div>
-    </div>
-    <div class="field-row">
-      <div class="field"><label>Número de viajantes</label><input type="number" id="cfg-viajantes" placeholder="Ex: 4" min="1" oninput="salvar()"></div>
-      <div class="field only-premium"><label>Cotação Dólar (R$)</label><input type="number" step="0.01" id="cfg-cambio" placeholder="Ex: 5.20" oninput="salvar()"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>RESUMO FINANCEIRO DA VIAGEM</h3>
-    <div class="resumo-grid">
-      <div class="resumo-item"><div class="resumo-label">Total Orçado</div><div class="resumo-val acc" id="res-total">R$ 0</div></div>
-      <div class="resumo-item"><div class="resumo-label">Por Pessoa</div><div class="resumo-val" id="res-pessoa">R$ 0</div></div>
-      <div class="resumo-item only-premium"><div class="resumo-label">Total Pago</div><div class="resumo-val pos" id="res-pago">R$ 0</div></div>
-      <div class="resumo-item only-premium"><div class="resumo-label">Pendente</div><div class="resumo-val neg" id="res-pendente">R$ 0</div></div>
+    <!-- MENU HAMBÚRGUER SUSPENSO -->
+    <div id="menuOverlay" class="menu-overlay" onclick="toggleMenu()"></div>
+    <div id="menuDrawer" class="menu-drawer">
+        <div class="menu-header">
+            <span style="font-weight: 600; color: var(--text-main)">Navegação Flowi</span>
+            <button class="btn-hamburger" onclick="toggleMenu()">✕</button>
+        </div>
+        <ul class="menu-links">
+            <li><a href="https://tryflowi.github.io/">Início / Flowi Home</a></li>
+            <li><a href="https://tryflowi.github.io/hub.html">Central do Cliente (Hub)</a></li>
+            <li><a href="https://tryflowi.github.io/flowi-viagens/">✈️ Flowi Viagens</a></li>
+            <li><a href="https://tryflowi.github.io/flowi-negocios/">💼 Flowi Negócios</a></li>
+            <li><a href="https://tryflowi.github.io/flowi-festas/">🎉 Flowi Festas</a></li>
+            <li><a href="https://tryflowi.github.io/flowi-financas/">💰 Flowi Finanças</a></li>
+        </ul>
     </div>
 
-    <div class="preview-lock only-free">
-      <div style="font-size:18px;margin-bottom:6px">🔒</div>
-      <div style="font-size:12px;font-weight:600;color:#1e3a8a;margin-bottom:4px">Gestão de Pagamentos e Câmbio Integrado</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6">No Premium, acompanhe quanto já foi pago, quanto falta pagar e converta gastos automaticamente.</div>
-      <button class="btn-add" style="margin-top:10px;font-size:11px;padding:8px 14px" onclick="switchTab('premium',document.querySelectorAll('.tab-btn')[3])">Conhecer Premium →</button>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main>
+        <!-- AVISO DE DADOS EXCLUSIVO FREE -->
+        <div id="alertDataBanner" class="alert-banner">
+            <div>
+                💾 Seus dados ficam salvos apenas neste dispositivo e navegador. Se trocar de aparelho, baixe o arquivo offline primeiro.
+            </div>
+            <button onclick="baixarOffline()">💾 Salvar para usar offline</button>
+        </div>
+
+        <!-- ABA DE NAVEGAÇÃO INTERNA -->
+        <nav class="tabs-nav" id="tabsNav">
+            <!-- Abas Dinâmicas via JS -->
+        </nav>
+
+        <!-- CONTEÚDOS DAS ABAS -->
+
+        <!-- 1. VISÃO GERAL (FREE) -->
+        <section id="tab-overview" class="tab-content active">
+            <div class="card">
+                <div class="card-title">🏰 Painel da Viagem: Disney Orlando</div>
+                <div class="card-desc">Planeje as datas e acompanhe a contagem regressiva para a sua viagem dos sonhos.</div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Data de Embarque</label>
+                        <input type="date" id="inputTravelDate" class="form-control" onchange="salvarEAtualizar()">
+                    </div>
+                    <div class="form-group">
+                        <label>Orçamento Total Estimado (USD $)</label>
+                        <input type="number" id="inputBudgetTotal" class="form-control" placeholder="Ex: 5000" onchange="salvarEAtualizar()">
+                    </div>
+                </div>
+
+                <div class="result-box" style="display:flex; justify-content:space-around; text-align:center;">
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--text-dim); text-transform:uppercase;">Dias Restantes</div>
+                        <div id="displayDaysLeft" style="font-size:1.8rem; font-weight:700; color:var(--primary-light);">--</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--text-dim); text-transform:uppercase;">Meta Diária de Gastos</div>
+                        <div id="displayDailyBudget" style="font-size:1.8rem; font-weight:700; color:var(--success);">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📌 Lembretes Essenciais Orlando</div>
+                <div class="card-desc">Primeiros passos críticos para não ter surpresas no aeroporto.</div>
+                <div class="checklist-group">
+                    <label class="checklist-item">
+                        <input type="checkbox" id="chk_visa" onchange="salvarEAtualizar()">
+                        <span>Passaporte e Visto Americano válidos por pelo menos 6 meses</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="chk_este" onchange="salvarEAtualizar()">
+                        <span>Cadastro no My Disney Experience configurado</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="chk_cards" onchange="salvarEAtualizar()">
+                        <span>Cartão internacional de débito (Wise/Nomad) habilitado</span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. CHECKLIST BASE (FREE) -->
+        <section id="tab-checklist" class="tab-content">
+            <div class="card">
+                <div class="card-title">🧳 Checklist da Mala & Documentos</div>
+                <div class="card-desc">Itens básicos indispensáveis para a maratona de parques.</div>
+                <div class="checklist-group" id="freeChecklistContainer">
+                    <label class="checklist-item">
+                        <input type="checkbox" id="chk_m1" onchange="salvarEAtualizar()">
+                        <span>Tênis extremamente confortável (rodagem de ~15km/dia)</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="chk_m2" onchange="salvarEAtualizar()">
+                        <span>Mochila leve de costas para usar nos parques</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="chk_m3" onchange="salvarEAtualizar()">
+                        <span>Carregador portátil (Power Bank) + Cabos</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="chk_m4" onchange="salvarEAtualizar()">
+                        <span>Filtro solar e protetor labial</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="chk_m5" onchange="salvarEAtualizar()">
+                        <span>Capa de chuva leve (temporais de verão)</span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. CALCULADORA BÁSICA (FREE) -->
+        <section id="tab-calc" class="tab-content">
+            <div class="card">
+                <div class="card-title">🧮 Conversor & Estimador de Dólar das Compras</div>
+                <div class="card-desc">Calcule o valor real das suas compras em Orlando (Dólar + Taxa Local FL de ~6.5%).</div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Cotação Dólar (R$)</label>
+                        <input type="number" id="calcUsdRate" class="form-control" value="5.60" step="0.01" oninput="calcularCompras()">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor do Produto (USD $)</label>
+                        <input type="number" id="calcProductUsd" class="form-control" placeholder="100.00" step="1" oninput="calcularCompras()">
+                    </div>
+                    <div class="form-group">
+                        <label>Taxa de Sales Tax (Orlando FL %)</label>
+                        <input type="number" id="calcTaxRate" class="form-control" value="6.5" readonly>
+                    </div>
+                </div>
+
+                <div class="result-box">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                        <span style="color:var(--text-muted)">Subtotal com Taxa FL:</span>
+                        <strong id="resUsdTotal">USD $0.00</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:1.1rem;">
+                        <span>Total Convertido em Reais:</span>
+                        <strong id="resBrlTotal" style="color:var(--primary-light)">R$ 0,00</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. ROTEIRO DIA A DIA (PREMIUM) -->
+        <section id="tab-roteiro" class="tab-content">
+            <div class="card">
+                <div class="card-title">🗓️ Roteiro Inteligente Dia a Dia (Disney + Universal)</div>
+                <div class="card-desc">Monte a sequência perfeita de parques considerando lotação e dias de descanso.</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Dia 1 - Chegada / Compras</label>
+                        <input type="text" class="form-control" placeholder="Ex: Check-in hotel + Walmart / Disney Springs">
+                    </div>
+                    <div class="form-group">
+                        <label>Dia 2 - Parque Ícone</label>
+                        <input type="text" class="form-control" placeholder="Ex: Magic Kingdom (Chegar 45min antes)">
+                    </div>
+                    <div class="form-group">
+                        <label>Dia 3 - Parque de Aventura</label>
+                        <input type="text" class="form-control" placeholder="Ex: Universal Studios / Islands of Adventure">
+                    </div>
+                    <div class="form-group">
+                        <label>Dia 4 - Descanso e Outlet</label>
+                        <input type="text" class="form-control" placeholder="Ex: Outlet Premium Vineland + Jantar">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. ESTIMADOR DE INGRESSOS E DISNEY GENIE+ / LIGHTNING LANE (PREMIUM) -->
+        <section id="tab-genie" class="tab-content">
+            <div class="card">
+                <div class="card-title">⚡ Calculadora Estratégica: Genie+ & Lightning Lane Multi Pass</div>
+                <div class="card-desc">Estime o custo do fura-filas oficial para a sua família no grupo total.</div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Qtd. de Pessoas no Grupo</label>
+                        <input type="number" id="geniePessoas" class="form-control" value="4" oninput="calcGenie()">
+                    </div>
+                    <div class="form-group">
+                        <label>Dias de Parques Disney</label>
+                        <input type="number" id="genieDias" class="form-control" value="4" oninput="calcGenie()">
+                    </div>
+                    <div class="form-group">
+                        <label>Estimativa Genie+/dia por pessoa (USD)</label>
+                        <input type="number" id="genieCustoDia" class="form-control" value="30" oninput="calcGenie()">
+                    </div>
+                </div>
+                <div class="result-box">
+                    <div style="display:flex; justify-content:space-between; font-size:1.1rem;">
+                        <span>Custo Total Estimado em Fura-Filas:</span>
+                        <strong id="genieTotalRes" style="color:var(--success)">USD $480.00</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. ESTIMADOR DE ALIMENTAÇÃO E COMPRAS (PREMIUM) -->
+        <section id="tab-alimentacao" class="tab-content">
+            <div class="card">
+                <div class="card-title">🍔 Estimador de Gastos com Alimentação nos Parques</div>
+                <div class="card-desc">Calcule o custo médio diário por refeição (Quick Service vs Table Service).</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Gasto médio Quick Service / Refeição (USD)</label>
+                        <input type="number" class="form-control" value="18">
+                    </div>
+                    <div class="form-group">
+                        <label>Gorjetas Estimadas (18% a 20% em restaurantes de mesa)</label>
+                        <input type="text" class="form-control" value="Recomendado 18%" readonly>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. ABA PREMIUM (Obrigatória na versão FREE) -->
+        <section id="tab-premium-sales" class="tab-content">
+            <div class="premium-sales-card">
+                <span class="premium-badge-glow">PREMIUM</span>
+                <h2 class="sales-title">Desbloqueie a Experiência Completa em Orlando</h2>
+                <p class="sales-subtitle">Garanta um planejamento sem estresse, economize centenas de dólares em ingressos e aproveite os parques como um expert.</p>
+
+                <div class="bullets-list">
+                    <div class="bullet-item">
+                        <span class="bullet-icon">✓</span>
+                        <span><strong>Roteiro Inteligente Dia a Dia:</strong> Estrutura otimizada para evitar filas monumentais.</span>
+                    </div>
+                    <div class="bullet-item">
+                        <span class="bullet-icon">✓</span>
+                        <span><strong>Calculadora de Genie+ / Lightning Lane:</strong> Planejamento financeiro exato para fura-filas.</span>
+                    </div>
+                    <div class="bullet-item">
+                        <span class="bullet-icon">✓</span>
+                        <span><strong>Estimador de Alimentação & Encontros com Personagens:</strong> Controle total de orçamento de refeições.</span>
+                    </div>
+                    <div class="bullet-item">
+                        <span class="bullet-icon">✓</span>
+                        <span><strong>Checklist Completo de Mala & Encomendas:</strong> Lista detalhada com mais de 80 itens cruciais.</span>
+                    </div>
+                    <div class="bullet-item">
+                        <span class="bullet-icon">✓</span>
+                        <span><strong>Sincronização na Nuvem:</strong> Acesse de qualquer celular ou computador sem risco de perder dados.</span>
+                    </div>
+                </div>
+
+                <div class="price-container">
+                    <div class="price-val">R$ 15,90</div>
+                    <div class="price-sub">Pagamento Único · Acesso Vitalício</div>
+                </div>
+
+                <a href="https://mpago.la/2BQyLnS" class="cta-btn-premium">
+                    Garantir o Premium por R$ 15,90 →
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL DE ACESSO "JÁ SOU PREMIUM" -->
+    <div id="modalAuth" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="fecharModalAuth()">✕</button>
+            <h3 style="margin-bottom:0.5rem; font-size:1.2rem;">Acessar Meus Flowis</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.25rem;">Digite o e-mail utilizado na compra para receber um link de acesso instantâneo.</p>
+            
+            <form onsubmit="solicitarLinkAcesso(event)">
+                <div class="form-group">
+                    <label>E-mail de Compra</label>
+                    <input type="email" id="authEmailInput" class="form-control" placeholder="seu@email.com" required>
+                </div>
+                <button type="submit" id="btnAuthSubmit" class="btn-action" style="width:100%;">Enviar Link de Acesso</button>
+            </form>
+            <div id="authMsg" style="margin-top:1rem; font-size:0.85rem; text-align:center;"></div>
+        </div>
     </div>
-  </div>
-</div>
 
-<!-- TAB 2: CHECKLIST -->
-<div class="tab-panel" id="tab-checklist">
-  <div class="card">
-    <h3>ADICIONAR TAREFA</h3>
-    <div class="field"><label>Descrição da Tarefa</label><input type="text" id="chk-nome" placeholder="Ex: Emitir PID (Permissão para Dirigir)"></div>
-    <div class="field only-premium">
-      <label>Categoria</label>
-      <select id="chk-cat">
-        <option>Documentação</option><option>Reservas & Ingressos</option>
-        <option>Mala & Preparativos</option><option>Outros</option>
-      </select>
-    </div>
-    <button class="btn-add" onclick="adicionarCheck()">Adicionar Tarefa</button>
-  </div>
+    <!-- RODAPÉ CLEAN -->
+    <footer>
+        Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank" rel="noopener">@tryflowi</a> · <a href="https://tryflowi.github.io/hub.html#votar">Sugerir melhoria</a>
+    </footer>
 
-  <div class="card">
-    <h3>CHECKLIST DE PREPARATIVOS</h3>
-    <div id="lista-check"></div>
-  </div>
-</div>
+    <!-- LOGICA E SCRIPTS INTEGRADOS -->
+    <script>
+        // --- CONSTANTES E CONFIGURAÇÃO ---
+        const LINK_CHECKOUT = 'https://mpago.la/2BQyLnS';
+        const SUPABASE_URL = 'https://xyzcompany.supabase.co'; // Substituted placeholder
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSJ9.exampleKey'; // Substituted placeholder
 
-<!-- TAB 3: ORÇAMENTO -->
-<div class="tab-panel" id="tab-orcamento">
-  <div class="card">
-    <h3>ADICIONAR ITEM AO ORÇAMENTO</h3>
-    <div class="field"><label>Descrição</label><input type="text" id="o-nome" placeholder="Ex: Passagens Aéreas Latam"></div>
-    <div class="field-row">
-      <div class="field"><label>Categoria</label>
-        <select id="o-cat">
-          <option>Passagens</option><option>Hospedagem</option><option>Parques</option>
-          <option>Transporte</option><option>Alimentação</option><option>Compras</option>
-          <option>Câmbio</option><option>Seguro Viagem</option><option>Outros</option>
-        </select>
-      </div>
-      <div class="field"><label>Valor Estimado (R$)</label><input type="number" id="o-val" placeholder="0"></div>
-    </div>
-    <div class="field-row only-premium">
-      <div class="field"><label>Valor Pago (R$)</label><input type="number" id="o-val-pago" placeholder="0"></div>
-      <div class="field"><label>Status</label>
-        <select id="o-status"><option value="pendente">Pendente</option><option value="pago">Pago</option></select>
-      </div>
-    </div>
-    <button class="btn-add" onclick="adicionarOrc()">Adicionar Item</button>
-  </div>
+        let supabaseClient = null;
+        if (typeof supabase !== 'undefined' && SUPABASE_URL !== 'https://xyzcompany.supabase.co') {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
 
-  <div class="card">
-    <h3>ITENS DO ORÇAMENTO</h3>
-    <div id="lista-orc"></div>
-  </div>
-</div>
+        // Estado da Aplicação
+        let state = {
+            isPremium: false,
+            activeTab: 'overview',
+            data: {
+                travelDate: '',
+                budgetTotal: '',
+                checklists: {}
+            }
+        };
 
-<!-- TAB 4: ROTEIRO (PREMIUM) -->
-<div class="tab-panel only-premium" id="tab-roteiro">
-  <div class="card">
-    <h3>ROTEIRO DIA A DIA</h3>
-    <div id="conteudo-roteiro-dinamico"></div>
-  </div>
-</div>
+        // Estrutura das Abas
+        const tabsConfig = [
+            { id: 'overview', label: '📊 Visão Geral', premium: false },
+            { id: 'checklist', label: '🧳 Checklist Base', premium: false },
+            { id: 'calc', label: '🧮 Calculadora USD', premium: false },
+            { id: 'roteiro', label: '🗓️ Roteiro Parques', premium: true },
+            { id: 'genie', label: '⚡ Genie+ / Fura-Filas', premium: true },
+            { id: 'alimentacao', label: '🍔 Alimentação', premium: true },
+            { id: 'premium-sales', label: '✦ Premium', premium: false }
+        ];
 
-<!-- TAB 5: GUIA (PREMIUM) -->
-<div class="tab-panel only-premium" id="tab-guia">
-  <div class="card">
-    <h3>GUIA PRÁTICO DE VIAGEM</h3>
-    <div id="conteudo-guia-dinamico"></div>
-  </div>
-</div>
+        // --- INICIALIZAÇÃO DA APLICAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarEValidar();
+        });
 
-<!-- TAB 6: DICAS & TOOLS (PREMIUM) -->
-<div class="tab-panel only-premium" id="tab-dicas">
-  <div class="card">
-    <h3>FERRAMENTAS & DICAS</h3>
-    <div id="conteudo-dicas-dinamico"></div>
-  </div>
-</div>
+        function carregarEValidar() {
+            // 1. Carregar do LocalStorage
+            const localData = localStorage.getItem('flowi_viagens_data');
+            if (localData) {
+                try {
+                    state.data = JSON.parse(localData);
+                } catch(e) {}
+            }
 
-<!-- TAB 7: OFERTA PREMIUM (FREE) -->
-<div class="tab-panel only-free" id="tab-premium">
-  <div class="premium-card">
-    <div style="display:inline-block;background:#2563EB;color:white;font-size:10px;font-weight:600;letter-spacing:2px;padding:4px 12px;border-radius:20px;margin-bottom:14px">PREMIUM</div>
-    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px">Planejamento completo.<br>Sem fila, sem susto, sem erro.</h3>
-    <a href="https://mpago.la/2BQyLnS" target="_blank" class="premium-btn">Garantir o Premium por R$ 15,90 →</a>
-  </div>
-</div>
+            const localPrem = localStorage.getItem('flowi_viagens_premium');
+            if (localPrem === 'true') {
+                state.isPremium = true;
+            }
 
-</div>
+            // 2. Validação da Compra via Parâmetros de URL (Mercado Pago / Gateway)
+            const urlParams = new URLSearchParams(window.location.search);
+            const statusParam = urlParams.get('status');
+            const tokenParam = urlParams.get('token');
 
-<script>
-// DETECÇÃO DE PLANO AUTOMÁTICA VIA URL (?plan=premium) OU VARIÁVEL
-const urlParams = new URLSearchParams(window.location.search);
-let IS_PREMIUM = urlParams.get('plan') === 'premium' || urlParams.get('p') === '1';
+            if (statusParam === 'approved' || tokenParam === 'flowi_success') {
+                state.isPremium = true;
+                localStorage.setItem('flowi_viagens_premium', 'true');
+                // Limpar URL sem recarregar a página
+                window.history.replaceState({}, document.title, window.location.pathname);
+                sincronizarSupabaseStatus();
+            }
 
-let estado = {
-  config: { nome: '', ida: '', volta: '', viajantes: 1, cambio: 5.20 },
-  roteiro: [],
-  orc: [],
-  check: []
-};
+            // 3. Renderizar Interface conforme Estado
+            renderHeader();
+            renderBanner();
+            renderTabsNav();
+            restaurarCamposForm();
+            calcularCompras();
+            calcGenie();
+        }
 
-function abrirMenu(){ document.getElementById('flowi-menu').classList.add('open'); }
-function fecharMenu(){ document.getElementById('flowi-menu').classList.remove('open'); }
-function get(id){ return (document.getElementById(id) || {}).value || ''; }
-function set(id, v){ var e = document.getElementById(id); if(e) e.textContent = v; }
+        // --- RENDERIZAÇÃO DA INTERFACE ---
+        function renderHeader() {
+            const badge = document.getElementById('headerBadge');
+            const btnAccess = document.getElementById('btnHeaderAccess');
 
-function switchTab(id, btn){
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  var panel = document.getElementById('tab-' + id);
-  if (panel) panel.classList.add('active');
-  if (btn) btn.classList.add('active');
-}
+            if (state.isPremium) {
+                badge.innerText = 'PREMIUM';
+                badge.className = 'badge-status badge-premium';
+                btnAccess.innerText = 'Meus Flowis';
+                btnAccess.onclick = () => { window.location.href = 'https://tryflowi.github.io/hub.html'; };
+            } else {
+                badge.innerText = 'FREE';
+                badge.className = 'badge-status badge-free';
+                btnAccess.innerText = '✦ Já sou Premium';
+                btnAccess.onclick = abrirJaSouPremium;
+            }
+        }
 
-function aplicarEstadoPlano() {
-  var badge = document.getElementById('badge-plano');
-  if (IS_PREMIUM) {
-    document.body.classList.add('is-premium-active');
-    if (badge) {
-      badge.textContent = 'PREMIUM';
-      badge.className = 'badge-status badge-premium';
-    }
-  } else {
-    document.body.classList.remove('is-premium-active');
-    if (badge) {
-      badge.textContent = 'FREE';
-      badge.className = 'badge-status badge-free';
-    }
-  }
-}
+        function renderBanner() {
+            const banner = document.getElementById('alertDataBanner');
+            if (state.isPremium) {
+                banner.style.display = 'none';
+            } else {
+                banner.style.display = 'flex';
+            }
+        }
 
-function carregar() {
-  aplicarEstadoPlano();
-  try {
-    var s = localStorage.getItem('flowi-disney-data');
-    if (s) estado = JSON.parse(s);
-  } catch (e) {}
+        function renderTabsNav() {
+            const navContainer = document.getElementById('tabsNav');
+            navContainer.innerHTML = '';
 
-  var c = estado.config || {};
-  if (document.getElementById('cfg-nome')) document.getElementById('cfg-nome').value = c.nome || '';
-  if (document.getElementById('cfg-ida')) document.getElementById('cfg-ida').value = c.ida || '';
-  if (document.getElementById('cfg-volta')) document.getElementById('cfg-volta').value = c.volta || '';
-  if (document.getElementById('cfg-viajantes')) document.getElementById('cfg-viajantes').value = c.viajantes || '1';
-  if (document.getElementById('cfg-cambio')) document.getElementById('cfg-cambio').value = c.cambio || '5.20';
+            tabsConfig.forEach(tab => {
+                // Se for a aba de vendas e o usuário já for Premium, omitir a aba de vendas
+                if (tab.id === 'premium-sales' && state.isPremium) return;
 
-  atualizarHeader();
-  renderCheck();
-  renderOrc();
-  calcResumo();
-  countdown();
-}
+                const btn = document.createElement('button');
+                btn.className = `tab-btn ${tab.id === state.activeTab ? 'active' : ''}`;
+                
+                let lockIcon = '';
+                if (tab.premium && !state.isPremium) {
+                    lockIcon = '<span class="lock-icon">🔒</span>';
+                }
 
-function salvar() {
-  estado.config = {
-    nome: get('cfg-nome'),
-    ida: get('cfg-ida'),
-    volta: get('cfg-volta'),
-    viajantes: get('cfg-viajantes'),
-    cambio: get('cfg-cambio')
-  };
-  try {
-    localStorage.setItem('flowi-disney-data', JSON.stringify(estado));
-  } catch(e){}
-  atualizarHeader();
-  calcResumo();
-  countdown();
-}
+                btn.innerHTML = `${tab.label} ${lockIcon}`;
+                btn.onclick = () => alternarAba(tab.id, tab.premium);
+                navContainer.appendChild(btn);
+            });
+        }
 
-function atualizarHeader() {
-  var c = estado.config || {};
-  set('hdr-nome', c.nome || 'Minha Viagem Disney');
-  set('hdr-sub', (c.viajantes || 1) + ' viajante(s) · ' + (c.ida ? c.ida.split('-').reverse().join('/') : '--/--/----'));
-}
+        function alternarAba(tabId, isTabPremium) {
+            if (isTabPremium && !state.isPremium) {
+                // Redireciona para o Card de Vendas na Aba Premium
+                state.activeTab = 'premium-sales';
+            } else {
+                state.activeTab = tabId;
+            }
 
-function calcResumo() {
-  var viajantes = parseInt((estado.config || {}).viajantes) || 1;
-  var totalOrcado = (estado.orc || []).reduce((acc, item) => acc + (parseFloat(item.est || item.val) || 0), 0);
-  var totalPago = (estado.orc || []).reduce((acc, item) => acc + (parseFloat(item.pago) || 0), 0);
-  
-  set('res-total', fmt(totalOrcado));
-  set('res-pessoa', fmt(totalOrcado / viajantes));
-  set('res-pago', fmt(totalPago));
-  set('res-pendente', fmt(totalOrcado - totalPago < 0 ? 0 : totalOrcado - totalPago));
-}
+            renderTabsNav();
 
-function countdown() {
-  var c = estado.config || {};
-  if (!c.ida) return;
-  var partes = c.ida.split('-');
-  var ida = new Date(partes[0], partes[1] - 1, partes[2]);
-  var diff = ida - new Date();
-  if (diff > 0) {
-    set('cd-dias', Math.floor(diff / (1000 * 60 * 60 * 24)));
-    set('cd-hrs', Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-    set('cd-min', Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)));
-  }
-}
+            // Atualizar Exibição dos Seções
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            const activeSec = document.getElementById(`tab-${state.activeTab}`);
+            if (activeSec) activeSec.classList.add('active');
+        }
 
-function fmt(v) {
-  return 'R$ ' + (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
+        function toggleMenu() {
+            const overlay = document.getElementById('menuOverlay');
+            const drawer = document.getElementById('menuDrawer');
+            overlay.classList.toggle('active');
+            drawer.classList.toggle('active');
+        }
 
-function adicionarCheck() {
-  var nome = get('chk-nome').trim();
-  if (!nome) return alert('Preencha a descrição.');
-  if (!estado.check) estado.check = [];
-  estado.check.push({ id: Date.now(), nome, done: false, cat: get('chk-cat') || 'Geral' });
-  salvar();
-  renderCheck();
-  document.getElementById('chk-nome').value = '';
-}
+        // --- SALVAMENTO E SINCRONIZAÇÃO DE DADOS ---
+        function salvarEAtualizar() {
+            // Guardar inputs nos dados
+            const tDate = document.getElementById('inputTravelDate').value;
+            const bTotal = document.getElementById('inputBudgetTotal').value;
 
-function renderCheck() {
-  var el = document.getElementById('lista-check');
-  if (!el) return;
-  el.innerHTML = (estado.check || []).map(c => `
-    <div class="check-item ${c.done ? 'done' : ''}">
-      <div class="ci-circle" onclick="toggleCheck(${c.id})">${c.done ? '✓' : ''}</div>
-      <div class="ci-name">${c.nome}</div>
-    </div>
-  `).join('') || '<div style="font-size:12px;color:var(--muted)">Nenhuma tarefa.</div>';
-}
+            state.data.travelDate = tDate;
+            state.data.budgetTotal = bTotal;
 
-function toggleCheck(id) {
-  var item = (estado.check || []).find(x => x.id === id);
-  if (item) item.done = !item.done;
-  salvar();
-  renderCheck();
-}
+            // Salvar checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+                if (chk.id) {
+                    state.data.checklists[chk.id] = chk.checked;
+                }
+            });
 
-function adicionarOrc() {
-  var nome = get('o-nome').trim();
-  var val = parseFloat(get('o-val')) || 0;
-  var pago = parseFloat(get('o-val-pago')) || 0;
-  if (!nome) return alert('Preencha o nome.');
-  if (!estado.orc) estado.orc = [];
-  estado.orc.push({ id: Date.now(), nome, est: val, pago: pago, cat: get('o-cat') });
-  salvar();
-  renderOrc();
-  calcResumo();
-  document.getElementById('o-nome').value = '';
-  document.getElementById('o-val').value = '';
-}
+            // Preservar LocalStorage
+            localStorage.setItem('flowi_viagens_data', JSON.stringify(state.data));
 
-function renderOrc() {
-  var el = document.getElementById('lista-orc');
-  if (!el) return;
-  el.innerHTML = (estado.orc || []).map(o => `
-    <div class="orc-row">
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:600">${o.nome}</div>
-        <div style="font-size:10px;color:var(--muted)">${o.cat}</div>
-      </div>
-      <div style="font-size:13px;font-weight:700;color:var(--accent)">${fmt(o.est || o.val)}</div>
-    </div>
-  `).join('') || '<div style="font-size:12px;color:var(--muted)">Nenhum item inserido.</div>';
-}
+            // Atualizar cálculos
+            atualizarContagemEDiaria();
+        }
 
-function resetarTudo() {
-  if (confirm('Apagar todos os dados salvos localmente?')) {
-    localStorage.removeItem('flowi-disney-data');
-    location.reload();
-  }
-}
+        function restaurarCamposForm() {
+            if (state.data.travelDate) {
+                document.getElementById('inputTravelDate').value = state.data.travelDate;
+            }
+            if (state.data.budgetTotal) {
+                document.getElementById('inputBudgetTotal').value = state.data.budgetTotal;
+            }
 
-document.addEventListener('DOMContentLoaded', carregar);
-</script>
+            if (state.data.checklists) {
+                Object.keys(state.data.checklists).forEach(id => {
+                    const chk = document.getElementById(id);
+                    if (chk) {
+                        chk.checked = state.data.checklists[id];
+                    }
+                });
+            }
+
+            atualizarContagemEDiaria();
+        }
+
+        // --- LÓGICA DAS CALCULADORAS ---
+        function atualizarContagemEDiaria() {
+            const dateVal = document.getElementById('inputTravelDate').value;
+            const budgetVal = parseFloat(document.getElementById('inputBudgetTotal').value) || 0;
+            const displayDays = document.getElementById('displayDaysLeft');
+            const displayDaily = document.getElementById('displayDailyBudget');
+
+            if (dateVal) {
+                const targetDate = new Date(dateVal);
+                const today = new Date();
+                const diffTime = targetDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                displayDays.innerText = diffDays > 0 ? `${diffDays} dias` : 'Chegou o dia!';
+            } else {
+                displayDays.innerText = '--';
+            }
+
+            if (budgetVal > 0) {
+                // Estimando uma viagem média de 14 dias em Orlando
+                const daily = (budgetVal / 14).toFixed(2);
+                displayDaily.innerText = `USD $${daily}`;
+            } else {
+                displayDaily.innerText = '--';
+            }
+        }
+
+        function calcularCompras() {
+            const rate = parseFloat(document.getElementById('calcUsdRate').value) || 0;
+            const prod = parseFloat(document.getElementById('calcProductUsd').value) || 0;
+            const tax = 6.5; // Taxa padrão Flórida
+
+            const prodWithTax = prod + (prod * (tax / 100));
+            const totalBrl = prodWithTax * rate;
+
+            document.getElementById('resUsdTotal').innerText = `USD $${prodWithTax.toFixed(2)}`;
+            document.getElementById('resBrlTotal').innerText = `R$ ${totalBrl.toFixed(2).replace('.', ',')}`;
+        }
+
+        function calcGenie() {
+            const pessoas = parseInt(document.getElementById('geniePessoas').value) || 0;
+            const dias = parseInt(document.getElementById('genieDias').value) || 0;
+            const custo = parseFloat(document.getElementById('genieCustoDia').value) || 0;
+
+            const total = pessoas * dias * custo;
+            document.getElementById('genieTotalRes').innerText = `USD $${total.toFixed(2)}`;
+        }
+
+        // --- FUNÇÕES OFFLINE & DOWNLOAD ---
+        function baixarOffline() {
+            const pageHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([pageHtml], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Flowi-Viagens-Disney-Orlando.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // --- AUTENTICAÇÃO E SUPABASE ---
+        async function abrirJaSouPremium() {
+            if (supabaseClient) {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    window.location.href = 'https://tryflowi.github.io/hub.html';
+                    return;
+                }
+            }
+            document.getElementById('modalAuth').classList.add('active');
+        }
+
+        function fecharModalAuth() {
+            document.getElementById('modalAuth').classList.remove('active');
+        }
+
+        async function solicitarLinkAcesso(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmailInput').value;
+            const msgEl = document.getElementById('authMsg');
+            const btn = document.getElementById('btnAuthSubmit');
+
+            btn.disabled = true;
+            btn.innerText = 'Enviando...';
+            msgEl.innerText = '';
+
+            if (supabaseClient) {
+                const { error } = await supabaseClient.auth.signInWithOtp({
+                    email: email,
+                    options: {
+                        emailRedirectTo: window.location.origin + "/hub.html"
+                    }
+                });
+
+                if (error) {
+                    msgEl.style.color = 'var(--danger)';
+                    msgEl.innerText = 'Erro ao enviar e-mail: ' + error.message;
+                } else {
+                    msgEl.style.color = 'var(--success)';
+                    msgEl.innerText = 'Link enviado! Verifique sua caixa de entrada.';
+                }
+            } else {
+                // Fallback de demonstração caso Supabase não esteja configurado
+                setTimeout(() => {
+                    msgEl.style.color = 'var(--success)';
+                    msgEl.innerText = 'Se o seu e-mail estiver cadastrado, você receberá o link de acesso em instantes.';
+                    btn.disabled = false;
+                    btn.innerText = 'Enviar Link de Acesso';
+                }, 1000);
+            }
+        }
+
+        async function sincronizarSupabaseStatus() {
+            if (!supabaseClient) return;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                await supabaseClient
+                    .from('user_purchases')
+                    .upsert({ user_id: user.id, product: 'flowi-viagens', is_premium: true });
+            }
+        }
+    </script>
 </body>
 </html>
