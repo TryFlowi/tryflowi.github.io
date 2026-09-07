@@ -21,7 +21,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .flowi-menu-panel{position:absolute;top:0;left:0;bottom:0;width:260px;background:#111827;padding:24px 20px;overflow-y:auto;}
 .flowi-menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
 .flowi-menu-close{background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px;}
-.flowi-menu-item{display:flex;align-items:center;padding:11px 12px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.8);font-size:12px;font-weight:500;margin-bottom:4px;transition:background .2s;font-family:'Inter',sans-serif;}
+.flowi-menu-item{display:flex;align-items:center;padding:11px 12px;border-radius:10px;text-decoration:none;color:rgba(255,255,255,0.8);font-size:12px;font-weight:500;margin-bottom:4px;transition:background .2s;}
 .flowi-menu-item:hover{background:rgba(255,255,255,0.1);}
 .header{background:var(--night);position:sticky;top:0;z-index:100;}
 .header-inner{max-width:640px;margin:0 auto;padding:20px 20px 0;}
@@ -54,16 +54,8 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;background:var(--cream);}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.field-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .btn-add{width:100%;padding:12px;background:var(--night);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
 .btn-reset{background:var(--red-light);color:var(--red);border:none;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
-.btn-sm{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--muted);cursor:pointer;font-family:inherit;}
-.edit-box{background:var(--sand);border-radius:10px;padding:12px;margin-bottom:8px;}
-.edit-box input,.edit-box select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px;font-family:'Inter',sans-serif;color:var(--text);}
-.edit-actions{display:flex;gap:6px;margin-top:6px;}
-.edit-save{flex:1;padding:7px;background:var(--night);color:white;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
-.edit-cancel{flex:1;padding:7px;background:white;color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
-.edit-del{padding:7px 12px;background:var(--red-light);color:var(--red);border:none;border-radius:8px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
 .check-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
 .check-item:last-child{border-bottom:none;}
 .check-item.done .ci-name{text-decoration:line-through;color:var(--muted);}
@@ -78,13 +70,11 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .badge-free{background:rgba(37,99,235,0.2);border:1px solid rgba(37,99,235,0.4);color:#93C5FD;}
 .badge-premium{background:rgba(37,99,235,0.25);border:1px solid rgba(37,99,235,0.5);color:#93C5FD;}
 .orc-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--sand);border-radius:10px;margin-bottom:6px;}
-.dica-card{background:var(--sand);border-radius:12px;padding:14px;margin-bottom:10px;border-left:3px solid #2563EB;}
 .preview-lock{background:rgba(37,99,235,0.05);border:1px dashed rgba(37,99,235,0.3);border-radius:12px;padding:14px;margin-top:10px;}
 .premium-card{background:linear-gradient(135deg,var(--night) 0%,#1a1a2e 100%);border-radius:20px;padding:24px;color:white;text-align:center;}
-.pf-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;text-align:left;}
-.pf-check{width:16px;height:16px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px;color:white;}
-.pf-text{font-size:12px;color:rgba(255,255,255,0.8);}
 .premium-btn{display:block;background:var(--accent);color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:13px;font-weight:700;letter-spacing:1px;margin-top:16px;}
+
+/* CONTROLE DE EXIBIÇÃO POR VERSÃO */
 .only-free{display:block;}
 .only-premium{display:none;}
 body.is-premium-active .only-free{display:none !important;}
@@ -97,9 +87,7 @@ body.is-premium-active .only-premium{display:block !important;}
   <div class="flowi-menu-bg" onclick="fecharMenu()"></div>
   <div class="flowi-menu-panel">
     <div class="flowi-menu-header">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:13px;font-weight:700;color:white;letter-spacing:2px;">flowi</span>
-      </div>
+      <span style="font-size:13px;font-weight:700;color:white;letter-spacing:2px;">flowi</span>
       <button class="flowi-menu-close" onclick="fecharMenu()">✕</button>
     </div>
     <a href="#" class="flowi-menu-item">🏠 Início</a>
@@ -140,7 +128,7 @@ body.is-premium-active .only-premium{display:block !important;}
 
 <div class="content">
 
-<!-- TAB INICIO -->
+<!-- TAB 1: INÍCIO -->
 <div class="tab-panel active" id="tab-inicio">
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -149,8 +137,8 @@ body.is-premium-active .only-premium{display:block !important;}
     </div>
     <div class="field"><label>Nome da viagem</label><input type="text" id="cfg-nome" placeholder="Ex: Disney 2026 em Família" oninput="salvar()"></div>
     <div class="field-row">
-      <div class="field"><label>Data de ida</label><input type="date" id="cfg-ida" oninput="salvar();gerarDiasRoteiro();"></div>
-      <div class="field"><label>Data de volta</label><input type="date" id="cfg-volta" oninput="salvar();gerarDiasRoteiro();"></div>
+      <div class="field"><label>Data de ida</label><input type="date" id="cfg-ida" oninput="salvar()"></div>
+      <div class="field"><label>Data de volta</label><input type="date" id="cfg-volta" oninput="salvar()"></div>
     </div>
     <div class="field-row">
       <div class="field"><label>Número de viajantes</label><input type="number" id="cfg-viajantes" placeholder="Ex: 4" min="1" oninput="salvar()"></div>
@@ -167,22 +155,16 @@ body.is-premium-active .only-premium{display:block !important;}
       <div class="resumo-item only-premium"><div class="resumo-label">Pendente</div><div class="resumo-val neg" id="res-pendente">R$ 0</div></div>
     </div>
 
-    <!-- LOCK PROMOÇIONAL NO FREE -->
     <div class="preview-lock only-free">
       <div style="font-size:18px;margin-bottom:6px">🔒</div>
       <div style="font-size:12px;font-weight:600;color:#1e3a8a;margin-bottom:4px">Gestão de Pagamentos e Câmbio Integrado</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6">No Premium, acompanhe quanto já foi pago, quanto falta pagar e converta gastos em Dólar automaticamente.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">No Premium, acompanhe quanto já foi pago, quanto falta pagar e converta gastos automaticamente.</div>
       <button class="btn-add" style="margin-top:10px;font-size:11px;padding:8px 14px" onclick="switchTab('premium',document.querySelectorAll('.tab-btn')[3])">Conhecer Premium →</button>
     </div>
   </div>
-
-  <div class="card only-premium">
-    <h3>PROGRESSO DAS TAREFAS POR CATEGORIA</h3>
-    <div id="progresso-categorias"></div>
-  </div>
 </div>
 
-<!-- TAB CHECKLIST -->
+<!-- TAB 2: CHECKLIST -->
 <div class="tab-panel" id="tab-checklist">
   <div class="card">
     <h3>ADICIONAR TAREFA</h3>
@@ -203,7 +185,7 @@ body.is-premium-active .only-premium{display:block !important;}
   </div>
 </div>
 
-<!-- TAB ORÇAMENTO -->
+<!-- TAB 3: ORÇAMENTO -->
 <div class="tab-panel" id="tab-orcamento">
   <div class="card">
     <h3>ADICIONAR ITEM AO ORÇAMENTO</h3>
@@ -233,32 +215,31 @@ body.is-premium-active .only-premium{display:block !important;}
   </div>
 </div>
 
-<!-- TABS EXCLUSIVAS PREMIUM -->
+<!-- TAB 4: ROTEIRO (PREMIUM) -->
 <div class="tab-panel only-premium" id="tab-roteiro">
   <div class="card">
     <h3>ROTEIRO DIA A DIA</h3>
-    <p style="font-size:12px;color:var(--muted)">Organize aqui sua programação e horários dos parques.</p>
+    <div id="conteudo-roteiro-dinamico"></div>
   </div>
 </div>
 
+<!-- TAB 5: GUIA (PREMIUM) -->
 <div class="tab-panel only-premium" id="tab-guia">
   <div class="card">
     <h3>GUIA PRÁTICO DE VIAGEM</h3>
-    <div class="dica-card">
-      <div style="font-size:12px;font-weight:700;margin-bottom:4px">📱 APPS ESSENCIAIS</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6">My Disney Experience & Universal FL: Gerenciamento de filas e mapas.</div>
-    </div>
+    <div id="conteudo-guia-dinamico"></div>
   </div>
 </div>
 
+<!-- TAB 6: DICAS & TOOLS (PREMIUM) -->
 <div class="tab-panel only-premium" id="tab-dicas">
   <div class="card">
     <h3>FERRAMENTAS & DICAS</h3>
-    <p style="font-size:12px;color:var(--muted)">Dicas de atrações e calculadoras.</p>
+    <div id="conteudo-dicas-dinamico"></div>
   </div>
 </div>
 
-<!-- TAB OFERTA PREMIUM (FREE) -->
+<!-- TAB 7: OFERTA PREMIUM (FREE) -->
 <div class="tab-panel only-free" id="tab-premium">
   <div class="premium-card">
     <div style="display:inline-block;background:#2563EB;color:white;font-size:10px;font-weight:600;letter-spacing:2px;padding:4px 12px;border-radius:20px;margin-bottom:14px">PREMIUM</div>
@@ -270,8 +251,9 @@ body.is-premium-active .only-premium{display:block !important;}
 </div>
 
 <script>
-// CONFIGURAÇÃO DO PLANO: mude para true para ativar a visão Premium
-let IS_PREMIUM = false;
+// DETECÇÃO DE PLANO AUTOMÁTICA VIA URL (?plan=premium) OU VARIÁVEL
+const urlParams = new URLSearchParams(window.location.search);
+let IS_PREMIUM = urlParams.get('plan') === 'premium' || urlParams.get('p') === '1';
 
 let estado = {
   config: { nome: '', ida: '', volta: '', viajantes: 1, cambio: 5.20 },
@@ -294,16 +276,19 @@ function switchTab(id, btn){
 }
 
 function aplicarEstadoPlano() {
+  var badge = document.getElementById('badge-plano');
   if (IS_PREMIUM) {
     document.body.classList.add('is-premium-active');
-    var badge = document.getElementById('badge-plano');
-    badge.textContent = 'PREMIUM';
-    badge.className = 'badge-status badge-premium';
+    if (badge) {
+      badge.textContent = 'PREMIUM';
+      badge.className = 'badge-status badge-premium';
+    }
   } else {
     document.body.classList.remove('is-premium-active');
-    var badge = document.getElementById('badge-plano');
-    badge.textContent = 'FREE';
-    badge.className = 'badge-status badge-free';
+    if (badge) {
+      badge.textContent = 'FREE';
+      badge.className = 'badge-status badge-free';
+    }
   }
 }
 
@@ -319,6 +304,7 @@ function carregar() {
   if (document.getElementById('cfg-ida')) document.getElementById('cfg-ida').value = c.ida || '';
   if (document.getElementById('cfg-volta')) document.getElementById('cfg-volta').value = c.volta || '';
   if (document.getElementById('cfg-viajantes')) document.getElementById('cfg-viajantes').value = c.viajantes || '1';
+  if (document.getElementById('cfg-cambio')) document.getElementById('cfg-cambio').value = c.cambio || '5.20';
 
   atualizarHeader();
   renderCheck();
@@ -408,9 +394,10 @@ function toggleCheck(id) {
 function adicionarOrc() {
   var nome = get('o-nome').trim();
   var val = parseFloat(get('o-val')) || 0;
+  var pago = parseFloat(get('o-val-pago')) || 0;
   if (!nome) return alert('Preencha o nome.');
   if (!estado.orc) estado.orc = [];
-  estado.orc.push({ id: Date.now(), nome, est: val, cat: get('o-cat') });
+  estado.orc.push({ id: Date.now(), nome, est: val, pago: pago, cat: get('o-cat') });
   salvar();
   renderOrc();
   calcResumo();
@@ -423,7 +410,10 @@ function renderOrc() {
   if (!el) return;
   el.innerHTML = (estado.orc || []).map(o => `
     <div class="orc-row">
-      <div style="flex:1"><div style="font-size:12px;font-weight:600">${o.nome}</div><div style="font-size:10px;color:var(--muted)">${o.cat}</div></div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600">${o.nome}</div>
+        <div style="font-size:10px;color:var(--muted)">${o.cat}</div>
+      </div>
       <div style="font-size:13px;font-weight:700;color:var(--accent)">${fmt(o.est || o.val)}</div>
     </div>
   `).join('') || '<div style="font-size:12px;color:var(--muted)">Nenhum item inserido.</div>';
@@ -435,8 +425,6 @@ function resetarTudo() {
     location.reload();
   }
 }
-
-function gerarDiasRoteiro() {}
 
 document.addEventListener('DOMContentLoaded', carregar);
 </script>
