@@ -7,6 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flowi - Organize sem complicar</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Supabase JS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{--night:#0a0a0a;}
@@ -39,12 +42,106 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:fl
   font-size: 12px;
   transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;
+  cursor: pointer;
 }
 .btn-header-premium:hover {
   background-color: #2563eb;
   color: #ffffff;
   border-color: #2563eb;
 }
+
+/* --- ESTILOS DO MODAL JÁ SOU PREMIUM --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(5px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-card {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 32px 28px;
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+.modal-fechar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 20px;
+  cursor: pointer;
+}
+.modal-fechar:hover { color: white; }
+.modal-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+.modal-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+.modal-form { display: flex; flex-direction: column; gap: 14px; }
+.modal-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: white;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+}
+.modal-input:focus { border-color: #60a5fa; }
+.modal-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: opacity 0.2s;
+}
+.modal-btn:hover { opacity: 0.9; }
+.modal-msg {
+  font-size: 12px;
+  margin-top: 12px;
+  line-height: 1.4;
+  display: none;
+}
+.modal-divisor {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 20px 0;
+}
+.modal-rodape { text-align: center; }
+.modal-rodape p { font-size: 12px; color: rgba(255, 255, 255, 0.4); margin-bottom: 6px; }
+.modal-rodape a { font-size: 12px; color: #60a5fa; text-decoration: none; font-weight: 500; }
+.modal-rodape a:hover { text-decoration: underline; }
 
 .hero{height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 24px;position:relative;overflow:hidden;}
 .hero-bg{position:absolute;inset:0;}
@@ -133,7 +230,8 @@ footer{border-top:1px solid rgba(255,255,255,0.05);padding:40px;display:flex;fle
   </div>
 
   <div style="display:flex;align-items:center;gap:16px;">
-    <a href="login.html" class="btn-header-premium">Já sou Premium</a>
+    <!-- Botão atualizado para abrir o Modal -->
+    <button onclick="abrirModalPremium()" class="btn-header-premium">Já sou Premium</button>
     <a href="https://instagram.com/tryflowi" target="_blank" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:3px;text-decoration:none;">@tryflowi</a>
   </div>
 </nav>
@@ -214,6 +312,40 @@ footer{border-top:1px solid rgba(255,255,255,0.05);padding:40px;display:flex;fle
   </div>
 </section>
 
+<!-- MODAL JÁ SOU PREMIUM -->
+<div class="modal-overlay" id="modal-ja-sou-premium">
+  <div class="modal-card">
+    <button class="modal-fechar" onclick="fecharModalPremium()">&times;</button>
+    
+    <h2 class="modal-titulo">Já sou Premium</h2>
+    <p class="modal-desc">
+      Digite o e-mail que você utilizou na compra. Enviaremos um link mágico de acesso direto para o seu e-mail, sem precisar de senha!
+    </p>
+
+    <form class="modal-form" id="form-login-premium">
+      <input 
+        type="email" 
+        id="email-premium" 
+        class="modal-input" 
+        placeholder="Seu e-mail de compra" 
+        required 
+      />
+      <button type="submit" id="btn-enviar-magic-link" class="modal-btn">
+        Enviar Link de Acesso
+      </button>
+    </form>
+
+    <div id="mensagem-login" class="modal-msg"></div>
+
+    <hr class="modal-divisor" />
+
+    <div class="modal-rodape">
+      <p>Ainda não é Premium?</p>
+      <a href="#segmentos" onclick="fecharModalPremium()">Faça um teste gratuito antes de adquirir</a>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div class="footer-top">
     <div style="display:flex;align-items:center;gap:8px;">
@@ -237,9 +369,66 @@ footer{border-top:1px solid rgba(255,255,255,0.05);padding:40px;display:flex;fle
 <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
+// --- CONFIGURAÇÃO SUPABASE ---
+// Substitua pelas suas chaves reais do projeto Supabase
+const SUPABASE_URL = 'https://gkvanakreiiiprriyats.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_1Lx3D9jBwegVvvqTK39JAg_yV6zuw3s';
+
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+// --- FUNÇÕES DO MENU & NAVEGAÇÃO ---
 function abrirMenu(){document.getElementById('flowi-menu').classList.add('open');}
 function fecharMenu(){document.getElementById('flowi-menu').classList.remove('open');}
 window.addEventListener('scroll',function(){var b=document.getElementById('back-top');if(b)b.style.display=window.scrollY>300?'flex':'none';});
+
+// --- FUNÇÕES DO MODAL PREMIUM ---
+function abrirModalPremium() {
+  document.getElementById('modal-ja-sou-premium').classList.add('open');
+}
+function fecharModalPremium() {
+  document.getElementById('modal-ja-sou-premium').classList.remove('open');
+}
+
+// --- ENVIO DO MAGIC LINK VIA SUPABASE ---
+document.getElementById('form-login-premium')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const emailInput = document.getElementById('email-premium').value.trim();
+  const mensagem = document.getElementById('mensagem-login');
+  const btnEnviar = document.getElementById('btn-enviar-magic-link');
+
+  btnEnviar.disabled = true;
+  btnEnviar.innerText = "Enviando...";
+  mensagem.style.display = 'block';
+  mensagem.style.color = "#a7f3d0";
+  mensagem.innerText = "Verificando e-mail...";
+
+  if (!supabaseClient) {
+    mensagem.style.color = "#fca5a5";
+    mensagem.innerText = "Erro ao conectar com o servidor. Configure as chaves do Supabase.";
+    btnEnviar.disabled = false;
+    btnEnviar.innerText = "Enviar Link de Acesso";
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signInWithOtp({
+    email: emailInput,
+    options: {
+      emailRedirectTo: window.location.href
+    }
+  });
+
+  if (error) {
+    mensagem.style.color = "#fca5a5";
+    mensagem.innerText = "Erro ao enviar. Verifique o e-mail digitado.";
+    btnEnviar.disabled = false;
+    btnEnviar.innerText = "Enviar Link de Acesso";
+  } else {
+    mensagem.style.color = "#a7f3d0";
+    mensagem.innerText = "✨ Link enviado! Abra seu e-mail para acessar o Flowi Premium.";
+    btnEnviar.innerText = "Link Enviado!";
+  }
+});
 
 function enviarVoto(){
   var input=document.getElementById('voto-input'),v=input&&input.value.trim();
