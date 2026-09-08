@@ -75,6 +75,9 @@
     <div id="loginArea" class="login-container" style="display:none;">
       <h2>Acessar Meus Flowis</h2>
       <p>Digite o e-mail que você utilizou na compra para ver seus produtos.</p>
+      <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 10px 12px; font-size: 0.78rem; color: var(--text-muted); text-align: left; margin-bottom: 14px;">
+        💡 Já comprou outro Flowi antes? Use o <strong>mesmo e-mail</strong> em todas as compras para ver todos os seus produtos juntos aqui.
+      </div>
       <input type="email" id="emailInput" class="input-email" placeholder="seuemail@exemplo.com">
       <button id="btnBuscar" onclick="buscarPorEmail()" class="btn-login">Buscar Meus Flowis</button>
       <div id="loginMsg" style="margin-top:10px; font-size:0.85rem;"></div>
@@ -101,36 +104,6 @@
     const SUPABASE_URL = "https://gkvanakreiiiprriyats.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_1Lx3D9jBwegVvvqTK39JAg_yV6zuw3s";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Catálogo — nome de exibição e URL de acesso de cada produto Flowi.
-    // A chave (ex: 'flowi-disney') precisa bater com o produto_id salvo em
-    // licencas_flowi e produtos_flowi.
-    const CATALOGO = {
-      'flowi-disney': {
-        nome: 'Flowi Viagens',
-        sub: 'Disney & Universal Orlando',
-        desc: 'Roteiro, orçamento, câmbio, metas de economia e muito mais.',
-        url: 'https://tryflowi.github.io/flowi-viagens/disney/'
-      },
-      'flowi-negocios-psicologo': {
-        nome: 'Flowi Negócios',
-        sub: 'Psicólogo',
-        desc: 'Sessões, custos e gestão do consultório.',
-        url: 'https://tryflowi.github.io/flowi-negocios/psicologo/'
-      },
-      'flowi-financas-mae-solo': {
-        nome: 'Flowi Finanças',
-        sub: 'Mãe Solo',
-        desc: 'Autonomia e clareza financeira completa.',
-        url: 'https://tryflowi.github.io/flowi-financas/mae-solo/'
-      },
-      'flowi-festas-15anos': {
-        nome: 'Flowi Festas',
-        sub: '15 Anos',
-        desc: 'Planejamento e controle de convidados e fornecedores.',
-        url: 'https://tryflowi.github.io/flowi-festas/15anos/'
-      }
-    };
 
     const EMAIL_STORAGE_KEY = 'flowi_hub_email';
 
@@ -221,19 +194,27 @@
         return false;
       }
 
+      const produtoIds = licencas.map((l) => l.produto);
+
+      const { data: infoProdutos, error: erroProdutos } = await supabaseClient
+        .from('produtos_flowi')
+        .select('produto_id, nome, subtitulo, descricao, url')
+        .in('produto_id', produtoIds);
+
+      if (erroProdutos) {
+        console.error('Erro ao consultar produtos:', erroProdutos);
+      }
+
       const grid = document.getElementById('compradosGrid');
       grid.innerHTML = '';
 
-      licencas.forEach(({ produto }) => {
-        const info = CATALOGO[produto];
-        if (!info) return; // produto desconhecido no catálogo local — ignora silenciosamente
-
+      (infoProdutos || []).forEach((info) => {
         grid.innerHTML += `
           <div class="card-product">
             <div>
               <span class="card-badge">Premium ativo</span>
-              <div class="card-title">${info.nome} <small style="font-weight:400; font-size:0.8rem; color:var(--text-muted);">${info.sub}</small></div>
-              <div class="card-desc">${info.desc}</div>
+              <div class="card-title">${info.nome} <small style="font-weight:400; font-size:0.8rem; color:var(--text-muted);">${info.subtitulo}</small></div>
+              <div class="card-desc">${info.descricao}</div>
             </div>
             <a href="${info.url}" class="btn-action btn-active">Acessar Flowi</a>
           </div>
