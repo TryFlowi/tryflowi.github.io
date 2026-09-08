@@ -710,9 +710,10 @@
     <div class="modal-card">
       <button class="modal-close" onclick="fecharLoginModal()">✕</button>
       <h3 style="margin-bottom:12px; font-size:18px;">Acessar Minha Conta Premium</h3>
-      <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Digite seu e-mail cadastrado para liberar todas as funções no dispositivo.</p>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Digite o e-mail usado na compra para liberar todas as funções neste dispositivo.</p>
       <div class="form-group"><label>E-mail</label><input type="email" id="loginEmail" class="form-control" placeholder="seuemail@exemplo.com"></div>
-      <button class="btn-submit" style="margin-top:8px;" onclick="ativarPremiumSimulado()">Ativar Acesso Premium</button>
+      <button class="btn-submit" id="btnAtivarPremium" style="margin-top:8px;" onclick="verificarLicencaPremium()">Ativar Acesso Premium</button>
+      <div id="loginStatus" style="font-size:13px; margin-top:12px; text-align:center; min-height:18px;"></div>
     </div>
   </div>
 
@@ -724,6 +725,25 @@
 
   <script>
     const BUY_LINK = 'https://mpago.la/2BQyLnS';
+
+    // Identificador deste produto na tabela licencas_flowi — precisa bater
+    // com o produto_id cadastrado em produtos_flowi para o link de pagamento
+    // "Flowi Viagens - Disney Premium".
+    const PRODUTO_ID = 'flowi-disney';
+
+    // Configuração do Supabase — usada para verificar licenças reais de
+    // compra no modal "Já sou Premium".
+    const SUPABASE_URL = 'https://gkvanakreiiiprriyats.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_1Lx3D9jBwegVvvqTK39JAg_yV6zuw3s';
+    let supabaseClient = null;
+    try {
+      if (window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch (e) {
+      console.warn('Supabase não inicializado:', e);
+    }
+
     let isPremium = false;
     let activeTabId = 'inicio';
 
@@ -768,11 +788,6 @@
     }
 
     function carregar() {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('teste') === 'premium' || urlParams.get('status') === 'approved') {
-        localStorage.setItem('flowi_is_premium', 'true');
-      }
-
       isPremium = localStorage.getItem('flowi_is_premium') === 'true';
 
       const saved = localStorage.getItem('flowi_disney_user_data');
@@ -1914,12 +1929,65 @@
     function abrirPaywall() { document.getElementById('paywallModal').classList.add('active'); }
     function fecharPaywall() { document.getElementById('paywallModal').classList.remove('active'); }
 
-    function abrirLoginModal() { document.getElementById('loginModal').classList.add('active'); }
+    function abrirLoginModal() {
+      document.getElementById('loginModal').classList.add('active');
+      document.getElementById('loginStatus').textContent = '';
+      document.getElementById('loginStatus').style.color = '';
+    }
     function fecharLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
 
-    function ativarPremiumSimulado() {
-      localStorage.setItem('flowi_is_premium', 'true');
-      location.reload();
+    async function verificarLicencaPremium() {
+      const emailInput = document.getElementById('loginEmail');
+      const statusEl = document.getElementById('loginStatus');
+      const btn = document.getElementById('btnAtivarPremium');
+
+      const email = emailInput.value.trim().toLowerCase();
+
+      if (!email || !email.includes('@')) {
+        statusEl.textContent = 'Digite um e-mail válido.';
+        statusEl.style.color = 'var(--danger)';
+        return;
+      }
+
+      if (!supabaseClient) {
+        statusEl.textContent = 'Serviço de verificação indisponível no momento.';
+        statusEl.style.color = 'var(--danger)';
+        return;
+      }
+
+      btn.disabled = true;
+      const textoOriginalBtn = btn.textContent;
+      btn.textContent = 'Verificando...';
+      statusEl.textContent = '';
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('licencas_flowi')
+          .select('ativo')
+          .eq('email', email)
+          .eq('produto', PRODUTO_ID)
+          .eq('ativo', true)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          localStorage.setItem('flowi_is_premium', 'true');
+          statusEl.textContent = 'Licença encontrada! Liberando...';
+          statusEl.style.color = 'var(--success)';
+          setTimeout(() => location.reload(), 800);
+        } else {
+          statusEl.textContent = 'Não encontramos uma compra aprovada com este e-mail para este produto.';
+          statusEl.style.color = 'var(--danger)';
+        }
+      } catch (e) {
+        console.error('Erro ao verificar licença:', e);
+        statusEl.textContent = 'Erro ao verificar. Tente novamente em instantes.';
+        statusEl.style.color = 'var(--danger)';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = textoOriginalBtn;
+      }
     }
   </script>
 </body>
