@@ -14,18 +14,19 @@
       --text-muted: #94a3b8;
       --accent: #10b981;
       --accent-hover: #059669;
+      --danger: #ef4444;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px; }
-    
+
     header { width: 100%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; padding: 10px 0 20px 0; border-bottom: 1px solid var(--border); }
-    .logo { font-size: 1.5rem; font-weight: 800; tracking: -0.05em; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .logo { font-size: 1.5rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
     .logo-dot { width: 10px; height: 10px; background-color: var(--accent); border-radius: 50%; display: inline-block; }
     .btn-logout { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
-    
+
     main { width: 100%; max-width: 800px; margin-top: 20px; flex-grow: 1; }
-    
+
     /* Login Box */
     .login-container { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 12px; text-align: center; max-width: 400px; margin: 40px auto; }
     .login-container h2 { font-size: 1.3rem; margin-bottom: 8px; }
@@ -33,19 +34,22 @@
     .input-email { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: var(--text); margin-bottom: 12px; font-size: 0.95rem; }
     .btn-login { width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-weight: 600; cursor: pointer; }
     .btn-login:hover { background: var(--accent-hover); }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Loading state (verificando pagamento recém-feito) */
+    .loading-container { text-align: center; margin: 60px auto; color: var(--text-muted); }
 
     /* Dashboard */
     .section-title { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 25px 0 15px 0; }
     .grid-products { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
     .card-product { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
-    .card-badge { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 10px; width: fit-content; }
-    .badge-active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-    .badge-locked { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); }
+    .card-badge { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 10px; width: fit-content; background: rgba(16, 185, 129, 0.2); color: #10b981; }
     .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
     .card-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; }
     .btn-action { width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; text-align: center; text-decoration: none; display: inline-block; font-size: 0.9rem; }
     .btn-active { background: var(--accent); color: #fff; }
-    .btn-locked { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+    .empty-state { text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 30px 20px; background: var(--card-bg); border: 1px dashed var(--border); border-radius: 12px; }
 
     /* Footer & Alert */
     .data-alert { text-align: center; font-size: 0.8rem; color: var(--text-muted); background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; margin: 30px 0 15px 0; border: 1px dashed var(--border); }
@@ -58,133 +62,207 @@
 
   <header>
     <div class="logo"><span class="logo-dot"></span> flowi</div>
-    <button id="btnLogout" class="btn-logout" style="display: none;" onclick="logout()">Sair</button>
+    <button id="btnLogout" class="btn-logout" style="display: none;" onclick="sair()">Sair</button>
   </header>
 
   <main>
-    <!-- TELA DE LOGIN (Mostra quando não autenticado) -->
-    <div id="loginArea" class="login-container">
+    <!-- TELA DE VERIFICAÇÃO AUTOMÁTICA (retorno de pagamento) -->
+    <div id="verificandoArea" class="loading-container" style="display:none;">
+      <p>Confirmando seu pagamento...</p>
+    </div>
+
+    <!-- TELA DE LOGIN POR E-MAIL -->
+    <div id="loginArea" class="login-container" style="display:none;">
       <h2>Acessar Meus Flowis</h2>
-      <p>Digite o e-mail que você utilizou na compra para receber seu link de acesso.</p>
+      <p>Digite o e-mail que você utilizou na compra para ver seus produtos.</p>
       <input type="email" id="emailInput" class="input-email" placeholder="seuemail@exemplo.com">
-      <button onclick="enviarMagicLink()" class="btn-login">Enviar Magic Link</button>
+      <button id="btnBuscar" onclick="buscarPorEmail()" class="btn-login">Buscar Meus Flowis</button>
       <div id="loginMsg" style="margin-top:10px; font-size:0.85rem;"></div>
     </div>
 
-    <!-- TELA PAINEL (Mostra quando autenticado) -->
+    <!-- TELA PAINEL (mostra os Flowis do e-mail identificado) -->
     <div id="hubArea" style="display: none;">
-      <div class="section-title">Meus Flowis Adquiridos</div>
+      <div class="section-title">Meus Flowis</div>
       <div id="compradosGrid" class="grid-products"></div>
-
-      <div class="section-title">Conheça Outros Flowis</div>
-      <div id="vitrineGrid" class="grid-products"></div>
     </div>
 
     <div class="data-alert">
-      💾 Seus dados ficam salvos apenas neste dispositivo e navegador. Se trocar de aparelho, baixe o arquivo offline primeiro.
+      💾 Este acesso é feito pelo seu e-mail de compra. Guarde o link deste Hub para acessar seus Flowis quando quiser.
     </div>
   </main>
 
   <footer>
-    Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a> &nbsp;·&nbsp; 
+    Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a> &nbsp;·&nbsp;
     <a href="https://tryflowi.github.io/#sugestoes">Sugerir melhoria</a>
   </footer>
 
   <script>
-    // COLIQUE AQUI SUAS CHAVES DO SUPABASE
-    const SUPABASE_URL = "SUA_SUPABASE_URL";
-    const SUPABASE_KEY = "SUA_SUPABASE_ANON_KEY";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Configuração do Supabase
+    const SUPABASE_URL = "https://gkvanakreiiiprriyats.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_1Lx3D9jBwegVvvqTK39JAg_yV6zuw3s";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // CATÁLOGO DE PRODUTOS FLOWI
-    const CATALOGO = [
-      { id: 'financas-mae-solo', nome: 'Flowi Finanças', sub: 'Mãe Solo', desc: 'Autonomia e clareza financeira completa.', url: 'financas.html', checkout: 'https://mpago.la/exemplo1' },
-      { id: 'festas-15-anos', nome: 'Flowi Festas', sub: '15 Anos', desc: 'Planejamento e controle de convidados/fornecedores.', url: 'festas-15anos.html', checkout: 'https://mpago.la/exemplo2' },
-      { id: 'viagens-disney', nome: 'Flowi Viagens', sub: 'Disney & Orlando', desc: 'Roteiros, conversão de câmbio e calculadora.', url: 'viagens-disney.html', checkout: 'https://mpago.la/exemplo3' },
-      { id: 'negocios-psicologo', nome: 'Flowi Negócios', sub: 'Consultório / Psicólogo', desc: 'Sessões, custos e gestão de inadimplência.', url: 'negocios.html', checkout: 'https://mpago.la/exemplo4' }
-    ];
+    // Catálogo — nome de exibição e URL de acesso de cada produto Flowi.
+    // A chave (ex: 'flowi-disney') precisa bater com o produto_id salvo em
+    // licencas_flowi e produtos_flowi.
+    const CATALOGO = {
+      'flowi-disney': {
+        nome: 'Flowi Viagens',
+        sub: 'Disney & Universal Orlando',
+        desc: 'Roteiro, orçamento, câmbio, metas de economia e muito mais.',
+        url: 'https://tryflowi.github.io/flowi-viagens/disney/'
+      },
+      'flowi-negocios-psicologo': {
+        nome: 'Flowi Negócios',
+        sub: 'Psicólogo',
+        desc: 'Sessões, custos e gestão do consultório.',
+        url: 'https://tryflowi.github.io/flowi-negocios/psicologo/'
+      },
+      'flowi-financas-mae-solo': {
+        nome: 'Flowi Finanças',
+        sub: 'Mãe Solo',
+        desc: 'Autonomia e clareza financeira completa.',
+        url: 'https://tryflowi.github.io/flowi-financas/mae-solo/'
+      },
+      'flowi-festas-15anos': {
+        nome: 'Flowi Festas',
+        sub: '15 Anos',
+        desc: 'Planejamento e controle de convidados e fornecedores.',
+        url: 'https://tryflowi.github.io/flowi-festas/15anos/'
+      }
+    };
 
-    async function checarSessao() {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        document.getElementById('loginArea').style.display = 'none';
-        document.getElementById('hubArea').style.display = 'block';
-        document.getElementById('btnLogout').style.display = 'block';
-        carregarProdutosUsuario(session.user.email);
+    const EMAIL_STORAGE_KEY = 'flowi_hub_email';
+
+    async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const paymentId = params.get('payment_id') ?? params.get('collection_id');
+
+      if (paymentId) {
+        // Veio direto de um pagamento — confirma automaticamente, sem pedir e-mail
+        mostrarTela('verificando');
+        const emailEncontrado = await buscarEmailPorPaymentId(paymentId);
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        if (emailEncontrado) {
+          localStorage.setItem(EMAIL_STORAGE_KEY, emailEncontrado);
+          await carregarProdutosDoEmail(emailEncontrado);
+          return;
+        }
+        // Se não achou pelo payment_id, cai para a verificação normal por e-mail
+      }
+
+      // Sem payment_id na URL — tenta reaproveitar e-mail já usado antes neste navegador
+      const emailSalvo = localStorage.getItem(EMAIL_STORAGE_KEY);
+      if (emailSalvo) {
+        await carregarProdutosDoEmail(emailSalvo);
+        return;
+      }
+
+      mostrarTela('login');
+    }
+
+    async function buscarEmailPorPaymentId(paymentId) {
+      const { data, error } = await supabaseClient
+        .from('licencas_flowi')
+        .select('email')
+        .eq('payment_id', String(paymentId))
+        .eq('ativo', true)
+        .maybeSingle();
+
+      if (error || !data) return null;
+      return data.email;
+    }
+
+    async function buscarPorEmail() {
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
+      const msg = document.getElementById('loginMsg');
+      const btn = document.getElementById('btnBuscar');
+
+      if (!email || !email.includes('@')) {
+        msg.textContent = 'Digite um e-mail válido.';
+        msg.style.color = 'var(--danger)';
+        return;
+      }
+
+      btn.disabled = true;
+      msg.textContent = 'Buscando...';
+      msg.style.color = 'var(--text-muted)';
+
+      const encontrouAlgo = await carregarProdutosDoEmail(email, true);
+
+      btn.disabled = false;
+
+      if (encontrouAlgo) {
+        localStorage.setItem(EMAIL_STORAGE_KEY, email);
       } else {
-        document.getElementById('loginArea').style.display = 'block';
-        document.getElementById('hubArea').style.display = 'none';
-        document.getElementById('btnLogout').style.display = 'none';
+        msg.textContent = 'Nenhum Flowi encontrado para este e-mail ainda.';
+        msg.style.color = 'var(--danger)';
       }
     }
 
-    async function enviarMagicLink() {
-      const email = document.getElementById('emailInput').value;
-      const msg = document.getElementById('loginMsg');
-      if (!email) { msg.innerText = "Por favor, digite o e-mail."; return; }
-
-      msg.innerText = "Enviando...";
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email,
-        options: { emailRedirectTo: window.location.href }
-      });
+    // Consulta licencas_flowi pelo e-mail e monta os cards. Retorna true se
+    // encontrou ao menos um produto ativo (usado para decidir se troca de tela).
+    async function carregarProdutosDoEmail(email, manterTelaLoginSeVazio) {
+      const { data: licencas, error } = await supabaseClient
+        .from('licencas_flowi')
+        .select('produto')
+        .eq('email', email.toLowerCase().trim())
+        .eq('ativo', true);
 
       if (error) {
-        msg.innerText = "Erro ao enviar: " + error.message;
-      } else {
-        msg.innerText = "Link enviado! Verifique seu e-mail (inclusive o SPAM).";
+        console.error('Erro ao consultar licenças:', error);
+        mostrarTela('login');
+        return false;
       }
-    }
 
-    async function carregarProdutosUsuario(email) {
-      // Consulta a tabela de compras vinculadas ao e-mail
-      const { data: compras } = await supabase.from('compras').select('produto_id').eq('email', email);
-      const IDsComprados = compras ? compras.map(c => c.produto_id) : [];
+      if (!licencas || licencas.length === 0) {
+        if (!manterTelaLoginSeVazio) mostrarTela('login');
+        return false;
+      }
 
-      const compradosGrid = document.getElementById('compradosGrid');
-      const vitrineGrid = document.getElementById('vitrineGrid');
-      
-      compradosGrid.innerHTML = '';
-      vitrineGrid.innerHTML = '';
+      const grid = document.getElementById('compradosGrid');
+      grid.innerHTML = '';
 
-      CATALOGO.forEach(p => {
-        const jaComprou = IDsComprados.includes(p.id);
-        const cardHtml = `
+      licencas.forEach(({ produto }) => {
+        const info = CATALOGO[produto];
+        if (!info) return; // produto desconhecido no catálogo local — ignora silenciosamente
+
+        grid.innerHTML += `
           <div class="card-product">
             <div>
-              <span class="card-badge ${jaComprou ? 'badge-active' : 'badge-locked'}">
-                ${jaComprou ? 'Liberação Premium' : 'Bloqueado'}
-              </span>
-              <div class="card-title">${p.nome} <small style="font-weight:400; font-size:0.8rem; color:var(--text-muted);">${p.sub}</small></div>
-              <div class="card-desc">${p.desc}</div>
+              <span class="card-badge">Premium ativo</span>
+              <div class="card-title">${info.nome} <small style="font-weight:400; font-size:0.8rem; color:var(--text-muted);">${info.sub}</small></div>
+              <div class="card-desc">${info.desc}</div>
             </div>
-            ${jaComprou 
-              ? `<a href="${p.url}?access=true" class="btn-action btn-active">Acessar Flowi</a>`
-              : `<a href="${p.checkout}" target="_blank" class="btn-action btn-locked">Desbloquear (R$ 15,90)</a>`
-            }
+            <a href="${info.url}" class="btn-action btn-active">Acessar Flowi</a>
           </div>
         `;
-
-        if (jaComprou) {
-          compradosGrid.innerHTML += cardHtml;
-        } else {
-          vitrineGrid.innerHTML += cardHtml;
-        }
       });
 
-      if (compradosGrid.innerHTML === '') {
-        compradosGrid.innerHTML = `<p style="color:var(--text-muted); font-size:0.9rem;">Nenhum produto atrelado a este e-mail até o momento.</p>`;
+      if (grid.innerHTML === '') {
+        grid.innerHTML = `<div class="empty-state">Nenhum Flowi reconhecido no catálogo para este e-mail.</div>`;
       }
+
+      mostrarTela('hub');
+      return true;
     }
 
-    async function logout() {
-      await supabase.auth.signOut();
-      window.location.reload();
+    function mostrarTela(nome) {
+      document.getElementById('verificandoArea').style.display = nome === 'verificando' ? 'block' : 'none';
+      document.getElementById('loginArea').style.display = nome === 'login' ? 'block' : 'none';
+      document.getElementById('hubArea').style.display = nome === 'hub' ? 'block' : 'none';
+      document.getElementById('btnLogout').style.display = nome === 'hub' ? 'block' : 'none';
     }
 
-    // Inicialização ao carregar a página
-    checarSessao();
+    function sair() {
+      localStorage.removeItem(EMAIL_STORAGE_KEY);
+      document.getElementById('emailInput').value = '';
+      document.getElementById('loginMsg').textContent = '';
+      mostrarTela('login');
+    }
+
+    init();
   </script>
 </body>
 </html>
