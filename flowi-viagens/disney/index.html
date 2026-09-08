@@ -701,7 +701,7 @@
       </div>
       <div class="paywall-price-label">R$ 15,90</div>
       <div class="paywall-price-sub">pagamento único - acesso vitalício</div>
-      <a href="https://flowi-webhook-mercadopago.tryflowicontato.workers.dev/criar-checkout?produto=flowi-disney" target="_blank" class="btn-buy-paywall">Garantir o Premium por R$ 15,90 →</a>
+      <button onclick="fecharPaywall(); irParaCompraPremium();" class="btn-buy-paywall">Garantir o Premium por R$ 15,90 →</button>
     </div>
   </div>
 
@@ -717,6 +717,18 @@
     </div>
   </div>
 
+  <!-- MODAL E-MAIL PARA COMPRA -->
+  <div class="modal-overlay" id="emailCompraModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="fecharEmailCompraModal()">✕</button>
+      <h3 style="margin-bottom:12px; font-size:18px;">Quase lá!</h3>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Digite o e-mail que você quer usar para acessar o Premium depois da compra.</p>
+      <div class="form-group"><label>E-mail</label><input type="email" id="emailCompraInput" class="form-control" placeholder="seuemail@exemplo.com"></div>
+      <button class="btn-submit" id="btnIrParaPagamento" style="margin-top:8px;" onclick="confirmarEmailEIrParaPagamento()">Continuar para o pagamento</button>
+      <div id="emailCompraStatus" style="font-size:13px; margin-top:12px; text-align:center; min-height:18px;"></div>
+    </div>
+  </div>
+
   <footer>
     <div style="margin-bottom:4px; font-weight:600; letter-spacing:1px; color:var(--text-muted);">FLOWI · ORGANIZE SEM COMPLICAR · @tryflowi</div>
     <div>Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a></div>
@@ -724,7 +736,7 @@
   </footer>
 
   <script>
-    const BUY_LINK = 'https://flowi-webhook-mercadopago.tryflowicontato.workers.dev/criar-checkout?produto=flowi-disney';
+    const CHECKOUT_BASE_URL = 'https://flowi-webhook-mercadopago.tryflowicontato.workers.dev/criar-checkout?produto=flowi-disney';
 
     // Identificador deste produto na tabela licencas_flowi — precisa bater
     // com o produto_id cadastrado em produtos_flowi para o link de pagamento
@@ -778,7 +790,34 @@
 
     window.addEventListener('DOMContentLoaded', () => { carregar(); });
 
-    function irParaCompraPremium() { window.open(BUY_LINK, '_blank'); }
+    function irParaCompraPremium() {
+      document.getElementById('emailCompraModal').classList.add('active');
+      document.getElementById('emailCompraStatus').textContent = '';
+    }
+
+    function fecharEmailCompraModal() {
+      document.getElementById('emailCompraModal').classList.remove('active');
+    }
+
+    function confirmarEmailEIrParaPagamento() {
+      const emailInput = document.getElementById('emailCompraInput');
+      const statusEl = document.getElementById('emailCompraStatus');
+      const email = emailInput.value.trim().toLowerCase();
+
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        statusEl.textContent = 'Digite um e-mail válido.';
+        statusEl.style.color = 'var(--danger)';
+        return;
+      }
+
+      // Guarda o e-mail localmente também, para reconhecimento automático
+      // assim que a licença for confirmada.
+      localStorage.setItem('flowi_hub_email', email);
+
+      const urlFinal = `${CHECKOUT_BASE_URL}&email=${encodeURIComponent(email)}`;
+      window.open(urlFinal, '_blank');
+      fecharEmailCompraModal();
+    }
 
     function confirmarReset() {
       if (confirm("⚠️ ATENÇÃO: Deseja realmente resetar o aplicativo?\n\nIsso apagará todas as atividades, itens do orçamento e configurações salvas.")) {
