@@ -335,11 +335,11 @@ footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 40px; display: f
   <div class="modal-card">
     <button class="modal-fechar" onclick="fecharModalLogin()">&times;</button>
     <div class="modal-titulo">Acessar Meus Flowis</div>
-    <div class="modal-desc">Informe o e-mail cadastrado na compra para receber seu link de acesso seguro.</div>
+    <div class="modal-desc">Informe o e-mail cadastrado na compra para ver seus produtos Premium.</div>
     
     <div class="modal-form">
       <input type="email" id="modalEmailInput" class="modal-input" placeholder="seuemail@exemplo.com">
-      <button id="btnEnviarMagicLink" onclick="enviarMagicLinkModal()" class="modal-btn">Enviar Magic Link</button>
+      <button id="btnEnviarMagicLink" onclick="verificarLicencaModal()" class="modal-btn">Acessar Meus Flowis</button>
     </div>
     
     <div id="modalMsg" class="modal-msg"></div>
@@ -386,13 +386,11 @@ window.addEventListener('scroll', function(){
 });
 
 // --- CONTROLE DO MODAL LOGIN PREMIUM ---
-async function abrirJaSouPremium() {
-  if (supabaseClient) {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session) {
-      window.location.href = "hub.html";
-      return;
-    }
+function abrirJaSouPremium() {
+  const emailSalvo = localStorage.getItem('flowi_hub_email');
+  if (emailSalvo) {
+    window.location.href = "hub.html";
+    return;
   }
   document.getElementById("modalJaSouPremium").classList.add("open");
 }
@@ -401,49 +399,52 @@ function fecharModalLogin() {
   document.getElementById("modalJaSouPremium").classList.remove("open");
 }
 
-async function enviarMagicLinkModal() {
-  const emailInput = document.getElementById("modalEmailInput").value.trim();
+async function verificarLicencaModal() {
+  const emailInput = document.getElementById("modalEmailInput").value.trim().toLowerCase();
   const msg = document.getElementById("modalMsg");
   const btn = document.getElementById("btnEnviarMagicLink");
 
   msg.style.display = "block";
   msg.style.color = "#94a3b8";
 
-  if (!emailInput) {
+  if (!emailInput || !emailInput.includes('@')) {
     msg.style.color = "#fca5a5";
-    msg.innerText = "Por favor, insira o seu e-mail de compra.";
+    msg.innerText = "Por favor, insira um e-mail válido.";
     return;
   }
 
   if (!supabaseClient) {
     msg.style.color = "#fca5a5";
-    msg.innerText = "Erro ao conectar ao serviço de autenticação.";
+    msg.innerText = "Erro ao conectar ao serviço de verificação.";
     return;
   }
 
   btn.disabled = true;
-  msg.innerText = "Enviando link de acesso...";
+  msg.innerText = "Verificando...";
 
-  const { error } = await supabaseClient.auth.signInWithOtp({
-    email: emailInput,
-    options: {
-      shouldCreateUser: false,
-      emailRedirectTo: window.location.origin + "/hub.html"
-    }
-  });
+  const { data, error } = await supabaseClient
+    .from('licencas_flowi')
+    .select('produto')
+    .eq('email', emailInput)
+    .eq('ativo', true);
 
   if (error) {
     msg.style.color = "#fca5a5";
-    if (error.message.includes("Signups not allowed") || error.status === 400) {
-      msg.innerText = "E-mail não cadastrado. Verifique a escrita ou realize sua compra.";
-    } else {
-      msg.innerText = "Erro: " + error.message;
-    }
+    msg.innerText = "Erro ao verificar. Tente novamente em instantes.";
     btn.disabled = false;
-  } else {
+    return;
+  }
+
+  if (data && data.length > 0) {
+    localStorage.setItem('flowi_hub_email', emailInput);
     msg.style.color = "#a7f3d0";
-    msg.innerText = "✨ Link enviado! Cheque sua caixa de entrada e spam.";
-    btn.innerText = "Enviado!";
+    msg.innerText = "✨ Encontramos seus Flowis! Redirecionando...";
+    btn.innerText = "Redirecionando...";
+    setTimeout(() => { window.location.href = "hub.html"; }, 800);
+  } else {
+    msg.style.color = "#fca5a5";
+    msg.innerText = "Nenhum Flowi encontrado para este e-mail. Verifique a escrita ou realize sua compra.";
+    btn.disabled = false;
   }
 }
 
