@@ -709,10 +709,10 @@
   <div class="modal-overlay" id="loginModal">
     <div class="modal-card">
       <button class="modal-close" onclick="fecharLoginModal()">✕</button>
-      <h3 style="margin-bottom:12px; font-size:18px;">Acessar Minha Conta Premium</h3>
+      <h3 style="margin-bottom:12px; font-size:18px;">Acessar Meus Flowis</h3>
       <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Digite o e-mail usado na compra para liberar todas as funções neste dispositivo.</p>
       <div class="form-group"><label>E-mail</label><input type="email" id="loginEmail" class="form-control" placeholder="seuemail@exemplo.com"></div>
-      <button class="btn-submit" id="btnAtivarPremium" style="margin-top:8px;" onclick="verificarLicencaPremium()">Ativar Acesso Premium</button>
+      <button class="btn-submit" id="btnAtivarPremium" style="margin-top:8px;" onclick="verificarLicencaPremium()">Verificar e Acessar</button>
       <div id="loginStatus" style="font-size:13px; margin-top:12px; text-align:center; min-height:18px;"></div>
     </div>
   </div>
@@ -787,9 +787,7 @@
       }
     }
 
-    function carregar() {
-      isPremium = localStorage.getItem('flowi_is_premium') === 'true';
-
+    async function carregar() {
       const saved = localStorage.getItem('flowi_disney_user_data');
       if (saved) {
         try { appData = { ...appData, ...JSON.parse(saved) }; } catch(e) { console.error(e); }
@@ -797,6 +795,33 @@
       if (!appData.metas) appData.metas = { mesInicio: '' };
       if (!appData.cronograma) appData.cronograma = [];
       if (!appData.mala) appData.mala = [];
+
+      // Checagem automática de Premium: usa o e-mail já identificado antes
+      // (pela Home ou pelo Hub, salvo no navegador) e verifica se HÁ licença
+      // ativa especificamente para este produto (flowi-disney). Uma pessoa
+      // pode ser Premium em outro Flowi e Free neste — a checagem é sempre
+      // por produto, nunca genérica.
+      isPremium = localStorage.getItem('flowi_is_premium') === 'true';
+
+      const emailSalvo = localStorage.getItem('flowi_hub_email');
+      if (emailSalvo && supabaseClient) {
+        try {
+          const { data } = await supabaseClient
+            .from('licencas_flowi')
+            .select('ativo')
+            .eq('email', emailSalvo.toLowerCase().trim())
+            .eq('produto', PRODUTO_ID)
+            .eq('ativo', true)
+            .maybeSingle();
+
+          if (data) {
+            isPremium = true;
+            localStorage.setItem('flowi_is_premium', 'true');
+          }
+        } catch (e) {
+          console.warn('Erro ao checar licença automática:', e);
+        }
+      }
 
       atualizarInterfaceState();
       renderTabs();
@@ -1973,6 +1998,7 @@
 
         if (data) {
           localStorage.setItem('flowi_is_premium', 'true');
+          localStorage.setItem('flowi_hub_email', email);
           statusEl.textContent = 'Licença encontrada! Liberando...';
           statusEl.style.color = 'var(--success)';
           setTimeout(() => location.reload(), 800);
