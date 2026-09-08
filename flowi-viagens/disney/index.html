@@ -826,11 +826,18 @@
       }
     }
 
+    // Guarda a data da última sincronização bem-sucedida com a nuvem,
+    // usada para detectar conflitos (edições em dois aparelhos offline).
+    let ultimaSincronizacaoNuvem = null;
+
     async function carregar() {
       const saved = localStorage.getItem('flowi_disney_user_data');
+      let dadosLocais = null;
       if (saved) {
-        try { appData = { ...appData, ...JSON.parse(saved) }; } catch(e) { console.error(e); }
+        try { dadosLocais = JSON.parse(saved); } catch(e) { console.error(e); }
       }
+      if (dadosLocais) appData = { ...appData, ...dadosLocais };
+
       if (!appData.metas) appData.metas = { mesInicio: '' };
       if (!appData.cronograma) appData.cronograma = [];
       if (!appData.mala) appData.mala = [];
@@ -862,6 +869,13 @@
         }
       }
 
+      // Se Premium, sincroniza com a nuvem: busca os dados salvos em
+      // dados_flowi para este e-mail+produto e decide o que fazer com base
+      // na comparação de datas (nuvem vs. local).
+      if (isPremium && emailSalvo && supabaseClient) {
+        await sincronizarComNuvem(emailSalvo, dadosLocais);
+      }
+
       atualizarInterfaceState();
       renderTabs();
       carregarInputsConfig();
@@ -869,9 +883,104 @@
       iniciarContador();
     }
 
+    async function sincronizarComNuvem(email, dadosLocais) {
+      try {
+        const { data: registroNuvem } = await supabaseClient
+          .from('dados_flowi')
+          .select('dados, atualizado_em')
+          .eq('email', email.toLowerCase().trim())
+          .eq('produto', PRODUTO_ID)
+          .maybeSingle();
+
+        if (!registroNuvem) {
+          // Primeira vez ficando Premium: sobe os dados locais (Free) que já
+          // existirem, iniciando o histórico na nuvem.
+          if (dadosLocais) {
+            await salvarNaNuvem(email, appData);
+          }
+          return;
+        }
+
+        const dadosDaNuvem = registroNuvem.dados;
+        const localTemDados = dadosLocais && Object.keys(dadosLocais).length > 0;
+
+        if (!localTemDados) {
+          // Aparelho novo, sem dados locais: usa a nuvem diretamente.
+          appData = { ...appData, ...dadosDaNuvem };
+          ultimaSincronizacaoNuvem = registroNuvem.atualizado_em;
+          return;
+        }
+
+        // Há dados nos dois lados. Se o local nunca foi sincronizado antes
+        // (não temos registro de quando), ou os dados batem, usa a nuvem
+        // sem perguntar — é o caso comum de reabrir em outro aparelho já
+        // sincronizado.
+        const localBateComNuvem = JSON.stringify(dadosLocais) === JSON.stringify(dadosDaNuvem);
+
+        if (localBateComNuvem) {
+          appData = { ...appData, ...dadosDaNuvem };
+          ultimaSincronizacaoNuvem = registroNuvem.atualizado_em;
+          return;
+        }
+
+        // Conflito real: dados diferentes nos dois lados. Pergunta ao
+        // usuário qual versão manter.
+        const usarNuvem = confirm(
+          'Encontramos dados diferentes salvos na nuvem e neste dispositivo.\n\n' +
+          'Clique OK para usar os dados da NUVEM (de outro aparelho).\n' +
+          'Clique Cancelar para manter os dados deste DISPOSITIVO (e substituir a nuvem).'
+        );
+
+        if (usarNuvem) {
+          appData = { ...appData, ...dadosDaNuvem };
+          ultimaSincronizacaoNuvem = registroNuvem.atualizado_em;
+        } else {
+          await salvarNaNuvem(email, appData);
+        }
+      } catch (e) {
+        console.warn('Erro ao sincronizar com a nuvem:', e);
+      }
+    }
+
+    async function salvarNaNuvem(email, dados) {
+      if (!supabaseClient) return;
+      try {
+        const { data, error } = await supabaseClient
+          .from('dados_flowi')
+          .upsert(
+            {
+              email: email.toLowerCase().trim(),
+              produto: PRODUTO_ID,
+              dados: dados,
+              atualizado_em: new Date().toISOString(),
+            },
+            { onConflict: 'email,produto' },
+          )
+          .select('atualizado_em')
+          .maybeSingle();
+
+        if (error) throw error;
+        if (data) ultimaSincronizacaoNuvem = data.atualizado_em;
+      } catch (e) {
+        console.warn('Erro ao salvar na nuvem:', e);
+      }
+    }
+
+    let debounceSincronizacao = null;
+
     function salvar() {
       localStorage.setItem('flowi_disney_user_data', JSON.stringify(appData));
       renderDashboardCalculos();
+
+      // Se Premium, sincroniza com a nuvem automaticamente (com pequeno
+      // atraso para agrupar edições rápidas em sequência numa só chamada).
+      const emailSalvo = localStorage.getItem('flowi_hub_email');
+      if (isPremium && emailSalvo && supabaseClient) {
+        clearTimeout(debounceSincronizacao);
+        debounceSincronizacao = setTimeout(() => {
+          salvarNaNuvem(emailSalvo, appData);
+        }, 1500);
+      }
     }
 
     function renderTabs() {
