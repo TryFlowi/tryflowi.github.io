@@ -263,7 +263,7 @@
       <div style="font-size:32px;margin-bottom:12px;">📱</div>
       <div style="font-weight:700;font-size:16px;color:#0F172A;margin-bottom:10px;">Exportar PDF no iPhone</div>
       <div style="font-size:13px;color:#64748B;line-height:1.6;margin-bottom:20px;">No Safari/iPhone, toque no botão <strong>Compartilhar</strong> <span style="font-size:16px;">⎙</span> na barra do navegador e escolha <strong>"Imprimir"</strong> para salvar como PDF.</div>
-      <button onclick="document.getElementById('avisoImpressaoIOS').style.display='none'; document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('print-show'));" style="background:#0B132B;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Entendido</button>
+      <button onclick="document.getElementById('avisoImpressaoIOS').style.display='none'; if(window._restaurarPrint){window._restaurarPrint();window._restaurarPrint=null;}" style="background:#0B132B;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Entendido</button>
     </div>
   </div>
 
@@ -971,8 +971,7 @@
 
     // Restaura estado após impressão (funciona em Android/Desktop; iOS não dispara este evento)
     window.addEventListener('afterprint', () => {
-      document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
-      renderTabs();
+      if (window._restaurarPrint) { window._restaurarPrint(); window._restaurarPrint = null; }
     });
 
     function irParaCompraPremium() {
@@ -1016,6 +1015,16 @@
       // Garante que todas as abas premium estejam renderizadas antes de imprimir
       renderAllData();
 
+      // Remove elementos de formulário do DOM fisicamente (não só CSS)
+      // para garantir zero espaço em todos os browsers/dispositivos.
+      const removidos = [];
+      document.querySelectorAll('.no-print, #cardVisualizacaoMoeda, #cardSalvarOffline, #promoRoteiroD1, #promoOrcamentoFree, #promoMoedaFree').forEach(el => {
+        const placeholder = document.createComment('no-print-placeholder');
+        el.parentNode.insertBefore(placeholder, el);
+        el.parentNode.removeChild(el);
+        removidos.push({ el, placeholder });
+      });
+
       // Remove classes de impressão anteriores
       document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
 
@@ -1031,29 +1040,32 @@
         document.querySelectorAll('.tab-content').forEach(s => s.classList.add('print-show'));
       }
 
-      // Safari/iOS bloqueia window.print() chamado programaticamente.
-      // Detecta iOS e exibe instrução para o usuário usar o menu de compartilhamento.
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
       const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
+      const restaurar = () => {
+        // Restaura todos os elementos removidos nas posições originais
+        removidos.forEach(({ el, placeholder }) => {
+          if (placeholder.parentNode) {
+            placeholder.parentNode.insertBefore(el, placeholder);
+            placeholder.parentNode.removeChild(placeholder);
+          }
+        });
+        document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
+        renderTabs();
+      };
+
       if (isIOS || isSafari) {
-        // Mantém o estado de impressão ativo e orienta o usuário
         const aviso = document.getElementById('avisoImpressaoIOS');
-        if (aviso) {
-          aviso.style.display = 'flex';
-          // Fecha o aviso após 8 segundos
-          setTimeout(() => { aviso.style.display = 'none'; }, 8000);
-        }
-        // Tenta mesmo assim — em alguns casos funciona
-        setTimeout(() => { window.print(); }, 100);
+        if (aviso) aviso.style.display = 'flex';
+        // Restaura após o usuário fechar o aviso (handled inline no botão)
+        window._restaurarPrint = restaurar;
+        setTimeout(() => { try { window.print(); } catch(e) {} }, 100);
         return;
       }
 
       window.print();
-
-      // Restaura estado original após impressão
-      document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
-      renderTabs();
+      restaurar();
     }
 
     function abrirModalTermos(id) {
@@ -1860,584 +1872,4 @@
       if (!mes || !titulo) return alert('Informe o mês/ano e a tarefa.');
 
       if (editId) {
-        const item = appData.cronograma.find(t => t.id == editId);
-        if (item) { item.mes = mes; item.titulo = titulo; }
-      } else {
-        appData.cronograma.push({ id: Date.now(), mes, titulo, feito: false });
-      }
-
-      salvar();
-      renderCronograma();
-      renderAlertasPrazo();
-      cancelarEdicaoCronograma();
-    }
-
-    function editarTarefaCronograma(id) {
-      const item = appData.cronograma.find(t => t.id === id);
-      if (!item) return;
-
-      document.getElementById('croEditId').value = item.id;
-      document.getElementById('croMes').value = item.mes;
-      document.getElementById('croTitulo').value = item.titulo;
-
-      document.getElementById('croFormTitle').textContent = 'Editar Tarefa do Cronograma';
-      document.getElementById('btnCroSubmit').textContent = 'Salvar Alterações';
-      document.getElementById('btnCroCancel').style.display = 'block';
-
-      window.scrollTo({ top: document.getElementById('tab-cronograma').offsetTop - 20, behavior: 'smooth' });
-    }
-
-    function cancelarEdicaoCronograma() {
-      document.getElementById('croEditId').value = '';
-      document.getElementById('croMes').value = '';
-      document.getElementById('croTitulo').value = '';
-
-      document.getElementById('croFormTitle').textContent = 'Adicionar Tarefa ao Cronograma';
-      document.getElementById('btnCroSubmit').textContent = 'Adicionar ao Cronograma';
-      document.getElementById('btnCroCancel').style.display = 'none';
-    }
-
-    function toggleTarefaCronograma(id) {
-      const item = appData.cronograma.find(t => t.id === id);
-      if (item) {
-        item.feito = !item.feito;
-        salvar();
-        renderCronograma();
-        renderAlertasPrazo();
-      }
-    }
-
-    function removerTarefaCronograma(id) {
-      if (confirm('Deseja excluir esta tarefa do cronograma?')) {
-        appData.cronograma = appData.cronograma.filter(t => t.id !== id);
-        salvar();
-        renderCronograma();
-        renderAlertasPrazo();
-      }
-    }
-
-    function renderCronograma() {
-      if (!isPremium) return;
-
-      const container = document.getElementById('cronogramaLista');
-      if (!container) return;
-      container.innerHTML = '';
-
-      if (appData.cronograma.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Nenhuma tarefa cadastrada. Adicione a primeira acima.</div>';
-        return;
-      }
-
-      const nomesMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
-      const ordenado = [...appData.cronograma].sort((a, b) => a.mes.localeCompare(b.mes));
-
-      const agrupado = {};
-      ordenado.forEach(item => {
-        if (!agrupado[item.mes]) agrupado[item.mes] = [];
-        agrupado[item.mes].push(item);
-      });
-
-      Object.keys(agrupado).sort().forEach(mesStr => {
-        const [anoStr, mesNumStr] = mesStr.split('-');
-        const mesNome = nomesMeses[parseInt(mesNumStr) - 1];
-
-        const grupo = document.createElement('div');
-        grupo.style.cssText = 'margin-bottom:18px;';
-        grupo.innerHTML = `<div style="font-weight:700; font-size:13px; color:var(--brand-primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border-color);">${mesNome} / ${anoStr}</div>`;
-
-        agrupado[mesStr].forEach(item => {
-          const linha = document.createElement('div');
-          linha.style.cssText = 'display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid #F1F5F9;';
-          linha.innerHTML = `
-            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggleTarefaCronograma(${item.id})" style="width:18px; height:18px; accent-color:var(--brand-primary); flex-shrink:0;">
-            <div style="flex:1; font-size:14px; ${item.feito ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${item.titulo}</div>
-            <button class="btn-action-icon" onclick="editarTarefaCronograma(${item.id})">✏️</button>
-            <button class="btn-action-icon" style="color:var(--danger);" onclick="removerTarefaCronograma(${item.id})">🗑️</button>
-          `;
-          grupo.appendChild(linha);
-        });
-
-        container.appendChild(grupo);
-      });
-    }
-
-    /* --- CHECKLIST DE MALA (PREMIUM) --- */
-    function salvarItemMala() {
-      const editId = document.getElementById('malaEditId').value;
-      const categoria = document.getElementById('malaCategoria').value;
-      const item = document.getElementById('malaItem').value.trim();
-
-      if (!item) return alert('Informe o nome do item.');
-
-      if (editId) {
-        const existente = appData.mala.find(m => m.id == editId);
-        if (existente) { existente.categoria = categoria; existente.item = item; }
-      } else {
-        appData.mala.push({ id: Date.now(), categoria, item, feito: false });
-      }
-
-      salvar();
-      renderMala();
-      cancelarEdicaoMala();
-    }
-
-    function editarItemMala(id) {
-      const item = appData.mala.find(m => m.id === id);
-      if (!item) return;
-
-      document.getElementById('malaEditId').value = item.id;
-      document.getElementById('malaCategoria').value = item.categoria;
-      document.getElementById('malaItem').value = item.item;
-
-      document.getElementById('malaFormTitle').textContent = 'Editar Item da Mala';
-      document.getElementById('btnMalaSubmit').textContent = 'Salvar Alterações';
-      document.getElementById('btnMalaCancel').style.display = 'block';
-
-      window.scrollTo({ top: document.getElementById('tab-mala').offsetTop - 20, behavior: 'smooth' });
-    }
-
-    function cancelarEdicaoMala() {
-      document.getElementById('malaEditId').value = '';
-      document.getElementById('malaCategoria').value = 'Documentos';
-      document.getElementById('malaItem').value = '';
-
-      document.getElementById('malaFormTitle').textContent = 'Adicionar Item à Mala';
-      document.getElementById('btnMalaSubmit').textContent = 'Adicionar à Mala';
-      document.getElementById('btnMalaCancel').style.display = 'none';
-    }
-
-    function toggleItemMala(id) {
-      const item = appData.mala.find(m => m.id === id);
-      if (item) {
-        item.feito = !item.feito;
-        salvar();
-        renderMala();
-      }
-    }
-
-    function removerItemMala(id) {
-      if (confirm('Deseja excluir este item da mala?')) {
-        appData.mala = appData.mala.filter(m => m.id !== id);
-        salvar();
-        renderMala();
-      }
-    }
-
-    function renderMala() {
-      if (!isPremium) return;
-
-      const container = document.getElementById('malaLista');
-      if (!container) return;
-      container.innerHTML = '';
-
-      const totalItens = appData.mala.length;
-      const totalFeitos = appData.mala.filter(m => m.feito).length;
-      const pct = totalItens > 0 ? Math.round((totalFeitos / totalItens) * 100) : 0;
-
-      document.getElementById('malaProgressoTexto').textContent = `${pct}% embalado`;
-      document.getElementById('malaBarraFill').style.width = pct + '%';
-
-      if (totalItens === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Nenhum item adicionado ainda. Adicione o primeiro acima.</div>';
-        return;
-      }
-
-      const categoriasOrdem = ['Documentos', 'Roupas', 'Eletrônicos', 'Itens de Parque', 'Higiene e Saúde', 'Outros'];
-      const iconesCategoria = {
-        'Documentos': '📄', 'Roupas': '👕', 'Eletrônicos': '🔌',
-        'Itens de Parque': '🎢', 'Higiene e Saúde': '🧴', 'Outros': '📦'
-      };
-
-      const agrupado = {};
-      appData.mala.forEach(item => {
-        if (!agrupado[item.categoria]) agrupado[item.categoria] = [];
-        agrupado[item.categoria].push(item);
-      });
-
-      categoriasOrdem.forEach(cat => {
-        if (!agrupado[cat]) return;
-        const itensCategoria = agrupado[cat];
-        const feitosCategoria = itensCategoria.filter(i => i.feito).length;
-
-        const grupo = document.createElement('div');
-        grupo.style.cssText = 'margin-bottom:18px;';
-        grupo.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:13px; color:var(--brand-primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border-color);">
-            <span>${iconesCategoria[cat] || '📦'} ${cat}</span>
-            <span style="color:var(--text-muted); font-weight:600; text-transform:none; letter-spacing:0;">${feitosCategoria}/${itensCategoria.length}</span>
-          </div>
-        `;
-
-        itensCategoria.forEach(item => {
-          const linha = document.createElement('div');
-          linha.style.cssText = 'display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid #F1F5F9;';
-          linha.innerHTML = `
-            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggleItemMala(${item.id})" style="width:18px; height:18px; accent-color:var(--brand-primary); flex-shrink:0;">
-            <div style="flex:1; font-size:14px; ${item.feito ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${item.item}</div>
-            <button class="btn-action-icon" onclick="editarItemMala(${item.id})">✏️</button>
-            <button class="btn-action-icon" style="color:var(--danger);" onclick="removerItemMala(${item.id})">🗑️</button>
-          `;
-          grupo.appendChild(linha);
-        });
-
-        container.appendChild(grupo);
-      });
-    }
-
-    /* --- ALERTAS DE PRAZO (PREMIUM) --- */
-    function renderAlertasPrazo() {
-      const card = document.getElementById('cardAlertasPrazo');
-      const lista = document.getElementById('alertasPrazoLista');
-      if (!card || !lista) return;
-
-      if (!isPremium) {
-        card.style.display = 'none';
-        return;
-      }
-
-      const hoje = new Date();
-      const mesAtualStr = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
-
-      const nomesMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
-      // Tarefas do cronograma vencidas (mês já passou) e não concluídas
-      const atrasadas = appData.cronograma.filter(t => !t.feito && t.mes < mesAtualStr);
-
-      // Tarefas do mês atual, não concluídas
-      const desteMs = appData.cronograma.filter(t => !t.feito && t.mes === mesAtualStr);
-
-      const alertas = [];
-
-      if (atrasadas.length > 0) {
-        alertas.push({
-          tipo: 'atrasado',
-          texto: `${atrasadas.length} tarefa${atrasadas.length > 1 ? 's' : ''} do cronograma está${atrasadas.length > 1 ? 'ão' : ''} atrasada${atrasadas.length > 1 ? 's' : ''}: ${atrasadas.map(t => t.titulo).join(', ')}`
-        });
-      }
-
-      if (desteMs.length > 0) {
-        alertas.push({
-          tipo: 'atencao',
-          texto: `${desteMs.length} tarefa${desteMs.length > 1 ? 's' : ''} para concluir este mês: ${desteMs.map(t => t.titulo).join(', ')}`
-        });
-      }
-
-      // Contagem de dias até a viagem, se houver data configurada
-      if (appData.config.startDate) {
-        const dataViagem = new Date(appData.config.startDate + 'T00:00:00');
-        const diffDias = Math.ceil((dataViagem - hoje) / (1000 * 60 * 60 * 24));
-        if (diffDias >= 0 && diffDias <= 60) {
-          alertas.push({
-            tipo: 'info',
-            texto: `Faltam ${diffDias} dia${diffDias !== 1 ? 's' : ''} para a viagem — hora de revisar cronograma e checklist de mala.`
-          });
-        }
-      }
-
-      if (alertas.length === 0) {
-        card.style.display = 'none';
-        return;
-      }
-
-      card.style.display = 'block';
-      lista.innerHTML = '';
-
-      alertas.forEach(alerta => {
-        const cores = {
-          atrasado: { bg: '#FEF2F2', border: '#FECACA', color: '#991B1B', icone: '🔴' },
-          atencao: { bg: '#FFFBEB', border: '#FDE68A', color: '#92400E', icone: '🟡' },
-          info: { bg: '#EFF6FF', border: '#BFDBFE', color: '#1E40AF', icone: '🔵' }
-        };
-        const c = cores[alerta.tipo];
-        const div = document.createElement('div');
-        div.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:${c.color}; padding:12px 14px; border-radius:8px; font-size:13px; margin-bottom:8px;`;
-        div.innerHTML = `${c.icone} ${alerta.texto}`;
-        lista.appendChild(div);
-      });
-    }
-
-    /* --- OUTRAS FUNÇÕES (ROTEIRO, TRANSPORTE, MODAIS) --- */
-    function salvarAtividade() {
-      const editId = document.getElementById('actEditId').value;
-      const date = document.getElementById('actDate').value;
-      const time = document.getElementById('actTime').value;
-      const title = document.getElementById('actTitle').value;
-      const desc = document.getElementById('actDesc').value;
-
-      if (!date || !title) return alert('Informe a data e o título.');
-
-      if (editId) {
-        const item = appData.activities.find(a => a.id == editId);
-        if (item) { item.date = date; item.time = time; item.title = title; item.desc = desc; }
-      } else {
-        appData.activities.push({ id: Date.now(), date, time, title, desc });
-      }
-
-      salvar();
-      renderRoteiroCronologico();
-      cancelarEdicaoAtividade();
-    }
-
-    function editarAtividade(id) {
-      const item = appData.activities.find(a => a.id === id);
-      if (!item) return;
-
-      document.getElementById('actEditId').value = item.id;
-      document.getElementById('actDate').value = item.date;
-      document.getElementById('actTime').value = item.time;
-      document.getElementById('actTitle').value = item.title;
-      document.getElementById('actDesc').value = item.desc || '';
-
-      document.getElementById('actFormTitle').textContent = 'Editar Atividade';
-      document.getElementById('btnActSubmit').textContent = 'Salvar Alterações';
-      document.getElementById('btnActCancel').style.display = 'block';
-      atualizarDiaSemanaForm();
-
-      window.scrollTo({ top: document.getElementById('tab-roteiro').offsetTop - 20, behavior: 'smooth' });
-    }
-
-    function cancelarEdicaoAtividade() {
-      document.getElementById('actEditId').value = '';
-      document.getElementById('actDate').value = '';
-      document.getElementById('actTime').value = '09:00';
-      document.getElementById('actTitle').value = '';
-      document.getElementById('actDesc').value = '';
-
-      document.getElementById('actFormTitle').textContent = 'Adicionar Atividade ao Roteiro';
-      document.getElementById('btnActSubmit').textContent = 'Adicionar ao Roteiro';
-      document.getElementById('btnActCancel').style.display = 'none';
-      atualizarDiaSemanaForm();
-    }
-
-    function removerAtividade(id) {
-      appData.activities = appData.activities.filter(a => a.id !== id);
-      salvar();
-      renderRoteiroCronologico();
-    }
-
-    function toggleAccordion(headerElem) { headerElem.parentElement.classList.toggle('open'); }
-
-    function renderRoteiroCronologico() {
-      const container = document.getElementById('cronogramaContainer');
-      container.innerHTML = '';
-
-      if (appData.activities.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Nenhuma atividade cadastrada. Adicione itens acima para montar seu roteiro.</div>';
-        return;
-      }
-
-      const atividadesOrdenadas = [...appData.activities].sort((a, b) => {
-        const datetimeA = (a.date || '') + ' ' + (a.time || '00:00');
-        const datetimeB = (b.date || '') + ' ' + (b.time || '00:00');
-        return datetimeA.localeCompare(datetimeB);
-      });
-
-      if (!isPremium) {
-        atividadesOrdenadas.forEach(item => {
-          const card = document.createElement('div');
-          card.style.cssText = 'background:#FFF; border:1px solid var(--border-color); border-radius:8px; padding:12px 16px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; font-size:13px;';
-          card.innerHTML = `
-            <div style="display:flex; align-items:center;">
-              <div style="font-weight:700; color:var(--text-muted); font-size:12px; margin-right:12px; width:85px; flex-shrink:0;">${formatarDataBR(item.date)}</div>
-              <div class="activity-time">${item.time || '--:--'}</div>
-              <div class="activity-info">
-                <strong>${item.title}</strong>
-                ${item.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${item.desc}</div>` : ''}
-              </div>
-            </div>
-            <div>
-              <button class="btn-action-icon" onclick="editarAtividade(${item.id})">✏️</button>
-              <button class="btn-action-icon" style="color:var(--danger);" onclick="removerAtividade(${item.id})">🗑️</button>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-        return;
-      }
-
-      const agrupado = {};
-      atividadesOrdenadas.forEach(act => {
-        if (!agrupado[act.date]) agrupado[act.date] = [];
-        agrupado[act.date].push(act);
-      });
-
-      const datasOrdenadas = Object.keys(agrupado).sort();
-      const startDateStr = appData.config.startDate;
-      const startDateTime = startDateStr ? new Date(startDateStr + 'T00:00:00').getTime() : null;
-
-      datasOrdenadas.forEach(dataStr => {
-        const atividades = agrupado[dataStr];
-
-        let diaTag = 'Dia';
-        if (startDateTime) {
-          const currentDateTime = new Date(dataStr + 'T00:00:00').getTime();
-          const diffDays = Math.floor((currentDateTime - startDateTime) / (1000 * 60 * 60 * 24)) + 1;
-          diaTag = diffDays > 0 ? `D${diffDays}` : `Pré-Viagem`;
-        }
-
-        const accordion = document.createElement('div');
-        accordion.className = 'day-accordion open';
-
-        let html = `
-          <div class="day-header" onclick="toggleAccordion(this)">
-            <div class="day-title-box">
-              <span class="day-badge">${diaTag}</span>
-              <span class="day-date-str">${formatarDataBR(dataStr)} · ${obterDiaSemana(dataStr)}</span>
-              <span class="day-count-tag">(${atividades.length} atividade${atividades.length > 1 ? 's' : ''})</span>
-            </div>
-            <span class="day-arrow">▼</span>
-          </div>
-          <div class="day-content">
-        `;
-        
-        atividades.forEach(item => {
-          html += `
-            <div class="activity-item">
-              <div class="activity-time">${item.time || '--:--'}</div>
-              <div class="activity-info">
-                <strong>${item.title}</strong>
-                ${item.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${item.desc}</div>` : ''}
-              </div>
-              <div>
-                <button class="btn-action-icon" onclick="editarAtividade(${item.id})">✏️</button>
-                <button class="btn-action-icon" style="color:var(--danger);" onclick="removerAtividade(${item.id})">🗑️</button>
-              </div>
-            </div>
-          `;
-        });
-        html += `</div>`;
-        accordion.innerHTML = html;
-        container.appendChild(accordion);
-      });
-    }
-
-    function calcularTransporte() {
-      const days = parseInt(document.getElementById('carDays').value) || 0;
-      const daily = parseFloat(document.getElementById('carDaily').value) || 0;
-      const park = parseFloat(document.getElementById('carPark').value) || 0;
-      const uber = parseFloat(document.getElementById('uberDaily').value) || 0;
-
-      const totalCar = days * (daily + park);
-      const totalUber = days * uber;
-
-      document.getElementById('resCarTotal').textContent = `US$ ${formatarUSD(totalCar)}`;
-      document.getElementById('resUberTotal').textContent = `US$ ${formatarUSD(totalUber)}`;
-
-      const verdict = document.getElementById('transporteVerdict');
-      if (totalUber < totalCar) {
-        verdict.textContent = `💡 O Uber é mais vantajoso! Economia estimada de US$ ${formatarUSD(totalCar - totalUber)}.`;
-        verdict.style.color = "var(--success)";
-      } else {
-        verdict.textContent = `🚗 Alugar um carro é mais vantajoso! Economia estimada de US$ ${formatarUSD(totalUber - totalCar)}.`;
-        verdict.style.color = "var(--brand-primary)";
-      }
-    }
-
-    function renderAllData() {
-      renderDashboardCalculos();
-      renderRoteiroCronologico();
-      renderOrcamento();
-      renderMetas();
-      renderCronograma();
-      renderMala();
-      renderAlertasPrazo();
-    }
-
-    function baixarArquivoOffline() {
-      const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'flowi-viagem-disney-offline.html';
-      a.click();
-    }
-
-    function toggleMenu() {
-      document.getElementById('drawer').classList.toggle('active');
-      document.getElementById('drawerOverlay').classList.toggle('active');
-      atualizarMenuPrincipal();
-    }
-
-    function atualizarMenuPrincipal() {
-      const link = document.getElementById('drawerMenuPrincipal');
-      if (!link) return;
-      const emailSalvo = localStorage.getItem('flowi_hub_email');
-      if (emailSalvo) {
-        link.textContent = '⚡ Minha Central Flowi';
-        link.href = 'https://tryflowi.github.io/hub.html';
-        link.onclick = null;
-      } else {
-        link.textContent = '🔑 Já sou Premium? Entrar';
-        link.href = '#';
-        link.onclick = function() { abrirLoginModal(); toggleMenu(); return false; };
-      }
-    }
-
-    function abrirPaywall() { document.getElementById('paywallModal').classList.add('active'); }
-    function fecharPaywall() { document.getElementById('paywallModal').classList.remove('active'); }
-
-    function abrirLoginModal() {
-      document.getElementById('loginModal').classList.add('active');
-      document.getElementById('loginStatus').textContent = '';
-      document.getElementById('loginStatus').style.color = '';
-    }
-    function fecharLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
-
-    async function verificarLicencaPremium() {
-      const emailInput = document.getElementById('loginEmail');
-      const statusEl = document.getElementById('loginStatus');
-      const btn = document.getElementById('btnAtivarPremium');
-
-      const email = emailInput.value.trim().toLowerCase();
-
-      if (!email || !email.includes('@')) {
-        statusEl.textContent = 'Digite um e-mail válido.';
-        statusEl.style.color = 'var(--danger)';
-        return;
-      }
-
-      if (!supabaseClient) {
-        statusEl.textContent = 'Serviço de verificação indisponível no momento.';
-        statusEl.style.color = 'var(--danger)';
-        return;
-      }
-
-      btn.disabled = true;
-      const textoOriginalBtn = btn.textContent;
-      btn.textContent = 'Verificando...';
-      statusEl.textContent = '';
-
-      try {
-        const { data, error } = await supabaseClient
-          .from('licencas_flowi')
-          .select('ativo')
-          .eq('email', email)
-          .eq('produto', PRODUTO_ID)
-          .eq('ativo', true)
-          .maybeSingle();
-
-        if (error) throw error;
-
-        if (data) {
-          localStorage.setItem('flowi_is_premium', 'true');
-          localStorage.setItem('flowi_hub_email', email);
-          statusEl.textContent = 'Licença encontrada! Liberando...';
-          statusEl.style.color = 'var(--success)';
-          setTimeout(() => location.reload(), 800);
-        } else {
-          statusEl.textContent = 'Não encontramos uma compra aprovada com este e-mail para este produto.';
-          statusEl.style.color = 'var(--danger)';
-        }
-      } catch (e) {
-        console.error('Erro ao verificar licença:', e);
-        statusEl.textContent = 'Erro ao verificar. Tente novamente em instantes.';
-        statusEl.style.color = 'var(--danger)';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = textoOriginalBtn;
-      }
-    }
-  </script>
-</body>
-</html>
+        cons
