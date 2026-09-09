@@ -180,7 +180,8 @@
       .top-header, .drawer, .drawer-overlay, footer,
       .alert-free-data, #cardOffline, .paywall-overlay,
       .modal-overlay, .modal-termos-overlay,
-      .nav-tabs-wrapper, .btn-exportar-aba { display: none !important; }
+      .nav-tabs-wrapper, .btn-exportar-aba,
+      #avisoImpressaoIOS { display: none !important; }
 
       /* Esconde formulários de entrada e botões */
       button, input, select, textarea { display: none !important; }
@@ -190,7 +191,7 @@
       .form-group, .form-row, .form-section,
       .promo-free, .promo-box,
       #promoRoteiroD1, #promoOrcamentoFree, #promoMoedaFree,
-      .info-box, .alert-free-data { display: none !important; }
+      .info-box, .alert-free-data { display: none !important; margin: 0 !important; padding: 0 !important; height: 0 !important; overflow: hidden !important; }
 
       /* Layout de impressão */
       body { background: white !important; color: #0F172A !important; font-size: 12px; margin: 0; padding: 0; }
@@ -244,6 +245,16 @@
   <div class="print-header">
     <h1 id="printTitulo">Minha Viagem Disney</h1>
     <p id="printSubtitulo">Planejamento gerado pelo Flowi Viagens · tryflowi.github.io</p>
+  </div>
+
+  <!-- Aviso para usuários iOS/Safari -->
+  <div id="avisoImpressaoIOS" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:24px;">
+    <div style="background:white;border-radius:16px;padding:28px 24px;max-width:340px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:12px;">📱</div>
+      <div style="font-weight:700;font-size:16px;color:#0F172A;margin-bottom:10px;">Exportar PDF no iPhone</div>
+      <div style="font-size:13px;color:#64748B;line-height:1.6;margin-bottom:20px;">No Safari/iPhone, toque no botão <strong>Compartilhar</strong> <span style="font-size:16px;">⎙</span> na barra do navegador e escolha <strong>"Imprimir"</strong> para salvar como PDF.</div>
+      <button onclick="document.getElementById('avisoImpressaoIOS').style.display='none'; document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('print-show'));" style="background:#0B132B;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Entendido</button>
+    </div>
   </div>
 
   <!-- MODAIS DE TERMOS (abrem sobre o planejador, sem sair da página) -->
@@ -948,6 +959,12 @@
 
     window.addEventListener('DOMContentLoaded', () => { carregar(); });
 
+    // Restaura estado após impressão (funciona em Android/Desktop; iOS não dispara este evento)
+    window.addEventListener('afterprint', () => {
+      document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
+      renderTabs();
+    });
+
     function irParaCompraPremium() {
       document.getElementById('emailCompraModal').classList.add('active');
       document.getElementById('emailCompraStatus').textContent = '';
@@ -993,17 +1010,33 @@
       document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
 
       if (abaId) {
-        // Modo aba única
         const nomesAbas = { inicio: 'Início', roteiro: 'Roteiro da Viagem', orcamento: 'Orçamento', metas: 'Metas de Economia', cronograma: 'Cronograma', mala: 'Checklist de Mala', transporte: 'Uber vs. Carro', dicas: 'Dicas' };
         if (elTitulo) elTitulo.textContent = titulo;
         if (elSub) elSub.textContent = `${nomesAbas[abaId] || abaId} · ${viajantes} viajante(s) · Flowi Viagens`;
         const alvo = document.getElementById(`tab-${abaId}`);
         if (alvo) alvo.classList.add('print-show');
       } else {
-        // Modo completo — todas as abas
         if (elTitulo) elTitulo.textContent = titulo;
         if (elSub) elSub.textContent = `${viajantes} viajante(s)${dataIda ? ' · Ida: ' + dataIda : ''} · Planejamento completo · Flowi Viagens`;
         document.querySelectorAll('.tab-content').forEach(s => s.classList.add('print-show'));
+      }
+
+      // Safari/iOS bloqueia window.print() chamado programaticamente.
+      // Detecta iOS e exibe instrução para o usuário usar o menu de compartilhamento.
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+      if (isIOS || isSafari) {
+        // Mantém o estado de impressão ativo e orienta o usuário
+        const aviso = document.getElementById('avisoImpressaoIOS');
+        if (aviso) {
+          aviso.style.display = 'flex';
+          // Fecha o aviso após 8 segundos
+          setTimeout(() => { aviso.style.display = 'none'; }, 8000);
+        }
+        // Tenta mesmo assim — em alguns casos funciona
+        setTimeout(() => { window.print(); }, 100);
+        return;
       }
 
       window.print();
