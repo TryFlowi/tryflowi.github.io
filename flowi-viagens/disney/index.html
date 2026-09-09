@@ -175,7 +175,7 @@
 
     @media print {
       * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .top-header, .drawer, .drawer-overlay, .modal-overlay, footer, .btn-header, .badge-plan, .nav-logo, .alert-free-data, #cardOffline, .paywall-overlay, button, .btn-add, .btn-submit, .btn-reset-discreet, input, select, textarea, label, .form-group, .form-row, .card-title + .form-group, [onclick] { display: none !important; }
+      .top-header, .drawer, .drawer-overlay, .modal-overlay, footer, .btn-header, .badge-plan, .nav-logo, .alert-free-data, #cardOffline, .paywall-overlay, button, .btn-add, .btn-submit, .btn-reset-discreet, .btn-exportar-aba, input, select, textarea, label, .form-group, .form-row, .card-title + .form-group, [onclick] { display: none !important; }
       .print-header { display: block !important; }
       body { background: white !important; color: #0F172A !important; font-size: 12px; }
       .main-container { padding: 0 !important; }
@@ -930,22 +930,33 @@
       fecharEmailCompraModal();
     }
 
-    function exportarPDF() {
+    function exportarPDF(abaId) {
       if (!isPremium) { abrirPaywall(); return; }
 
-      // Atualiza o cabeçalho de impressão com o nome da viagem
       const titulo = appData.config?.tripName || 'Minha Viagem Disney';
       const viajantes = appData.config?.travelers || 1;
       const dataIda = appData.config?.travelDate || '';
       const elTitulo = document.getElementById('printTitulo');
       const elSub = document.getElementById('printSubtitulo');
-      if (elTitulo) elTitulo.textContent = titulo;
-      if (elSub) elSub.textContent = `${viajantes} viajante(s)${dataIda ? ' · Ida: ' + dataIda : ''} · Planejamento gerado pelo Flowi Viagens`;
 
-      // Exibe todas as telas no momento da impressão
-      document.querySelectorAll('.screen').forEach(s => s.style.display = 'block');
+      if (abaId) {
+        // Modo aba única — imprime só a aba solicitada
+        if (elTitulo) elTitulo.textContent = titulo;
+        const nomesAbas = { inicio: 'Início', roteiro: 'Roteiro da Viagem', orcamento: 'Orçamento', metas: 'Metas de Economia', cronograma: 'Cronograma', mala: 'Checklist de Mala', ubervscarro: 'Uber vs. Carro', dicas: 'Dicas' };
+        if (elSub) elSub.textContent = `${nomesAbas[abaId] || abaId} · ${viajantes} viajante(s) · Flowi Viagens`;
+        document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+        const abaAlvo = document.getElementById('screen-' + abaId);
+        if (abaAlvo) abaAlvo.style.display = 'block';
+      } else {
+        // Modo completo — imprime todas as abas
+        if (elTitulo) elTitulo.textContent = titulo;
+        if (elSub) elSub.textContent = `${viajantes} viajante(s)${dataIda ? ' · Ida: ' + dataIda : ''} · Planejamento completo · Flowi Viagens`;
+        document.querySelectorAll('.screen').forEach(s => s.style.display = 'block');
+      }
+
       window.print();
-      // Após imprimir, restaura a tela ativa
+
+      // Restaura estado original após impressão
       document.querySelectorAll('.screen').forEach(s => s.style.display = '');
       renderTabs();
       renderAllData();
@@ -1121,6 +1132,24 @@
         }
         nav.appendChild(btn);
       });
+
+      // Injeta botão de exportar PDF no início de cada aba (só Premium)
+      if (isPremium) {
+        TABS_CONFIG.forEach(tab => {
+          const el = document.getElementById(`tab-${tab.id}`);
+          if (!el) return;
+          // Remove botão anterior se existir
+          const anterior = el.querySelector('.btn-exportar-aba');
+          if (anterior) anterior.remove();
+          // Cria novo botão
+          const btnExp = document.createElement('button');
+          btnExp.className = 'btn-exportar-aba';
+          btnExp.innerHTML = '📄 Exportar esta aba em PDF';
+          btnExp.style.cssText = 'display:block;margin:0 0 16px auto;background:none;border:1px solid var(--border-color);border-radius:8px;padding:6px 14px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;';
+          btnExp.onclick = () => exportarPDF(tab.id);
+          el.insertBefore(btnExp, el.firstChild);
+        });
+      }
     }
 
     function switchTab(id) {
