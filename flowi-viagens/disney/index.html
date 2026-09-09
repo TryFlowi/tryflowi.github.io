@@ -191,7 +191,17 @@
       .form-group, .form-row, .form-section,
       .promo-free, .promo-box,
       #promoRoteiroD1, #promoOrcamentoFree, #promoMoedaFree,
-      .info-box, .alert-free-data { display: none !important; margin: 0 !important; padding: 0 !important; height: 0 !important; overflow: hidden !important; }
+      .info-box, .alert-free-data {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        overflow: hidden !important;
+      }
 
       /* Layout de impressão */
       body { background: white !important; color: #0F172A !important; font-size: 12px; margin: 0; padding: 0; }
@@ -1070,12 +1080,11 @@
     }
 
     async function carregar() {
-      // PASSO 1 — Carrega dados locais e renderiza imediatamente, sem esperar nada.
-      // Isso elimina o "tela em branco" que aparecia enquanto aguardava respostas do Supabase.
+      // PASSO 1 — Dados locais → render imediato, zero delay.
       const saved = localStorage.getItem('flowi_disney_user_data');
       let dadosLocais = null;
       if (saved) {
-        try { dadosLocais = JSON.parse(saved); } catch(e) { console.error(e); }
+        try { dadosLocais = JSON.parse(saved); } catch(e) {}
       }
       if (dadosLocais) appData = { ...appData, ...dadosLocais };
       if (!appData.metas) appData.metas = { mesInicio: '' };
@@ -1084,20 +1093,24 @@
 
       isPremium = localStorage.getItem('flowi_is_premium') === 'true';
 
-      // Renderiza imediatamente com o que tem localmente — usuário vê o conteúdo na hora.
+      // Renderiza IMEDIATAMENTE com dados locais — usuário nunca vê tela em branco.
       atualizarInterfaceState();
       renderTabs();
       carregarInputsConfig();
       renderAllData();
       iniciarContador();
 
-      // PASSO 2 — Em paralelo, verifica licença e sincroniza nuvem em background.
-      // Se vier algo novo da nuvem, re-renderiza silenciosamente.
+      // PASSO 2 — Verificação e sincronização em background, completamente silenciosa.
+      // Nenhuma parte deste bloco toca na UI enquanto estiver carregando.
       const emailSalvo = localStorage.getItem('flowi_hub_email');
       if (!emailSalvo || !supabaseClient) return;
 
+      // Snapshot do estado atual para comparar depois
+      const snapshotAntes = JSON.stringify(appData);
+      const premiumAntes = isPremium;
+
       try {
-        // Verifica licença
+        // Verifica licença em background
         const { data: licenca } = await supabaseClient
           .from('licencas_flowi')
           .select('ativo')
@@ -1109,22 +1122,27 @@
         if (licenca && !isPremium) {
           isPremium = true;
           localStorage.setItem('flowi_is_premium', 'true');
-          atualizarInterfaceState();
-          renderTabs();
         }
 
         // Sincroniza dados com nuvem se for Premium
         if (isPremium) {
-          const dadosAntesNuvem = JSON.stringify(appData);
           await sincronizarComNuvem(emailSalvo, dadosLocais);
-          // Só re-renderiza se os dados mudaram após sincronização
-          if (JSON.stringify(appData) !== dadosAntesNuvem) {
-            carregarInputsConfig();
-            renderAllData();
-          }
         }
-      } catch (e) {
+      } catch(e) {
         console.warn('Erro na sincronização em background:', e);
+      }
+
+      // Só atualiza a UI se algo mudou de verdade — sem flash desnecessário
+      const mudouPremium = isPremium !== premiumAntes;
+      const mudouDados = JSON.stringify(appData) !== snapshotAntes;
+
+      if (mudouPremium) {
+        atualizarInterfaceState();
+        renderTabs();
+      }
+      if (mudouDados) {
+        carregarInputsConfig();
+        renderAllData();
       }
     }
 
