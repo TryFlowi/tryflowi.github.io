@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -33,7 +33,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background-color: var(--bg-body); color: var(--text-main); font-family: var(--font-sans); min-height: 100vh; display: flex; flex-direction: column; line-height: 1.5; }
+    body { background-color: var(--bg-body); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 14px; min-height: 100vh; display: flex; flex-direction: column; line-height: 1.5; }
     input, select, textarea, button { font-family: inherit; font-size: 14px; color: inherit; }
 
     .top-header { background-color: var(--bg-header); color: var(--text-white); padding: 16px 24px 0 24px; }
@@ -48,7 +48,7 @@
 
     .btn-header { background: #2563EB; border: none; color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 12px; cursor: pointer; }
     .btn-header:hover { background: #1d4ed8; }
-    .menu-toggle { background: transparent; border: none; color: var(--text-white); font-size: 20px; cursor: pointer; }
+    .nav-logo { display: flex; align-items: center; gap: 6px; }
 
     .trip-title-container { max-width: 1200px; margin: 0 auto 16px auto; }
     .trip-title { font-size: 24px; font-weight: 700; color: var(--text-white); }
@@ -90,7 +90,7 @@
 
     .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
     .form-group label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
-    .form-control { background-color: #F8FAFC; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 12px; color: var(--text-main); outline: none; }
+    .form-control { background-color: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; color: var(--text-main); outline: none; }
 
     .radio-group { display: flex; gap: 12px; margin-top: 4px; }
     .radio-label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; background: #F8FAFC; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; flex: 1; }
@@ -157,13 +157,32 @@
 
     footer { text-align: center; font-size: 12px; color: var(--text-muted); padding: 24px; border-top: 1px solid var(--border-color); margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 8px; }
     footer a { color: var(--brand-primary); text-decoration: none; }
+
+    @media print {
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .top-header, .drawer, .drawer-overlay, .modal-overlay, footer, .btn-header, .badge-plan, .nav-logo, .alert-free-data, #cardOffline, .paywall-overlay { display: none !important; }
+      body { background: white !important; color: #0F172A !important; font-size: 12px; }
+      .main-container { padding: 0 !important; }
+      .nav-tabs-wrapper, .nav-tabs { display: none !important; }
+      .screen { display: block !important; margin-bottom: 24px; break-inside: avoid; }
+      .card { border: 1px solid #E2E8F0 !important; border-radius: 8px; padding: 16px; margin-bottom: 12px; break-inside: avoid; box-shadow: none !important; }
+      .card-title { color: #64748B !important; font-size: 10px !important; }
+      .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .print-header { display: block !important; text-align: center; padding: 16px 0 24px; border-bottom: 2px solid #E2E8F0; margin-bottom: 24px; }
+      .print-header h1 { font-size: 20px; font-weight: 700; color: #0F172A; }
+      .print-header p { font-size: 12px; color: #64748B; margin-top: 4px; }
+      table { width: 100%; border-collapse: collapse; font-size: 11px; }
+      th { background: #F4F6F9 !important; color: #64748B; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; padding: 6px 8px; text-align: left; }
+      td { padding: 6px 8px; border-bottom: 1px solid #F1F5F9; }
+    }
+    .print-header { display: none; }
   </style>
 </head>
 <body>
 
   <header class="top-header">
     <div class="top-bar">
-      <div class="nav-logo" onclick="window.location.href='https://tryflowi.github.io/hub.html'">
+      <div class="nav-logo" onclick="toggleMenu()" style="cursor:pointer;">
         <div style="display:flex;align-items:flex-end;gap:2px">
           <div class="nav-icon">
             <span style="width:22px;height:2.5px;background:white;border-radius:2px;display:block;"></span>
@@ -178,7 +197,6 @@
       <div class="header-actions">
         <span id="badgePlan" class="badge-plan badge-free">FREE</span>
         <button id="btnHeaderAction" class="btn-header" onclick="irParaCompraPremium()">Garantir Premium R$ 15,90</button>
-        <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir Menu">☰</button>
       </div>
     </div>
 
@@ -200,12 +218,24 @@
 
   <div class="drawer-overlay" id="drawerOverlay" onclick="toggleMenu()"></div>
   <div class="drawer" id="drawer">
-    <div class="drawer-title">Flowi Viagens — Disney</div>
-    <a href="#" class="drawer-link" onclick="abrirLoginModal(); toggleMenu();">🔑 Já sou Premium (Entrar)</a>
-    <hr style="border:0; border-top:1px solid var(--border-color); margin:4px 0;">
-    <a href="https://tryflowi.github.io/hub.html" class="drawer-link">🌐 Central Flowi (Hub)</a>
-    <a href="https://tryflowi.github.io/flowi-viagens/" class="drawer-link">✈️ Flowi Viagens</a>
-    <a href="https://tryflowi.github.io/termos.html" class="drawer-link">📜 Termos de Uso</a>
+    <div style="background:#0B132B;margin:-24px -24px 16px -24px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:flex-end;gap:2px">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <span style="width:18px;height:2px;background:white;border-radius:2px;display:block"></span>
+          <span style="width:12px;height:2px;background:white;border-radius:2px;display:block"></span>
+          <span style="width:7px;height:2px;background:white;border-radius:2px;display:block"></span>
+        </div>
+        <div style="width:6px;height:6px;background:white;border-radius:50%;margin-bottom:1px;margin-left:-3px"></div>
+        <span style="font-size:14px;font-weight:600;letter-spacing:2px;color:white;margin-left:5px">flowi</span>
+      </div>
+      <button onclick="toggleMenu()" style="color:rgba(255,255,255,0.7);font-size:20px;background:none;border:none;cursor:pointer">✕</button>
+    </div>
+    <a href="https://tryflowi.github.io/" class="drawer-link">🏠 Home</a>
+    <a href="#" id="drawerMenuPrincipal" class="drawer-link"></a>
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border-color)">Legal</div>
+    <a href="https://tryflowi.github.io/termos.html" class="drawer-link">Termos de uso</a>
+    <a href="https://tryflowi.github.io/privacidade.html" class="drawer-link">Privacidade</a>
+    <a href="https://tryflowi.github.io/reembolso.html" class="drawer-link">Reembolso</a>
   </div>
 
   <main class="main-container">
@@ -698,6 +728,7 @@
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Alertas de prazo:</strong> avisos automáticos de tarefas atrasadas e contagem regressiva</div></div>
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Calculadora Uber vs. Carro:</strong> saiba onde economizar</div></div>
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Dicas para uma viagem segura e confortável:</strong> app, ingressos, seguro viagem, internet, Genie+ e mais</div></div>
+        <div class="paywall-item" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;"><div class="paywall-check">✓</div><div><strong>📄 Exportar PDF completo:</strong> imprima ou compartilhe todo o seu planejamento (roteiro, orçamento, checklist e cronograma) em um único documento</div></div>
       </div>
       <div class="paywall-price-label">R$ 15,90</div>
       <div class="paywall-price-sub">pagamento único - acesso vitalício</div>
@@ -722,17 +753,28 @@
     <div class="modal-card">
       <button class="modal-close" onclick="fecharEmailCompraModal()">✕</button>
       <h3 style="margin-bottom:12px; font-size:18px;">Quase lá!</h3>
-      <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Digite o e-mail que você quer usar para acessar o Premium depois da compra.</p>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Digite o e-mail que você quer usar para acessar o Premium depois da compra.</p>
+      <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:10px 12px; font-size:12px; color:#166534; margin-bottom:16px;">
+        💡 Já comprou outro Flowi antes? Use o <strong>mesmo e-mail</strong> para juntar todos os seus produtos na sua Central Flowi.
+      </div>
       <div class="form-group"><label>E-mail</label><input type="email" id="emailCompraInput" class="form-control" placeholder="seuemail@exemplo.com"></div>
       <button class="btn-submit" id="btnIrParaPagamento" style="margin-top:8px;" onclick="confirmarEmailEIrParaPagamento()">Continuar para o pagamento</button>
       <div id="emailCompraStatus" style="font-size:13px; margin-top:12px; text-align:center; min-height:18px;"></div>
     </div>
   </div>
 
+  <div class="print-header">
+    <h1 id="printTitulo">Minha Viagem Disney</h1>
+    <p id="printSubtitulo">Planejamento gerado pelo Flowi Viagens · tryflowi.github.io</p>
+  </div>
+
   <footer>
-    <div style="margin-bottom:4px; font-weight:600; letter-spacing:1px; color:var(--text-muted);">FLOWI · ORGANIZE SEM COMPLICAR · @tryflowi</div>
+    <div style="font-weight:600;letter-spacing:1px;color:var(--text-muted);">FLOWI · Cada destino, uma experiência · <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a></div>
     <div>Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a></div>
-    <button class="btn-reset-discreet" style="margin-top:8px;" onclick="confirmarReset()">🔄 Resetar aplicativo</button>
+    <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;justify-content:center">
+      <button class="btn-reset-discreet" onclick="exportarPDF()" id="btnExportarPDF" style="display:none">📄 Exportar PDF</button>
+      <button class="btn-reset-discreet" style="margin-top:0" onclick="confirmarReset()">🔄 Resetar aplicativo</button>
+    </div>
   </footer>
 
   <script>
@@ -819,16 +861,33 @@
       fecharEmailCompraModal();
     }
 
+    function exportarPDF() {
+      if (!isPremium) { abrirPaywall(); return; }
+
+      // Atualiza o cabeçalho de impressão com o nome da viagem
+      const titulo = appData.config?.tripName || 'Minha Viagem Disney';
+      const viajantes = appData.config?.travelers || 1;
+      const dataIda = appData.config?.travelDate || '';
+      const elTitulo = document.getElementById('printTitulo');
+      const elSub = document.getElementById('printSubtitulo');
+      if (elTitulo) elTitulo.textContent = titulo;
+      if (elSub) elSub.textContent = `${viajantes} viajante(s)${dataIda ? ' · Ida: ' + dataIda : ''} · Planejamento gerado pelo Flowi Viagens`;
+
+      // Exibe todas as telas no momento da impressão
+      document.querySelectorAll('.screen').forEach(s => s.style.display = 'block');
+      window.print();
+      // Após imprimir, restaura a tela ativa
+      document.querySelectorAll('.screen').forEach(s => s.style.display = '');
+      renderTabs();
+      renderAllData();
+    }
+
     function confirmarReset() {
       if (confirm("⚠️ ATENÇÃO: Deseja realmente resetar o aplicativo?\n\nIsso apagará todas as atividades, itens do orçamento e configurações salvas.")) {
         localStorage.removeItem('flowi_disney_user_data');
         location.reload();
       }
     }
-
-    // Guarda a data da última sincronização bem-sucedida com a nuvem,
-    // usada para detectar conflitos (edições em dois aparelhos offline).
-    let ultimaSincronizacaoNuvem = null;
 
     async function carregar() {
       const saved = localStorage.getItem('flowi_disney_user_data');
@@ -893,11 +952,9 @@
           .maybeSingle();
 
         if (!registroNuvem) {
-          // Primeira vez ficando Premium: sobe os dados locais (Free) que já
-          // existirem, iniciando o histórico na nuvem.
-          if (dadosLocais) {
-            await salvarNaNuvem(email, appData);
-          }
+          // Primeira vez ficando Premium: sobe os dados locais que já
+          // existirem (virada Free → Premium), sem perguntar nada.
+          if (dadosLocais) await salvarNaNuvem(email, appData);
           return;
         }
 
@@ -905,38 +962,19 @@
         const localTemDados = dadosLocais && Object.keys(dadosLocais).length > 0;
 
         if (!localTemDados) {
-          // Aparelho novo, sem dados locais: usa a nuvem diretamente.
+          // Aparelho novo sem dados locais: usa a nuvem diretamente.
           appData = { ...appData, ...dadosDaNuvem };
-          ultimaSincronizacaoNuvem = registroNuvem.atualizado_em;
+          localStorage.setItem('flowi_disney_user_data', JSON.stringify(appData));
           return;
         }
 
-        // Há dados nos dois lados. Se o local nunca foi sincronizado antes
-        // (não temos registro de quando), ou os dados batem, usa a nuvem
-        // sem perguntar — é o caso comum de reabrir em outro aparelho já
-        // sincronizado.
-        const localBateComNuvem = JSON.stringify(dadosLocais) === JSON.stringify(dadosDaNuvem);
+        // Nuvem sempre prevalece — garante consistência entre aparelhos sem
+        // interromper o usuário com confirmações confusas. O localStorage
+        // anterior fica sobrescrito, mas a nuvem é a fonte confiável porque
+        // é ela que recebe cada edição em tempo real (com debounce).
+        appData = { ...appData, ...dadosDaNuvem };
+        localStorage.setItem('flowi_disney_user_data', JSON.stringify(appData));
 
-        if (localBateComNuvem) {
-          appData = { ...appData, ...dadosDaNuvem };
-          ultimaSincronizacaoNuvem = registroNuvem.atualizado_em;
-          return;
-        }
-
-        // Conflito real: dados diferentes nos dois lados. Pergunta ao
-        // usuário qual versão manter.
-        const usarNuvem = confirm(
-          'Encontramos dados diferentes salvos na nuvem e neste dispositivo.\n\n' +
-          'Clique OK para usar os dados da NUVEM (de outro aparelho).\n' +
-          'Clique Cancelar para manter os dados deste DISPOSITIVO (e substituir a nuvem).'
-        );
-
-        if (usarNuvem) {
-          appData = { ...appData, ...dadosDaNuvem };
-          ultimaSincronizacaoNuvem = registroNuvem.atualizado_em;
-        } else {
-          await salvarNaNuvem(email, appData);
-        }
       } catch (e) {
         console.warn('Erro ao sincronizar com a nuvem:', e);
       }
@@ -1042,13 +1080,10 @@
         alertFree.style.display = 'none';
         cardOffline.style.display = 'none';
         if (promoD1) promoD1.style.display = 'none';
-
         if (groupCat) groupCat.style.display = 'flex';
         if (groupPaid) groupPaid.style.display = 'flex';
         if (groupStatus) groupStatus.style.display = 'flex';
         if (promoOrc) promoOrc.style.display = 'none';
-
-        // Conversão Real <-> Dólar liberada apenas no Premium
         if (groupBudType) groupBudType.style.display = 'flex';
         if (promoMoedaFree) promoMoedaFree.style.display = 'none';
         if (kpiForeignCard) kpiForeignCard.style.display = 'block';
@@ -1057,6 +1092,8 @@
         if (kpiNationalCard) kpiNationalCard.style.display = 'block';
         if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'block';
         if (infoBoxResumo) infoBoxResumo.innerHTML = 'ℹ️ <strong>Aviso:</strong> Escolha abaixo em qual moeda deseja visualizar o saldo consolidado da sua viagem.';
+        const btnPDF = document.getElementById('btnExportarPDF');
+        if (btnPDF) btnPDF.style.display = 'inline-flex';
         if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Nacionais + Estrangeiros convertidos';
       } else {
         badge.className = 'badge-plan badge-free';
@@ -2097,6 +2134,22 @@
     function toggleMenu() {
       document.getElementById('drawer').classList.toggle('active');
       document.getElementById('drawerOverlay').classList.toggle('active');
+      atualizarMenuPrincipal();
+    }
+
+    function atualizarMenuPrincipal() {
+      const link = document.getElementById('drawerMenuPrincipal');
+      if (!link) return;
+      const emailSalvo = localStorage.getItem('flowi_hub_email');
+      if (emailSalvo) {
+        link.textContent = '⚡ Minha Central Flowi';
+        link.href = 'https://tryflowi.github.io/hub.html';
+        link.onclick = null;
+      } else {
+        link.textContent = '🔑 Já sou Premium? Entrar';
+        link.href = '#';
+        link.onclick = function() { abrirLoginModal(); toggleMenu(); return false; };
+      }
     }
 
     function abrirPaywall() { document.getElementById('paywallModal').classList.add('active'); }
