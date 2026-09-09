@@ -73,6 +73,21 @@
     .drawer-title { font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
     .drawer-link { color: var(--text-muted); font-size: 14px; text-decoration: none; }
 
+    /* Modal de termos — abre sobre o planejador sem sair da página */
+    .modal-termos-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: flex-start; justify-content: center; padding: 24px 16px; overflow-y: auto; }
+    .modal-termos-overlay.active { display: flex; }
+    .modal-termos-card { background: #fff; border-radius: 16px; max-width: 680px; width: 100%; padding: 32px 28px; position: relative; margin: auto; }
+    .modal-termos-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); line-height: 1; }
+    .modal-termos-titulo { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; padding-right: 32px; }
+    .modal-termos-body { font-size: 13px; line-height: 1.7; color: var(--text-muted); }
+    .modal-termos-body h3 { font-size: 14px; font-weight: 700; color: var(--text-main); margin: 20px 0 8px; }
+    .modal-termos-body p { margin-bottom: 12px; }
+
+    /* print-header aparece só no PDF, no topo antes de tudo */
+    .print-header { display: none; text-align: center; padding: 16px 0 24px; border-bottom: 2px solid #E2E8F0; margin-bottom: 24px; }
+    .print-header h1 { font-size: 22px; font-weight: 700; color: #0F172A; }
+    .print-header p { font-size: 12px; color: #64748B; margin-top: 4px; }
+
     .main-container { max-width: 1200px; width: 100%; margin: 24px auto; padding: 0 16px; flex: 1; }
     .tab-content { display: none; }
     .tab-content.active { display: block; animation: fadeIn 0.2s ease-in-out; }
@@ -160,17 +175,16 @@
 
     @media print {
       * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .top-header, .drawer, .drawer-overlay, .modal-overlay, footer, .btn-header, .badge-plan, .nav-logo, .alert-free-data, #cardOffline, .paywall-overlay { display: none !important; }
+      .top-header, .drawer, .drawer-overlay, .modal-overlay, footer, .btn-header, .badge-plan, .nav-logo, .alert-free-data, #cardOffline, .paywall-overlay, button, .btn-add, .btn-submit, .btn-reset-discreet, input, select, textarea, label, .form-group, .form-row, .card-title + .form-group, [onclick] { display: none !important; }
+      .print-header { display: block !important; }
       body { background: white !important; color: #0F172A !important; font-size: 12px; }
       .main-container { padding: 0 !important; }
       .nav-tabs-wrapper, .nav-tabs { display: none !important; }
-      .screen { display: block !important; margin-bottom: 24px; break-inside: avoid; }
+      .screen { display: block !important; margin-bottom: 32px; break-inside: avoid; }
       .card { border: 1px solid #E2E8F0 !important; border-radius: 8px; padding: 16px; margin-bottom: 12px; break-inside: avoid; box-shadow: none !important; }
-      .card-title { color: #64748B !important; font-size: 10px !important; }
-      .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .print-header { display: block !important; text-align: center; padding: 16px 0 24px; border-bottom: 2px solid #E2E8F0; margin-bottom: 24px; }
-      .print-header h1 { font-size: 20px; font-weight: 700; color: #0F172A; }
-      .print-header p { font-size: 12px; color: #64748B; margin-top: 4px; }
+      .card-title { display: block !important; color: #64748B !important; font-size: 10px !important; }
+      .kpi-grid { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .kpi-card { display: block !important; }
       table { width: 100%; border-collapse: collapse; font-size: 11px; }
       th { background: #F4F6F9 !important; color: #64748B; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; padding: 6px 8px; text-align: left; }
       td { padding: 6px 8px; border-bottom: 1px solid #F1F5F9; }
@@ -179,6 +193,66 @@
   </style>
 </head>
 <body>
+  <!-- Cabeçalho visível apenas no PDF (aparece no topo antes de tudo) -->
+  <div class="print-header">
+    <h1 id="printTitulo">Minha Viagem Disney</h1>
+    <p id="printSubtitulo">Planejamento gerado pelo Flowi Viagens · tryflowi.github.io</p>
+  </div>
+
+  <!-- MODAIS DE TERMOS (abrem sobre o planejador, sem sair da página) -->
+  <div class="modal-termos-overlay" id="modalTermos">
+    <div class="modal-termos-card">
+      <button class="modal-termos-close" onclick="fecharModalTermos()">✕</button>
+      <div class="modal-termos-titulo">Termos de Uso</div>
+      <div class="modal-termos-body">
+        <p>Ao utilizar o Flowi Viagens, você concorda com os termos descritos abaixo.</p>
+        <h3>1. Uso do Serviço</h3>
+        <p>O Flowi é uma ferramenta de planejamento pessoal. O uso é individual e intransferível. É proibida a reprodução ou redistribuição do conteúdo sem autorização.</p>
+        <h3>2. Dados e Privacidade</h3>
+        <p>No modo Free, seus dados ficam armazenados apenas no seu dispositivo. No modo Premium, os dados são sincronizados em nossos servidores de forma segura para acesso em múltiplos dispositivos.</p>
+        <h3>3. Pagamentos</h3>
+        <p>O acesso Premium é adquirido mediante pagamento único, processado pelo Mercado Pago. Consulte nossa política de reembolso para informações sobre cancelamentos.</p>
+        <h3>4. Responsabilidades</h3>
+        <p>O Flowi não se responsabiliza por decisões tomadas com base nas informações inseridas no aplicativo. As estimativas de orçamento e cronograma são de responsabilidade do usuário.</p>
+        <h3>5. Contato</h3>
+        <p>Dúvidas? Entre em contato pelo Instagram <strong>@tryflowi</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-termos-overlay" id="modalPrivacidade">
+    <div class="modal-termos-card">
+      <button class="modal-termos-close" onclick="fecharModalTermos('modalPrivacidade')">✕</button>
+      <div class="modal-termos-titulo">Política de Privacidade</div>
+      <div class="modal-termos-body">
+        <p>Sua privacidade é importante para nós. Esta política explica como tratamos seus dados.</p>
+        <h3>1. Dados Coletados</h3>
+        <p>Coletamos apenas o e-mail informado no momento da compra, para vinculação da licença Premium. Nenhum dado pessoal além deste é coletado ou armazenado por nós.</p>
+        <h3>2. Dados do Planejamento</h3>
+        <p>No modo Free, seus dados de planejamento (roteiro, orçamento etc.) ficam armazenados localmente no seu dispositivo e nunca são enviados a nossos servidores. No modo Premium, esses dados são sincronizados para permitir acesso em múltiplos dispositivos.</p>
+        <h3>3. Compartilhamento</h3>
+        <p>Não compartilhamos seus dados com terceiros, exceto o e-mail com o Mercado Pago para processamento do pagamento.</p>
+        <h3>4. Contato</h3>
+        <p>Para solicitações relacionadas à privacidade, entre em contato pelo Instagram <strong>@tryflowi</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-termos-overlay" id="modalReembolso">
+    <div class="modal-termos-card">
+      <button class="modal-termos-close" onclick="fecharModalTermos('modalReembolso')">✕</button>
+      <div class="modal-termos-titulo">Política de Reembolso</div>
+      <div class="modal-termos-body">
+        <p>Queremos que você esteja satisfeito com o Flowi Premium.</p>
+        <h3>1. Prazo de Reembolso</h3>
+        <p>Você pode solicitar reembolso integral em até 7 dias após a data da compra, desde que não tenha utilizado extensivamente as funcionalidades Premium.</p>
+        <h3>2. Como Solicitar</h3>
+        <p>Entre em contato pelo Instagram <strong>@tryflowi</strong> informando o e-mail utilizado na compra e o número da transação (disponível no comprovante do Mercado Pago).</p>
+        <h3>3. Processamento</h3>
+        <p>O reembolso é processado em até 10 dias úteis pelo Mercado Pago, na mesma forma de pagamento original.</p>
+      </div>
+    </div>
+  </div>
 
   <header class="top-header">
     <div class="top-bar">
@@ -195,6 +269,7 @@
       </div>
 
       <div class="header-actions">
+        <button id="btnExportarPDF" onclick="exportarPDF()" style="display:none;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:white;font-size:11px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;">📄 Exportar PDF</button>
         <span id="badgePlan" class="badge-plan badge-free">FREE</span>
         <button id="btnHeaderAction" class="btn-header" onclick="irParaCompraPremium()">Garantir Premium R$ 15,90</button>
       </div>
@@ -233,9 +308,9 @@
     <a href="https://tryflowi.github.io/" class="drawer-link">🏠 Home</a>
     <a href="#" id="drawerMenuPrincipal" class="drawer-link"></a>
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border-color)">Legal</div>
-    <a href="https://tryflowi.github.io/termos.html" class="drawer-link">Termos de uso</a>
-    <a href="https://tryflowi.github.io/privacidade.html" class="drawer-link">Privacidade</a>
-    <a href="https://tryflowi.github.io/reembolso.html" class="drawer-link">Reembolso</a>
+    <a href="#" onclick="abrirModalTermos('modalTermos')" class="drawer-link">Termos de uso</a>
+    <a href="#" onclick="abrirModalTermos('modalPrivacidade')" class="drawer-link">Privacidade</a>
+    <a href="#" onclick="abrirModalTermos('modalReembolso')" class="drawer-link">Reembolso</a>
   </div>
 
   <main class="main-container">
@@ -728,7 +803,7 @@
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Alertas de prazo:</strong> avisos automáticos de tarefas atrasadas e contagem regressiva</div></div>
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Calculadora Uber vs. Carro:</strong> saiba onde economizar</div></div>
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Dicas para uma viagem segura e confortável:</strong> app, ingressos, seguro viagem, internet, Genie+ e mais</div></div>
-        <div class="paywall-item" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;"><div class="paywall-check">✓</div><div><strong>📄 Exportar PDF completo:</strong> imprima ou compartilhe todo o seu planejamento (roteiro, orçamento, checklist e cronograma) em um único documento</div></div>
+        <div class="paywall-item" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;"><div class="paywall-check">✓</div><div><strong>📄 Exportar PDF completo:</strong> imprima ou compartilhe todo o seu planejamento — roteiro, orçamento, checklist e cronograma — em um único documento</div></div>
       </div>
       <div class="paywall-price-label">R$ 15,90</div>
       <div class="paywall-price-sub">pagamento único - acesso vitalício</div>
@@ -763,16 +838,10 @@
     </div>
   </div>
 
-  <div class="print-header">
-    <h1 id="printTitulo">Minha Viagem Disney</h1>
-    <p id="printSubtitulo">Planejamento gerado pelo Flowi Viagens · tryflowi.github.io</p>
-  </div>
-
   <footer>
     <div style="font-weight:600;letter-spacing:1px;color:var(--text-muted);">FLOWI · Cada destino, uma experiência · <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a></div>
     <div>Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a></div>
     <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;justify-content:center">
-      <button class="btn-reset-discreet" onclick="exportarPDF()" id="btnExportarPDF" style="display:none">📄 Exportar PDF</button>
       <button class="btn-reset-discreet" style="margin-top:0" onclick="confirmarReset()">🔄 Resetar aplicativo</button>
     </div>
   </footer>
@@ -881,6 +950,22 @@
       renderTabs();
       renderAllData();
     }
+
+    function abrirModalTermos(id) {
+      toggleMenu();
+      document.getElementById(id || 'modalTermos').classList.add('active');
+    }
+
+    function fecharModalTermos(id) {
+      document.getElementById(id || 'modalTermos').classList.remove('active');
+    }
+
+    // Fechar modal de termos clicando fora do card
+    document.querySelectorAll('.modal-termos-overlay').forEach(el => {
+      el.addEventListener('click', function(e) {
+        if (e.target === el) el.classList.remove('active');
+      });
+    });
 
     function confirmarReset() {
       if (confirm("⚠️ ATENÇÃO: Deseja realmente resetar o aplicativo?\n\nIsso apagará todas as atividades, itens do orçamento e configurações salvas.")) {
