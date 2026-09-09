@@ -212,9 +212,29 @@
       .kpi-grid { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .kpi-card { display: block !important; border: 1px solid #E2E8F0; border-radius: 6px; padding: 8px; text-align: center; }
 
-      /* Checklist e cronograma — mostra checkboxes/círculos para riscar */
-      .item-check, .item-check-circle { display: inline-block !important; width: 14px; height: 14px; border: 1.5px solid #64748B; border-radius: 3px; margin-right: 8px; vertical-align: middle; }
-      .item-mala-check { display: inline-block !important; width: 14px; height: 14px; border: 1.5px solid #64748B; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+      /* Checklist e cronograma — transforma checkboxes em quadradinhos/círculos para riscar */
+      input[type="checkbox"] {
+        display: inline-block !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        width: 13px !important;
+        height: 13px !important;
+        border: 1.5px solid #64748B !important;
+        background: white !important;
+        vertical-align: middle !important;
+        margin-right: 6px !important;
+        flex-shrink: 0 !important;
+      }
+      /* Mala: círculo */
+      #malaLista input[type="checkbox"] {
+        border-radius: 50% !important;
+      }
+      /* Cronograma: quadrado */
+      #cronogramaLista input[type="checkbox"] {
+        border-radius: 2px !important;
+      }
+      /* Esconde botões de edição/exclusão nas linhas */
+      .btn-action-icon { display: none !important; }
     }
     .print-header { display: none; }
   </style>
@@ -966,6 +986,9 @@
       const elTitulo = document.getElementById('printTitulo');
       const elSub = document.getElementById('printSubtitulo');
 
+      // Garante que todas as abas premium estejam renderizadas antes de imprimir
+      renderAllData();
+
       // Remove classes de impressão anteriores
       document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
 
@@ -988,7 +1011,6 @@
       // Restaura estado original após impressão
       document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
       renderTabs();
-      renderAllData();
     }
 
     function abrirModalTermos(id) {
@@ -1015,56 +1037,62 @@
     }
 
     async function carregar() {
+      // PASSO 1 — Carrega dados locais e renderiza imediatamente, sem esperar nada.
+      // Isso elimina o "tela em branco" que aparecia enquanto aguardava respostas do Supabase.
       const saved = localStorage.getItem('flowi_disney_user_data');
       let dadosLocais = null;
       if (saved) {
         try { dadosLocais = JSON.parse(saved); } catch(e) { console.error(e); }
       }
       if (dadosLocais) appData = { ...appData, ...dadosLocais };
-
       if (!appData.metas) appData.metas = { mesInicio: '' };
       if (!appData.cronograma) appData.cronograma = [];
       if (!appData.mala) appData.mala = [];
 
-      // Checagem automática de Premium: usa o e-mail já identificado antes
-      // (pela Home ou pelo Hub, salvo no navegador) e verifica se HÁ licença
-      // ativa especificamente para este produto (flowi-disney). Uma pessoa
-      // pode ser Premium em outro Flowi e Free neste — a checagem é sempre
-      // por produto, nunca genérica.
       isPremium = localStorage.getItem('flowi_is_premium') === 'true';
 
-      const emailSalvo = localStorage.getItem('flowi_hub_email');
-      if (emailSalvo && supabaseClient) {
-        try {
-          const { data } = await supabaseClient
-            .from('licencas_flowi')
-            .select('ativo')
-            .eq('email', emailSalvo.toLowerCase().trim())
-            .eq('produto', PRODUTO_ID)
-            .eq('ativo', true)
-            .maybeSingle();
-
-          if (data) {
-            isPremium = true;
-            localStorage.setItem('flowi_is_premium', 'true');
-          }
-        } catch (e) {
-          console.warn('Erro ao checar licença automática:', e);
-        }
-      }
-
-      // Se Premium, sincroniza com a nuvem: busca os dados salvos em
-      // dados_flowi para este e-mail+produto e decide o que fazer com base
-      // na comparação de datas (nuvem vs. local).
-      if (isPremium && emailSalvo && supabaseClient) {
-        await sincronizarComNuvem(emailSalvo, dadosLocais);
-      }
-
+      // Renderiza imediatamente com o que tem localmente — usuário vê o conteúdo na hora.
       atualizarInterfaceState();
       renderTabs();
       carregarInputsConfig();
       renderAllData();
       iniciarContador();
+
+      // PASSO 2 — Em paralelo, verifica licença e sincroniza nuvem em background.
+      // Se vier algo novo da nuvem, re-renderiza silenciosamente.
+      const emailSalvo = localStorage.getItem('flowi_hub_email');
+      if (!emailSalvo || !supabaseClient) return;
+
+      try {
+        // Verifica licença
+        const { data: licenca } = await supabaseClient
+          .from('licencas_flowi')
+          .select('ativo')
+          .eq('email', emailSalvo.toLowerCase().trim())
+          .eq('produto', PRODUTO_ID)
+          .eq('ativo', true)
+          .maybeSingle();
+
+        if (licenca && !isPremium) {
+          isPremium = true;
+          localStorage.setItem('flowi_is_premium', 'true');
+          atualizarInterfaceState();
+          renderTabs();
+        }
+
+        // Sincroniza dados com nuvem se for Premium
+        if (isPremium) {
+          const dadosAntesNuvem = JSON.stringify(appData);
+          await sincronizarComNuvem(emailSalvo, dadosLocais);
+          // Só re-renderiza se os dados mudaram após sincronização
+          if (JSON.stringify(appData) !== dadosAntesNuvem) {
+            carregarInputsConfig();
+            renderAllData();
+          }
+        }
+      } catch (e) {
+        console.warn('Erro na sincronização em background:', e);
+      }
     }
 
     async function sincronizarComNuvem(email, dadosLocais) {
