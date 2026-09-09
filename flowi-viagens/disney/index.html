@@ -176,6 +176,8 @@
     @media print {
       * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
+      @page { margin: 1cm; }
+
       /* Esconde toda navegação e controles */
       .top-header, .drawer, .drawer-overlay, footer,
       .alert-free-data, #cardOffline, .paywall-overlay,
@@ -184,30 +186,41 @@
       #avisoImpressaoIOS { display: none !important; }
 
       /* Esconde formulários de entrada e botões */
-      button, input, select, textarea { display: none !important; }
+      button, input[type="text"], input[type="number"], input[type="date"],
+      input[type="time"], input[type="email"], input[type="hidden"],
+      select, textarea { display: none !important; }
 
-      /* Esconde cards de configuração e formulários */
-      .no-print, #cardVisualizacaoMoeda, #cardSalvarOffline,
-      .form-group, .form-row, .form-section,
-      .promo-free, .promo-box,
-      #promoRoteiroD1, #promoOrcamentoFree, #promoMoedaFree,
-      .info-box, .alert-free-data {
+      /* Esconde cards de configuração — colapso total sem deixar espaço */
+      .no-print {
         display: none !important;
-        visibility: hidden !important;
-        position: absolute !important;
-        width: 0 !important;
+        visibility: collapse !important;
         height: 0 !important;
+        min-height: 0 !important;
+        max-height: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
         border: none !important;
+        overflow: hidden !important;
+        line-height: 0 !important;
+        font-size: 0 !important;
+      }
+
+      #cardVisualizacaoMoeda, #cardSalvarOffline,
+      #promoRoteiroD1, #promoOrcamentoFree, #promoMoedaFree,
+      .form-group, .form-row, .form-section,
+      .promo-free, .promo-box, .info-box, .alert-free-data {
+        display: none !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
         overflow: hidden !important;
       }
 
       /* Layout de impressão */
       body { background: white !important; color: #0F172A !important; font-size: 12px; margin: 0; padding: 0; }
       .main-container { padding: 8px !important; margin: 0 !important; }
-      .tab-content { display: none !important; }
-      .tab-content.print-show { display: block !important; margin-bottom: 32px; }
+      .tab-content { display: none !important; height: 0 !important; overflow: hidden !important; }
+      .tab-content.print-show { display: block !important; height: auto !important; overflow: visible !important; margin-bottom: 32px; }
       .print-header { display: block !important; }
 
       /* Cards de conteúdo */
