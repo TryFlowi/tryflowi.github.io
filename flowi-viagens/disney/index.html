@@ -1313,14 +1313,7 @@
       const alertFree = document.getElementById('alertFreeData');
       const cardOffline = document.getElementById('cardSalvarOffline');
       const promoD1 = document.getElementById('promoRoteiroD1');
-      const groupCat = document.getElementById('groupBudCategory');
-      const groupPaid = document.getElementById('groupBudPaid');
-      const groupStatus = document.getElementById('groupBudStatus');
       const promoOrc = document.getElementById('promoOrcamentoFree');
-
-      const groupBudType = document.getElementById('groupBudType');
-      const promoMoedaFree = document.getElementById('promoMoedaFree');
-      const infoBoxResumo = document.getElementById('infoBoxResumo');
       const cardVisualizacaoMoeda = document.getElementById('cardVisualizacaoMoeda');
       const kpiTotalBrlSub = document.getElementById('kpiTotalBrlSub');
 
@@ -1330,42 +1323,23 @@
         btnHeader.textContent = 'Meus Flowis';
         btnHeader.onclick = () => window.location.href = 'https://tryflowi.github.io/hub.html';
         alertFree.style.display = 'none';
-        cardOffline.style.display = 'none';
+        if (cardOffline) cardOffline.style.display = 'none';
         if (promoD1) promoD1.style.display = 'none';
-        if (groupCat) groupCat.style.display = 'flex';
-        if (groupPaid) groupPaid.style.display = 'flex';
-        if (groupStatus) groupStatus.style.display = 'flex';
         if (promoOrc) promoOrc.style.display = 'none';
-        if (groupBudType) groupBudType.style.display = 'flex';
-        if (promoMoedaFree) promoMoedaFree.style.display = 'none';
-        if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none'; // Removido — divisão por categoria sempre em BRL
-        if (infoBoxResumo) infoBoxResumo.innerHTML = 'ℹ️ <strong>Aviso:</strong> Escolha abaixo em qual moeda deseja visualizar o saldo consolidado da sua viagem.';
+        if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none';
+        if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Total lançado';
         const btnPDF = document.getElementById('btnExportarPDF');
         if (btnPDF) btnPDF.style.display = 'inline-flex';
-        if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Nacionais + Estrangeiros convertidos';
       } else {
         badge.className = 'badge-plan badge-free';
         badge.textContent = 'FREE';
         btnHeader.textContent = 'Garantir Premium R$ 15,90';
         btnHeader.onclick = () => irParaCompraPremium();
         alertFree.style.display = 'flex';
-        cardOffline.style.display = 'block';
+        if (cardOffline) cardOffline.style.display = 'block';
         if (promoD1) promoD1.style.display = 'block';
-
-        if (groupCat) groupCat.style.display = 'none';
-        if (groupPaid) groupPaid.style.display = 'none';
-        if (groupStatus) groupStatus.style.display = 'none';
         if (promoOrc) promoOrc.style.display = 'block';
-
-        // Free: moeda única (BRL), sem conversão
-        if (groupBudType) groupBudType.style.display = 'none';
-        if (promoMoedaFree) promoMoedaFree.style.display = 'block';
-        document.getElementById('groupBudBrl').style.display = 'flex';
-        document.getElementById('groupBudUsd').style.display = 'none';
-        document.getElementById('groupBudRate').style.display = 'none';
-        document.getElementById('brlPreviewBox').style.display = 'none';
         if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none';
-        if (infoBoxResumo) infoBoxResumo.innerHTML = 'ℹ️ <strong>Aviso:</strong> No modo Free, todos os lançamentos e o resumo do orçamento são exibidos apenas em Reais (BRL).';
         if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Total lançado em Reais';
       }
 
@@ -1394,6 +1368,8 @@
       renderRoteiroCronologico();
       renderMetas();
       renderAlertasPrazo();
+      // Não chama renderDashboardCalculos aqui para preservar o estado
+      // dos botões 💱 nos cards de categoria ao editar a cotação.
     }
 
     function atualizarHeaderTitles() {
@@ -1752,7 +1728,10 @@
           card.innerHTML = `
             <div class="category-name">${cat}</div>
             <div class="category-amount" id="${cardId}_val">R$ ${formatarBRL(valorBrl)}</div>
-            ${podeConverter && isPremium ? `<button onclick="toggleCategoriaMoeda('${cardId}',${valorBrl},${rate})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>` : ''}
+            ${podeConverter && isPremium ? `
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Lançado em R$ · cotação R$ ${rate}/US$</div>
+              <button onclick="toggleCategoriaMoeda('${cardId}',${valorBrl},${rate})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>
+            ` : ''}
           `;
           grid.appendChild(card);
         });
