@@ -521,6 +521,16 @@
           </div>
           <div class="form-group"><label>Título da Atividade / Local</label><input type="text" id="actTitle" class="form-control" placeholder="Ex: Magic Kingdom - Parque"></div>
           <div class="form-group"><label>Observações</label><textarea id="actDesc" class="form-control" placeholder="Ex: Chegar para o Rope Drop" rows="3" style="resize:vertical;line-height:1.5;"></textarea></div>
+          <div style="border-top:1px solid var(--border-color);margin:12px 0 12px;"></div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:8px;">🚗 Trajeto (opcional) — reflete na aba Transporte</div>
+          <div class="grid-2">
+            <div class="form-group"><label>Origem</label><input type="text" id="actTrajOrigem" class="form-control" placeholder="Ex: Hotel Rosen Inn"></div>
+            <div class="form-group"><label>Destino</label><input type="text" id="actTrajDestino" class="form-control" placeholder="Ex: Magic Kingdom"></div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group"><label>App/Meio <span style="font-weight:400;font-size:11px;color:var(--text-muted);">opcional</span></label><input type="text" id="actTrajApp" class="form-control" placeholder="Ex: Uber, Lyft, Ônibus..."></div>
+            <div class="form-group"><label>Teto (US$) <span style="font-weight:400;font-size:11px;color:var(--text-muted);">opcional</span></label><input type="number" id="actTrajTeto" class="form-control" placeholder="0.00" step="0.01"></div>
+          </div>
           <div style="display:flex;gap:8px;">
             <button class="btn-submit" id="btnActSubmit" onclick="salvarAtividade()">Salvar</button>
             <button class="btn-cancel" id="btnActCancel" style="display:none;" onclick="cancelarEdicaoAtividade()">Cancelar</button>
@@ -677,6 +687,9 @@
     <div id="tab-compras" class="tab-content">
       <div class="card">
         <div class="card-title">🛍️ Lista de Compras por Dia</div>
+        <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 12px;font-size:12px;color:#1E40AF;margin-bottom:12px;">
+          ℹ️ Aqui aparecem apenas os itens do tipo <strong>🛍️ Compras</strong> e <strong>🛒 Mercado</strong> adicionados nas atividades do Roteiro. Alimentação e Transporte são gerenciados separadamente.
+        </div>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Itens adicionados nas atividades do roteiro, agrupados por dia.</p>
         <div id="comprasConsolidada"></div>
       </div>
@@ -747,7 +760,6 @@
               <option value="compras">🛍️ Compras</option>
               <option value="mercado">🛒 Mercado</option>
               <option value="alimentacao">🍽️ Alimentação</option>
-              <option value="transporte">🚗 Transporte</option>
             </select>
           </div>
           <div class="form-group"><label>Descrição</label><input type="text" id="cmpProduto" class="form-control" placeholder="Ex: Tênis Nike, Jantar..."></div>
@@ -1175,6 +1187,13 @@
       renderAllData();
       iniciarContador();
 
+      // Restaura a aba que estava ativa antes do F5
+      const abaRestaurada = localStorage.getItem('flowi_disney_aba');
+      if (abaRestaurada && TABS_CONFIG.find(t => t.id === abaRestaurada)) {
+        const podeAbrir = !TABS_CONFIG.find(t => t.id === abaRestaurada)?.premium || isPremium;
+        if (podeAbrir) switchTab(abaRestaurada);
+      }
+
       // PASSO 2 — Verificação e sincronização em background, completamente silenciosa.
       // Nenhuma parte deste bloco toca na UI enquanto estiver carregando.
       const emailSalvo = localStorage.getItem('flowi_hub_email');
@@ -1337,15 +1356,16 @@
 
     function switchTab(id) {
       activeTabId = id;
+      localStorage.setItem('flowi_disney_aba', id);
       renderTabs();
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       const target = document.getElementById(`tab-${id}`);
       if (target) target.classList.add('active');
-
       if (id === 'transporte') calcularTransporte();
       if (id === 'metas') renderMetas();
       if (id === 'cronograma') renderCronograma();
       if (id === 'mala') renderMala();
+      if (id === 'compras') renderCompras();
     }
 
     function atualizarInterfaceState() {
@@ -1752,48 +1772,67 @@
       let totalNationalBrl = 0;
       let totalForeignBrl = 0;
       let totalUsdEstimated = 0;
-
       let totalPaidBrl = 0;
       let totalPendingBrl = 0;
-
       const catTotalsBrl = {};
 
       appData.budgetItems.forEach(item => {
         const brl = item.amountBrl || 0;
         totalBrl += brl;
-
-        if (item.isEstrangeiro) {
-          totalForeignBrl += brl;
-          totalUsdEstimated += (item.amountUsd || 0);
-        } else {
-          totalNationalBrl += brl;
-        }
-
+        if (item.isEstrangeiro) { totalForeignBrl += brl; totalUsdEstimated += (item.amountUsd || 0); }
+        else { totalNationalBrl += brl; }
         const paid = item.paidBrl || 0;
-        if (item.status === 'Pago') {
-          totalPaidBrl += paid || brl;
-        } else {
-          // Status Pendente: não soma nada no total pago, independente de ter valor pago preenchido
-          totalPendingBrl += brl;
-        }
-
+        if (item.status === 'Pago') { totalPaidBrl += paid || brl; }
+        else { totalPendingBrl += brl; }
         const cat = item.category || 'Outros';
         catTotalsBrl[cat] = (catTotalsBrl[cat] || 0) + brl;
       });
 
-      const travelers = appData.config.travelers || 1;
+      // Soma transporte (da aba Transporte) ao Gasto Total
       const rate = appData.config.dollarRate || 5.20;
+      const transpUsdTotal = (() => {
+        let manual = 0;
+        if (appData.transporte) {
+          if (appData.transporte.modo === 'app') {
+            manual = (appData.transporte.trajetos || []).reduce((a, t) => a + (t.valor || 0), 0);
+          } else {
+            const days = parseFloat(document.getElementById('carDays')?.value) || 0;
+            const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
+            const park = parseFloat(document.getElementById('carPark')?.value) || 0;
+            const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
+            manual = days * (daily + park) + fuel;
+          }
+        }
+        const doRoteiro = (appData.activities || []).reduce((s, at) =>
+          s + (at.trajeto?.teto || 0), 0);
+        return manual + doRoteiro;
+      })();
+      const transpBrlTotal = transpUsdTotal * rate;
+      const totalBrlComTransporte = totalBrl + transpBrlTotal;
+
+      // Tetos do roteiro por categoria para comparativo
+      const tipoParaCat = { compras: 'Compras', mercado: 'Alimentação', alimentacao: 'Alimentação' };
+      const tetoRoteiroPorCat = {};
+      (appData.activities || []).forEach(at => {
+        (at.compras || []).forEach(c => {
+          if (c.tipo === 'transporte') return;
+          const cat = tipoParaCat[c.tipo] || 'Outros';
+          tetoRoteiroPorCat[cat] = (tetoRoteiroPorCat[cat] || 0) + (c.teto || 0) * rate;
+        });
+      });
+
+      const travelers = appData.config.travelers || 1;
       const viewCurrencyEl = document.querySelector('input[name="viewCurrency"]:checked');
       const viewCurrency = (isPremium && viewCurrencyEl) ? viewCurrencyEl.value : 'BRL';
 
       if (viewCurrency === 'USD') {
-        const totalUsdConsolidado = rate > 0 ? (totalBrl / rate) : 0;
-        const perPersonUsd = rate > 0 ? ((totalBrl / travelers) / rate) : 0;
+        const totalUsdConsolidado = rate > 0 ? (totalBrlComTransporte / rate) : 0;
+        const perPersonUsd = rate > 0 ? ((totalBrlComTransporte / travelers) / rate) : 0;
         document.getElementById('kpiTotalBrl').textContent = `US$ ${formatarUSD(totalUsdConsolidado)}`;
         document.getElementById('kpiPerPerson').textContent = `US$ ${formatarUSD(perPersonUsd)}`;
       } else {
-        document.getElementById('kpiTotalBrl').textContent = `R$ ${formatarBRL(totalBrl)}`;
-        document.getElementById('kpiPerPerson').textContent = `R$ ${formatarBRL(totalBrl / travelers)}`;
+        document.getElementById('kpiTotalBrl').textContent = `R$ ${formatarBRL(totalBrlComTransporte)}`;
+        document.getElementById('kpiPerPerson').textContent = `R$ ${formatarBRL(totalBrlComTransporte / travelers)}`;
       }
 
       const paidBox = document.getElementById('kpiTotalPaidContainer');
@@ -1848,6 +1887,7 @@
 
         categoriasPadrao.forEach(cat => {
           const valorBrl = catTotalsBrl[cat] || 0;
+          const tetoRoteiro = tetoRoteiroPorCat[cat] || 0;
           const card = document.createElement('div');
           card.className = 'category-card';
           const cardId = `cat_${cat.replace(/\s+/g,'_')}`;
@@ -1855,9 +1895,25 @@
           card.dataset.brl = valorBrl;
           card.dataset.modo = 'brl';
           const podeConverter = ['Alimentação', 'Compras', 'Outros'].includes(cat);
+
+          // Comparativo teto do roteiro vs orçado
+          let comparativoHtml = '';
+          if (isPremium && tetoRoteiro > 0) {
+            const diff = valorBrl - tetoRoteiro;
+            const cor = diff < 0 ? '#16A34A' : diff > 0 ? '#DC2626' : '#64748B';
+            const icone = diff < 0 ? '✅' : diff > 0 ? '⚠️' : '✓';
+            const label = diff < 0
+              ? `${icone} Roteiro: R$ ${formatarBRL(tetoRoteiro)} (folga R$ ${formatarBRL(Math.abs(diff))})`
+              : diff > 0
+              ? `${icone} Roteiro: R$ ${formatarBRL(tetoRoteiro)} (acima R$ ${formatarBRL(diff)})`
+              : `${icone} Roteiro: R$ ${formatarBRL(tetoRoteiro)} (exato)`;
+            comparativoHtml = `<div style="font-size:10px;margin-top:4px;color:${cor};">${label}</div>`;
+          }
+
           card.innerHTML = `
             <div class="category-name">${cat}</div>
             <div class="category-amount" id="${cardId}_val">R$ ${formatarBRL(valorBrl)}</div>
+            ${comparativoHtml}
             ${podeConverter && isPremium ? `
               <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Lançado em R$ · cotação R$ ${rate}/US$</div>
               <button onclick="toggleCategoriaMoeda('${cardId}',${valorBrl},${rate})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>
@@ -1883,7 +1939,7 @@
             manual = days * (daily + park) + fuel;
           }
           const doRoteiro = (appData.activities || []).reduce((s, at) =>
-            s + (at.compras || []).filter(c => c.tipo === 'transporte').reduce((a, c) => a + (c.teto || 0), 0), 0);
+            s + (at.trajeto?.teto || 0), 0);
           return manual + doRoteiro;
         })();
         const transpBrl = transpUsd * rate;
@@ -2358,15 +2414,20 @@
       const time = document.getElementById('actTime').value;
       const title = document.getElementById('actTitle').value;
       const desc = document.getElementById('actDesc').value;
+      const trajOrigem = document.getElementById('actTrajOrigem')?.value.trim() || '';
+      const trajDestino = document.getElementById('actTrajDestino')?.value.trim() || '';
+      const trajApp = document.getElementById('actTrajApp')?.value.trim() || '';
+      const trajTeto = parseFloat(document.getElementById('actTrajTeto')?.value) || 0;
+      const trajeto = (trajOrigem || trajDestino) ? { origem: trajOrigem, destino: trajDestino, app: trajApp, teto: trajTeto } : null;
 
       if (!date || !title) return alert('Informe a data e o título.');
 
       if (editId) {
         const item = appData.activities.find(a => a.id == editId);
-        if (item) { item.date = date; item.time = time; item.title = title; item.desc = desc; }
-        _diaExpandidoId = date; // Mantém o dia expandido após salvar edição
+        if (item) { item.date = date; item.time = time; item.title = title; item.desc = desc; item.trajeto = trajeto; }
+        _diaExpandidoId = date;
       } else {
-        appData.activities.push({ id: Date.now(), date, time, title, desc, compras: [] });
+        appData.activities.push({ id: Date.now(), date, time, title, desc, compras: [], trajeto });
         _diaExpandidoId = date;
       }
 
@@ -2385,6 +2446,10 @@
       document.getElementById('actTime').value = item.time;
       document.getElementById('actTitle').value = item.title;
       document.getElementById('actDesc').value = item.desc || '';
+      document.getElementById('actTrajOrigem').value = item.trajeto?.origem || '';
+      document.getElementById('actTrajDestino').value = item.trajeto?.destino || '';
+      document.getElementById('actTrajApp').value = item.trajeto?.app || '';
+      document.getElementById('actTrajTeto').value = item.trajeto?.teto || '';
 
       const cancelBtn = document.getElementById('btnActCancel');
       const submitBtn = document.getElementById('btnActSubmit');
@@ -2402,6 +2467,8 @@
       document.getElementById('actTime').value = '09:00';
       document.getElementById('actTitle').value = '';
       document.getElementById('actDesc').value = '';
+      const campos = ['actTrajOrigem','actTrajDestino','actTrajApp','actTrajTeto'];
+      campos.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
       const cancelBtn = document.getElementById('btnActCancel');
       const submitBtn = document.getElementById('btnActSubmit');
       if (cancelBtn) cancelBtn.style.display = 'none';
@@ -2458,7 +2525,10 @@
       });
 
       const datasOrdenadas = Object.keys(agrupado).sort();
-      const startDateStr = appData.config.startDate;
+
+      // Expande: o dia sendo editado, ou o primeiro dia se nenhum estiver definido
+      const primeiraData = datasOrdenadas[0];
+      if (!_diaExpandidoId) _diaExpandidoId = primeiraData;
       const startDateTime = startDateStr ? new Date(startDateStr + 'T00:00:00').getTime() : null;
 
       datasOrdenadas.forEach(dataStr => {
@@ -2588,12 +2658,12 @@
       document.getElementById('campusCarro').style.display = modo === 'carro' ? 'block' : 'none';
       document.getElementById('campusApp').style.display = modo === 'app' ? 'block' : 'none';
 
-      // Trajetos do roteiro (itens tipo 'transporte' nas atividades)
+      // Trajetos do roteiro (campo trajeto nas atividades)
       const trajetosRoteiro = [];
       (appData.activities || []).forEach(at => {
-        (at.compras || []).filter(c => c.tipo === 'transporte').forEach(c => {
-          trajetosRoteiro.push({ desc: c.produto, detalhe: c.marca, teto: c.teto || 0, data: at.date, hora: at.time });
-        });
+        if (at.trajeto && (at.trajeto.origem || at.trajeto.destino)) {
+          trajetosRoteiro.push({ desc: at.trajeto.origem && at.trajeto.destino ? `${at.trajeto.origem} → ${at.trajeto.destino}` : (at.trajeto.origem || at.trajeto.destino), detalhe: at.trajeto.app, teto: at.trajeto.teto || 0, data: at.date, hora: at.time, titulo: at.title });
+        }
       });
       const totalRoteiro = trajetosRoteiro.reduce((a, t) => a + t.teto, 0);
       const cardRoteiro = document.getElementById('cardTransporteRoteiro');
