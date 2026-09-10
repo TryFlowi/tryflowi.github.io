@@ -1165,72 +1165,73 @@
     }
 
     async function carregar() {
-      // PASSO 1 — Dados locais → render imediato, zero delay.
+      // PASSO 1 — Dados locais → render imediato
       const saved = localStorage.getItem('flowi_disney_user_data');
       let dadosLocais = null;
-      if (saved) {
-        try { dadosLocais = JSON.parse(saved); } catch(e) {}
-      }
+      if (saved) { try { dadosLocais = JSON.parse(saved); } catch(e) {} }
       if (dadosLocais) appData = { ...appData, ...dadosLocais };
       if (!appData.metas) appData.metas = { mesInicio: '' };
       if (!appData.cronograma) appData.cronograma = [];
       if (!appData.mala) appData.mala = [];
       if (!appData.compras) appData.compras = [];
       if (!appData.transporte) appData.transporte = { modo: 'carro', trajetos: [] };
+      if (!appData.activities) appData.activities = [];
+      if (!appData.budgetItems) appData.budgetItems = [];
 
       isPremium = localStorage.getItem('flowi_is_premium') === 'true';
 
-      // Renderiza IMEDIATAMENTE com dados locais — usuário nunca vê tela em branco.
+      // Restaura aba salva ANTES de renderizar (para renderTabs marcar a certa)
+      const abaSalva = localStorage.getItem('flowi_disney_aba');
+      if (abaSalva && TABS_CONFIG.find(t => t.id === abaSalva)) {
+        activeTabId = abaSalva;
+      }
+
       atualizarInterfaceState();
       renderTabs();
       carregarInputsConfig();
       renderAllData();
       iniciarContador();
 
-      // PASSO 2 — Verificação e sincronização em background
+      // Ativa visualmente a aba correta
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      const tabAlvo = document.getElementById(`tab-${activeTabId}`);
+      if (tabAlvo) tabAlvo.classList.add('active');
+
+      // PASSO 2 — Sincronização em background (sem tocar na UI exceto se mudou algo)
       const emailSalvo = localStorage.getItem('flowi_hub_email');
       if (!emailSalvo || !supabaseClient) return;
 
-      // Snapshot do estado atual para comparar depois
-      const snapshotAntes = JSON.stringify(appData);
-      const premiumAntes = isPremium;
-
       try {
-        // Verifica licença em background
         const { data: licenca } = await supabaseClient
-          .from('licencas_flowi')
-          .select('ativo')
+          .from('licencas_flowi').select('ativo')
           .eq('email', emailSalvo.toLowerCase().trim())
-          .eq('produto', PRODUTO_ID)
-          .eq('ativo', true)
-          .maybeSingle();
+          .eq('produto', PRODUTO_ID).eq('ativo', true).maybeSingle();
 
+        const eraPremium = isPremium;
         if (licenca && !isPremium) {
           isPremium = true;
           localStorage.setItem('flowi_is_premium', 'true');
         }
 
-        // Sincroniza dados com nuvem se for Premium
         if (isPremium) {
+          const dadosAntes = JSON.stringify(appData);
           await sincronizarComNuvem(emailSalvo, dadosLocais);
+          const dadosDepois = JSON.stringify(appData);
+
+          // Só re-renderiza se os dados ou o status Premium mudaram
+          if (dadosAntes !== dadosDepois || eraPremium !== isPremium) {
+            atualizarInterfaceState();
+            renderTabs();
+            carregarInputsConfig();
+            renderAllData();
+            // Mantém a aba que estava ativa
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            const t = document.getElementById(`tab-${activeTabId}`);
+            if (t) t.classList.add('active');
+          }
         }
       } catch(e) {
-        console.warn('Erro na sincronização em background:', e);
-      }
-
-      // Sempre re-renderiza tudo após verificar licença e sincronizar nuvem
-      // Isso garante que abas como Orçamento e Roteiro mostrem os dados
-      // mesmo quando a transição Free→Premium acontece no carregamento
-      atualizarInterfaceState();
-      renderTabs();
-      carregarInputsConfig();
-      renderAllData();
-
-      // Restaura aba ativa
-      const abaFinal = localStorage.getItem('flowi_disney_aba');
-      if (abaFinal && TABS_CONFIG.find(t => t.id === abaFinal)) {
-        const podeAbrir = !TABS_CONFIG.find(t => t.id === abaFinal)?.premium || isPremium;
-        if (podeAbrir) switchTab(abaFinal);
+        console.warn('Erro na sincronização:', e);
       }
     }
 
