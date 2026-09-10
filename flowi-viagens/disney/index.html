@@ -1740,199 +1740,209 @@
       renderDashboardCalculos();
     }
 
-    /* --- CÁLCULO DAS DASHBOARDS E RESUMOS CONSOLIDADOS --- */
-    function renderDashboardCalculos() {
-      // Salva estado dos botões 💱 antes de re-renderizar os cards de categoria
-      const estadosBotoes = {};
-      document.querySelectorAll('.category-card[id]').forEach(card => {
-        estadosBotoes[card.id] = card.dataset.modo || 'brl';
-      });
-const valorAbaTransporte = (typeof calcularTransporte === 'function') ? calcularTransporte() : 0;
-      let totalBrl = 0;
-      let totalNationalBrl = 0;
-      let totalForeignBrl = 0;
-      let totalUsdEstimated = 0;
+    /* --- CÁLCULO DAS DASHBOARDS E RESUMOS CONSOLIDADOS (CORRIGIDO) --- */
+function renderDashboardCalculos() {
+  // Salva estado dos botões 💱 antes de re-renderizar os cards de categoria
+  const estadosBotoes = {};
+  document.querySelectorAll('.category-card[id]').forEach(card => {
+    estadosBotoes[card.id] = card.dataset.modo || 'brl';
+  });
 
-      let totalPaidBrl = 0;
-      let totalPendingBrl = 0;
+  // Pega o valor estimado da aba Transporte (já convertido em BRL)
+  const valorAbaTransporte = (typeof calcularTransporte === 'function') ? calcularTransporte() : 0;
+  
+  let totalBrl = 0;
+  let totalNationalBrl = 0;
+  let totalForeignBrl = 0;
+  let totalUsdEstimated = 0;
 
-      const catTotalsBrl = {};
+  let totalPaidBrl = 0;
+  let totalPendingBrl = 0;
 
-      appData.budgetItems.forEach(item => {
-        const brl = item.amountBrl || 0;
-        totalBrl += brl;
+  const catTotalsBrl = {};
 
-        if (item.isEstrangeiro) {
-          totalForeignBrl += brl;
-          totalUsdEstimated += (item.amountUsd || 0);
-        } else {
-          totalNationalBrl += brl;
-        }
+  // Varre os itens lançados na aba Orçamento
+  (appData.budgetItems || []).forEach(item => {
+    const brl = item.amountBrl || 0;
+    totalBrl += brl;
 
-        const paid = item.paidBrl || 0;
-        if (item.status === 'Pago') {
-          totalPaidBrl += paid || brl;
-        } else {
-          // Status Pendente: não soma nada no total pago, independente de ter valor pago preenchido
-          totalPendingBrl += brl;
-        }
+    if (item.isEstrangeiro) {
+      totalForeignBrl += brl;
+      totalUsdEstimated += (item.amountUsd || 0);
+    } else {
+      totalNationalBrl += brl;
+    }
 
-        const cat = item.category || 'Outros';
-        catTotalsBrl[cat] = (catTotalsBrl[cat] || 0) + brl;
-      });
-// 1. Obtém o valor do transporte em BRL para somar nos totais gerais
+    const paid = item.paidBrl || 0;
+    if (item.status === 'Pago') {
+      totalPaidBrl += (paid > 0 ? paid : brl);
+    } else {
+      totalPendingBrl += brl;
+    }
+
+    const cat = item.category || 'Outros';
+    catTotalsBrl[cat] = (catTotalsBrl[cat] || 0) + brl;
+  });
+
+  // CONSOLIDAÇÃO DO TRANSPORTE NO TOTAL GERAL
   totalBrl += valorAbaTransporte;
   totalNationalBrl += valorAbaTransporte;
 
-  // 2. Garante que o totalizador geral em BRL receba a soma correta
-  // (NÃO sobrescreve catTotalsBrl['Transporte'] para preservar o valor original em USD do card)
   if (!catTotalsBrl['Transporte']) {
     catTotalsBrl['Transporte'] = valorAbaTransporte;
   }
-      const travelers = appData.config.travelers || 1;
-      const rate = appData.config.dollarRate || 5.20;
-      const viewCurrencyEl = document.querySelector('input[name="viewCurrency"]:checked');
-      const viewCurrency = (isPremium && viewCurrencyEl) ? viewCurrencyEl.value : 'BRL';
 
-      if (viewCurrency === 'USD') {
-        const totalUsdConsolidado = rate > 0 ? (totalBrl / rate) : 0;
-        const perPersonUsd = rate > 0 ? ((totalBrl / travelers) / rate) : 0;
-        document.getElementById('kpiTotalBrl').textContent = `US$ ${formatarUSD(totalUsdConsolidado)}`;
-        document.getElementById('kpiPerPerson').textContent = `US$ ${formatarUSD(perPersonUsd)}`;
-      } else {
-        document.getElementById('kpiTotalBrl').textContent = `R$ ${formatarBRL(totalBrl)}`;
-        document.getElementById('kpiPerPerson').textContent = `R$ ${formatarBRL(totalBrl / travelers)}`;
-      }
+  const travelers = appData.config?.travelers || 1;
+  const rate = appData.config?.dollarRate || 5.20;
+  const viewCurrencyEl = document.querySelector('input[name="viewCurrency"]:checked');
+  const viewCurrency = (isPremium && viewCurrencyEl) ? viewCurrencyEl.value : 'BRL';
 
-      const paidBox = document.getElementById('kpiTotalPaidContainer');
-      const pendingBox = document.getElementById('kpiTotalPendingContainer');
-      const economiaBox = document.getElementById('kpiEconomiaContainer');
+  // 1. GASTO TOTAL E GASTO POR PESSOA
+  if (viewCurrency === 'USD') {
+    const totalUsdConsolidado = rate > 0 ? (totalBrl / rate) : 0;
+    const perPersonUsd = rate > 0 ? (totalUsdConsolidado / travelers) : 0;
+    document.getElementById('kpiTotalBrl').textContent = `US$ ${formatarUSD(totalUsdConsolidado)}`;
+    document.getElementById('kpiPerPerson').textContent = `US$ ${formatarUSD(perPersonUsd)}`;
+  } else {
+    document.getElementById('kpiTotalBrl').textContent = `R$ ${formatarBRL(totalBrl)}`;
+    document.getElementById('kpiPerPerson').textContent = `R$ ${formatarBRL(totalBrl / travelers)}`;
+  }
 
-      if (!isPremium) {
-        paidBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
-        pendingBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
-        if (economiaBox) economiaBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
-      } else {
-    // Calcula os valores pagos e pendentes da aba Transporte
+  const paidBox = document.getElementById('kpiTotalPaidContainer');
+  const pendingBox = document.getElementById('kpiTotalPendingContainer');
+  const economiaBox = document.getElementById('kpiEconomiaContainer');
+
+  // 2. TOTAIS PAGO, PENDENTE E ECONOMIA
+  if (!isPremium) {
+    if (paidBox) paidBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
+    if (pendingBox) pendingBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
+    if (economiaBox) economiaBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
+  } else {
+    // Transporte: calcula o que já foi pago e o que está pendente
     const transpPago = (typeof calcularTransportePago === 'function') ? calcularTransportePago() : 0;
     const transpPendente = Math.max(0, valorAbaTransporte - transpPago);
 
-    paidBox.innerHTML = `<div class="kpi-value green">R$ ${formatarBRL(totalPaidBrl + transpPago)}</div>`;
-    pendingBox.innerHTML = `<div class="kpi-value red">R$ ${formatarBRL(totalPendingBrl + transpPendente)}</div>`;
-        // Economia = diferença entre o valor orçado e o valor efetivamente pago nos itens já pagos
-        let totalOrcadoPago = 0;
-        let totalEfetivamentePago = 0;
-        appData.budgetItems.forEach(item => {
-          if (item.status === 'Pago') {
-            totalOrcadoPago += item.amountBrl || 0;
-            totalEfetivamentePago += item.paidBrl || item.amountBrl || 0;
-          }
-        });
-        const economia = Math.max(0, totalOrcadoPago - totalEfetivamentePago);
-        if (economiaBox) {
-          economiaBox.style.color = economia > 0 ? '#16A34A' : '#64748B';
-          economiaBox.textContent = `R$ ${formatarBRL(economia)}`;
-        }
+    const totalPagoFinal = totalPaidBrl + transpPago;
+    const totalPendenteFinal = totalPendingBrl + transpPendente;
+
+    if (paidBox) paidBox.innerHTML = `<div class="kpi-value green">R$ ${formatarBRL(totalPagoFinal)}</div>`;
+    if (pendingBox) pendingBox.innerHTML = `<div class="kpi-value red">R$ ${formatarBRL(totalPendenteFinal)}</div>`;
+
+    // Economia Realizada
+    let totalOrcadoPago = 0;
+    let totalEfetivamentePago = 0;
+    (appData.budgetItems || []).forEach(item => {
+      if (item.status === 'Pago') {
+        totalOrcadoPago += item.amountBrl || 0;
+        totalEfetivamentePago += item.paidBrl || item.amountBrl || 0;
       }
-
-      const tituloCategoria = document.getElementById('tituloDivisaoCategoria');
-      if (tituloCategoria) {
-        tituloCategoria.textContent = viewCurrency === 'USD'
-          ? 'Divisão por Categoria (Consolidado em USD)'
-          : 'Divisão por Categoria (Consolidado em BRL)';
-      }
-
-      const wrapper = document.getElementById('categoriesWrapper');
-      wrapper.innerHTML = '';
-
-      if (!isPremium) {
-        wrapper.innerHTML = `
-          <div style="background:#F8FAFC; border:1px dashed var(--border-color); padding:20px; border-radius:8px; text-align:center; font-size:13px; color:var(--text-muted);">
-            🔒 <strong>Organização por Categorias exclusiva do Premium</strong><br>
-            Acompanhe a distribuição exata dos gastos em Passagens, Hospedagem, Ingressos, Alimentação e mais.<br>
-            <button onclick="abrirPaywall()" class="btn-submit" style="width:auto; margin-top:12px; padding:8px 16px; font-size:12px;">Desbloquear por R$ 15,90</button>
-          </div>
-        `;
-      } else {
-        const grid = document.createElement('div');
-        grid.className = 'grid-3';
-        const categoriasPadrao = ['Passagens', 'Hospedagem', 'Parques e Ingressos', 'Alimentação', 'Compras', 'Outros'];
-
-        categoriasPadrao.forEach(cat => {
-          const valorBrl = catTotalsBrl[cat] || 0;
-          const card = document.createElement('div');
-          card.className = 'category-card';
-          const cardId = `cat_${cat.replace(/\s+/g,'_')}`;
-          card.id = cardId;
-          card.dataset.brl = valorBrl;
-          card.dataset.modo = 'brl';
-          const podeConverter = ['Alimentação', 'Compras', 'Outros'].includes(cat);
-          card.innerHTML = `
-            <div class="category-name">${cat}</div>
-            <div class="category-amount" id="${cardId}_val">R$ ${formatarBRL(valorBrl)}</div>
-            ${podeConverter && isPremium ? `
-              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Lançado em R$ · cotação R$ ${rate}/US$</div>
-              <button onclick="toggleCategoriaMoeda('${cardId}',${valorBrl},${rate})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>
-            ` : ''}
-          `;
-          grid.appendChild(card);
-        });
-
-        // Transporte: valor em USD da aba Transporte, exibido em BRL por padrão
-        const transpCard = document.createElement('div');
-        transpCard.className = 'category-card';
-        transpCard.id = 'cat_Transporte';
-        const transpUsd = (() => {
-          let manual = 0;
-          if (!appData.transporte) return 0;
-          if (appData.transporte.modo === 'app') {
-            manual = (appData.transporte.trajetos || []).reduce((a, t) => a + (t.valor || 0), 0);
-          } else {
-            const days = parseFloat(document.getElementById('carDays')?.value) || 0;
-            const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
-            const park = parseFloat(document.getElementById('carPark')?.value) || 0;
-            const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
-            manual = days * (daily + park) + fuel;
-          }
-          const doRoteiro = (appData.activities || []).reduce((s, at) =>
-            s + (at.compras || []).filter(c => c.tipo === 'transporte').reduce((a, c) => a + (c.teto || 0), 0), 0);
-          return manual + doRoteiro;
-        })();
-        const transpBrl = transpUsd * rate;
-        transpCard.dataset.modo = 'brl';
-        transpCard.dataset.usdOriginal = transpUsd;
-        transpCard.innerHTML = `
-          <div class="category-name">🚗 Transporte</div>
-          <div class="category-amount" id="cat_Transporte_val">R$ ${formatarBRL(transpBrl)}</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Calculado na aba Transporte · cotação R$ ${rate}/US$</div>
-          ${isPremium ? `<button onclick="toggleCategoriaMoeda('cat_Transporte',${transpBrl},${rate},${transpUsd})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>` : ''}
-        `;
-        grid.appendChild(transpCard);
-        wrapper.appendChild(grid);
-
-        // Restaura estado dos botões 💱 que estavam ativos antes do re-render
-        Object.entries(estadosBotoes).forEach(([id, modo]) => {
-          if (modo === 'usd') {
-            const card = document.getElementById(id);
-            if (!card) return;
-            const valEl = document.getElementById(id + '_val');
-            const btn = card.querySelector('button');
-            if (!valEl || !btn) return;
-            const brl = parseFloat(card.dataset.brl) || 0;
-            // Transporte: usa USD original; outros: divide BRL pela cotação
-            if (id === 'cat_Transporte') {
-              const usdOriginal = parseFloat(card.dataset.usdOriginal) || 0;
-              valEl.textContent = `US$ ${formatarUSD(usdOriginal)}`;
-            } else {
-              const r = appData.config?.dollarRate || 5.20;
-              valEl.textContent = `US$ ${formatarUSD(r > 0 ? brl / r : 0)}`;
-            }
-            btn.textContent = '💱 ver em R$';
-            card.dataset.modo = 'usd';
-          }
-        });
-      }
+    });
+    const economia = Math.max(0, totalOrcadoPago - totalEfetivamentePago);
+    if (economiaBox) {
+      economiaBox.style.color = economia > 0 ? '#16A34A' : '#64748B';
+      economiaBox.textContent = `R$ ${formatarBRL(economia)}`;
     }
+  }
+
+  // 3. DIVISÃO POR CATEGORIA
+  const tituloCategoria = document.getElementById('tituloDivisaoCategoria');
+  if (tituloCategoria) {
+    tituloCategoria.textContent = viewCurrency === 'USD'
+      ? 'Divisão por Categoria (Consolidado em USD)'
+      : 'Divisão por Categoria (Consolidado em BRL)';
+  }
+
+  const wrapper = document.getElementById('categoriesWrapper');
+  if (!wrapper) return;
+  wrapper.innerHTML = '';
+
+  if (!isPremium) {
+    wrapper.innerHTML = `
+      <div style="background:#F8FAFC; border:1px dashed var(--border-color); padding:20px; border-radius:8px; text-align:center; font-size:13px; color:var(--text-muted);">
+        🔒 <strong>Organização por Categorias exclusiva do Premium</strong><br>
+        Acompanhe a distribuição exata dos gastos em Passagens, Hospedagem, Ingressos, Alimentação e mais.<br>
+        <button onclick="abrirPaywall()" class="btn-submit" style="width:auto; margin-top:12px; padding:8px 16px; font-size:12px;">Desbloquear por R$ 15,90</button>
+      </div>
+    `;
+  } else {
+    const grid = document.createElement('div');
+    grid.className = 'grid-3';
+    const categoriasPadrao = ['Passagens', 'Hospedagem', 'Parques e Ingressos', 'Alimentação', 'Compras', 'Outros'];
+
+    categoriasPadrao.forEach(cat => {
+      const valorBrl = catTotalsBrl[cat] || 0;
+      const card = document.createElement('div');
+      card.className = 'category-card';
+      const cardId = `cat_${cat.replace(/\s+/g,'_')}`;
+      card.id = cardId;
+      card.dataset.brl = valorBrl;
+      card.dataset.modo = 'brl';
+      const podeConverter = ['Alimentação', 'Compras', 'Outros'].includes(cat);
+      card.innerHTML = `
+        <div class="category-name">${cat}</div>
+        <div class="category-amount" id="${cardId}_val">R$ ${formatarBRL(valorBrl)}</div>
+        ${podeConverter && isPremium ? `
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Lançado em R$ · cotação R$ ${rate}/US$</div>
+          <button onclick="toggleCategoriaMoeda('${cardId}',${valorBrl},${rate})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>
+        ` : ''}
+      `;
+      grid.appendChild(card);
+    });
+
+    // Card da aba Transporte
+    const transpCard = document.createElement('div');
+    transpCard.className = 'category-card';
+    transpCard.id = 'cat_Transporte';
+    const transpUsd = (() => {
+      let manual = 0;
+      if (!appData.transporte) return 0;
+      if (appData.transporte.modo === 'app') {
+        manual = (appData.transporte.trajetos || []).reduce((a, t) => a + (t.valor || 0), 0);
+      } else {
+        const days = parseFloat(document.getElementById('carDays')?.value) || 0;
+        const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
+        const park = parseFloat(document.getElementById('carPark')?.value) || 0;
+        const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
+        manual = days * (daily + park) + fuel;
+      }
+      const doRoteiro = (appData.activities || []).reduce((s, at) =>
+        s + (at.compras || []).filter(c => c.tipo === 'transporte').reduce((a, c) => a + (c.teto || 0), 0), 0);
+      return manual + doRoteiro;
+    })();
+    const transpBrl = transpUsd * rate;
+    transpCard.dataset.modo = 'brl';
+    transpCard.dataset.usdOriginal = transpUsd;
+    transpCard.innerHTML = `
+      <div class="category-name">🚗 Transporte</div>
+      <div class="category-amount" id="cat_Transporte_val">R$ ${formatarBRL(transpBrl)}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Calculado na aba Transporte · cotação R$ ${rate}/US$</div>
+      ${isPremium ? `<button onclick="toggleCategoriaMoeda('cat_Transporte',${transpBrl},${rate},${transpUsd})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>` : ''}
+    `;
+    grid.appendChild(transpCard);
+    wrapper.appendChild(grid);
+
+    // Restaura estado dos botões de alternância de moeda
+    Object.entries(estadosBotoes).forEach(([id, modo]) => {
+      if (modo === 'usd') {
+        const card = document.getElementById(id);
+        if (!card) return;
+        const valEl = document.getElementById(id + '_val');
+        const btn = card.querySelector('button');
+        if (!valEl || !btn) return;
+        const brl = parseFloat(card.dataset.brl) || 0;
+        if (id === 'cat_Transporte') {
+          const usdOriginal = parseFloat(card.dataset.usdOriginal) || 0;
+          valEl.textContent = `US$ ${formatarUSD(usdOriginal)}`;
+        } else {
+          const r = appData.config?.dollarRate || 5.20;
+          valEl.textContent = `US$ ${formatarUSD(r > 0 ? brl / r : 0)}`;
+        }
+        btn.textContent = '💱 ver em R$';
+        card.dataset.modo = 'usd';
+      }
+    });
+  }
+}
 
     /* --- METAS DE ECONOMIA (PREMIUM) --- */
     function salvarMetaConfig() {
