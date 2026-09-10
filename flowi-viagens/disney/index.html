@@ -73,7 +73,6 @@
     .drawer-title { font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
     .drawer-link { color: var(--text-muted); font-size: 14px; text-decoration: none; }
 
-    /* Modal de termos — abre sobre o planejador sem sair da página */
     .modal-termos-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: flex-start; justify-content: center; padding: 24px 16px; overflow-y: auto; }
     .modal-termos-overlay.active { display: flex; }
     .modal-termos-card { background: #fff; border-radius: 16px; max-width: 680px; width: 100%; padding: 32px 28px; position: relative; margin: auto; }
@@ -83,7 +82,6 @@
     .modal-termos-body h3 { font-size: 14px; font-weight: 700; color: var(--text-main); margin: 20px 0 8px; }
     .modal-termos-body p { margin-bottom: 12px; }
 
-    /* print-header aparece só no PDF, no topo antes de tudo */
     .print-header { display: none; text-align: center; padding: 16px 0 24px; border-bottom: 2px solid #E2E8F0; margin-bottom: 24px; }
     .print-header h1 { font-size: 22px; font-weight: 700; color: #0F172A; }
     .print-header p { font-size: 12px; color: #64748B; margin-top: 4px; }
@@ -134,23 +132,6 @@
     .category-name { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
     .category-amount { font-size: 15px; font-weight: 700; color: var(--text-main); margin-top: 4px; }
 
-    .day-accordion { background: #FFFFFF; border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
-    .day-header { background: #F8FAFC; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; border-bottom: 1px solid transparent; }
-    .day-accordion.open .day-header { border-bottom-color: var(--border-color); }
-    .day-title-box { display: flex; align-items: center; gap: 10px; }
-    .day-badge { background: var(--brand-primary); color: #fff; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 6px; }
-    .day-date-str { font-weight: 700; font-size: 14px; color: var(--text-main); }
-    .day-count-tag { font-size: 12px; color: var(--text-muted); }
-    .day-arrow { font-size: 12px; color: var(--text-muted); transition: transform 0.2s; }
-    .day-accordion.open .day-arrow { transform: rotate(180deg); }
-    .day-content { display: none; padding: 8px 16px; }
-    .day-accordion.open .day-content { display: block; }
-
-    .activity-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #F1F5F9; font-size: 13px; }
-    .activity-item:last-child { border-bottom: none; }
-    .activity-time { font-weight: 700; color: var(--brand-primary); width: 60px; flex-shrink: 0; }
-    .activity-info { flex: 1; padding: 0 12px; }
-
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.active { display: flex; }
     
@@ -173,168 +154,9 @@
 
     footer { text-align: center; font-size: 12px; color: var(--text-muted); padding: 24px; border-top: 1px solid var(--border-color); margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 8px; }
     footer a { color: var(--brand-primary); text-decoration: none; }
-
-    @media print {
-      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-      @page { margin: 1cm; }
-
-      /* Esconde toda navegação e controles */
-      .top-header, .drawer, .drawer-overlay, footer,
-      .alert-free-data, #cardOffline, .paywall-overlay,
-      .modal-overlay, .modal-termos-overlay,
-      .nav-tabs-wrapper, .btn-exportar-aba,
-      #avisoImpressaoIOS { display: none !important; }
-
-      /* Esconde formulários de entrada e botões */
-      button, input[type="text"], input[type="number"], input[type="date"],
-      input[type="time"], input[type="email"], input[type="hidden"],
-      select, textarea { display: none !important; }
-
-      /* Esconde cards de configuração — colapso total sem deixar espaço */
-      .no-print {
-        display: none !important;
-        visibility: collapse !important;
-        height: 0 !important;
-        min-height: 0 !important;
-        max-height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: none !important;
-        overflow: hidden !important;
-        line-height: 0 !important;
-        font-size: 0 !important;
-      }
-
-      #cardVisualizacaoMoeda, #cardSalvarOffline,
-      #promoRoteiroD1, #promoOrcamentoFree, #promoMoedaFree,
-      .form-group, .form-row, .form-section,
-      .promo-free, .promo-box, .info-box, .alert-free-data {
-        display: none !important;
-        height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-      }
-
-      /* Layout de impressão */
-      body { background: white !important; color: #0F172A !important; font-size: 12px; margin: 0; padding: 0; }
-      .main-container { padding: 8px !important; margin: 0 !important; }
-      .tab-content { display: none !important; height: 0 !important; overflow: hidden !important; }
-      .tab-content.print-show { display: block !important; height: auto !important; overflow: visible !important; margin-bottom: 32px; }
-      .print-header { display: block !important; }
-
-      /* Cards de conteúdo */
-      .card { border: 1px solid #E2E8F0 !important; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; break-inside: avoid; box-shadow: none !important; background: white !important; }
-      .card-title { display: block !important; color: #64748B !important; font-size: 10px !important; font-weight: 700 !important; }
-
-      /* Tabelas e listas */
-      table { width: 100%; border-collapse: collapse; font-size: 11px; }
-      th { background: #F4F6F9 !important; color: #64748B; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; padding: 6px 8px; text-align: left; }
-      td { padding: 6px 8px; border-bottom: 1px solid #F1F5F9; vertical-align: top; }
-
-      /* KPIs */
-      .kpi-grid { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .kpi-card { display: block !important; border: 1px solid #E2E8F0; border-radius: 6px; padding: 8px; text-align: center; }
-
-      /* Checklist e cronograma — transforma checkboxes em quadradinhos/círculos para riscar */
-      input[type="checkbox"] {
-        display: inline-block !important;
-        appearance: none !important;
-        -webkit-appearance: none !important;
-        width: 13px !important;
-        height: 13px !important;
-        border: 1.5px solid #64748B !important;
-        background: white !important;
-        vertical-align: middle !important;
-        margin-right: 6px !important;
-        flex-shrink: 0 !important;
-      }
-      /* Mala: círculo */
-      #malaLista input[type="checkbox"] {
-        border-radius: 50% !important;
-      }
-      /* Cronograma: quadrado */
-      #cronogramaLista input[type="checkbox"] {
-        border-radius: 2px !important;
-      }
-      /* Esconde botões de edição/exclusão nas linhas */
-      .btn-action-icon { display: none !important; }
-    }
-    .print-header { display: none; }
   </style>
 </head>
 <body>
-  <!-- Cabeçalho visível apenas no PDF (aparece no topo antes de tudo) -->
-  <div class="print-header">
-    <h1 id="printTitulo">Minha Viagem Disney</h1>
-    <p id="printSubtitulo">Planejamento gerado pelo Flowi Viagens · tryflowi.github.io</p>
-  </div>
-
-  <!-- Aviso para usuários iOS/Safari -->
-  <div id="avisoImpressaoIOS" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:24px;">
-    <div style="background:white;border-radius:16px;padding:28px 24px;max-width:340px;text-align:center;">
-      <div style="font-size:32px;margin-bottom:12px;">📱</div>
-      <div style="font-weight:700;font-size:16px;color:#0F172A;margin-bottom:10px;">Exportar PDF no iPhone</div>
-      <div style="font-size:13px;color:#64748B;line-height:1.6;margin-bottom:20px;">No Safari/iPhone, toque no botão <strong>Compartilhar</strong> <span style="font-size:16px;">⎙</span> na barra do navegador e escolha <strong>"Imprimir"</strong> para salvar como PDF.</div>
-      <button onclick="document.getElementById('avisoImpressaoIOS').style.display='none'; if(window._restaurarPrint){window._restaurarPrint();window._restaurarPrint=null;}" style="background:#0B132B;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Entendido</button>
-    </div>
-  </div>
-
-  <!-- MODAIS DE TERMOS (abrem sobre o planejador, sem sair da página) -->
-  <div class="modal-termos-overlay" id="modalTermos">
-    <div class="modal-termos-card">
-      <button class="modal-termos-close" onclick="fecharModalTermos()">✕</button>
-      <div class="modal-termos-titulo">Termos de Uso</div>
-      <div class="modal-termos-body">
-        <p>Ao utilizar o Flowi Viagens, você concorda com os termos descritos abaixo.</p>
-        <h3>1. Uso do Serviço</h3>
-        <p>O Flowi é uma ferramenta de planejamento pessoal. O uso é individual e intransferível. É proibida a reprodução ou redistribuição do conteúdo sem autorização.</p>
-        <h3>2. Dados e Privacidade</h3>
-        <p>No modo Free, seus dados ficam armazenados apenas no seu dispositivo. No modo Premium, os dados são sincronizados em nossos servidores de forma segura para acesso em múltiplos dispositivos.</p>
-        <h3>3. Pagamentos</h3>
-        <p>O acesso Premium é adquirido mediante pagamento único, processado pelo Mercado Pago. Consulte nossa política de reembolso para informações sobre cancelamentos.</p>
-        <h3>4. Responsabilidades</h3>
-        <p>O Flowi não se responsabiliza por decisões tomadas com base nas informações inseridas no aplicativo. As estimativas de orçamento e cronograma são de responsabilidade do usuário.</p>
-        <h3>5. Contato</h3>
-        <p>Dúvidas? Entre em contato pelo Instagram <strong>@tryflowi</strong>.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-termos-overlay" id="modalPrivacidade">
-    <div class="modal-termos-card">
-      <button class="modal-termos-close" onclick="fecharModalTermos('modalPrivacidade')">✕</button>
-      <div class="modal-termos-titulo">Política de Privacidade</div>
-      <div class="modal-termos-body">
-        <p>Sua privacidade é importante para nós. Esta política explica como tratamos seus dados.</p>
-        <h3>1. Dados Coletados</h3>
-        <p>Coletamos apenas o e-mail informado no momento da compra, para vinculação da licença Premium. Nenhum dado pessoal além deste é coletado ou armazenado por nós.</p>
-        <h3>2. Dados do Planejamento</h3>
-        <p>No modo Free, seus dados de planejamento (roteiro, orçamento etc.) ficam armazenados localmente no seu dispositivo e nunca são enviados a nossos servidores. No modo Premium, esses dados são sincronizados para permitir acesso em múltiplos dispositivos.</p>
-        <h3>3. Compartilhamento</h3>
-        <p>Não compartilhamos seus dados com terceiros, exceto o e-mail com o Mercado Pago para processamento do pagamento.</p>
-        <h3>4. Contato</h3>
-        <p>Para solicitações relacionadas à privacidade, entre em contato pelo Instagram <strong>@tryflowi</strong>.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-termos-overlay" id="modalReembolso">
-    <div class="modal-termos-card">
-      <button class="modal-termos-close" onclick="fecharModalTermos('modalReembolso')">✕</button>
-      <div class="modal-termos-titulo">Política de Reembolso</div>
-      <div class="modal-termos-body">
-        <p>Queremos que você esteja satisfeito com o Flowi Premium.</p>
-        <h3>1. Prazo de Reembolso</h3>
-        <p>Você pode solicitar reembolso integral em até 7 dias após a data da compra, desde que não tenha utilizado extensivamente as funcionalidades Premium.</p>
-        <h3>2. Como Solicitar</h3>
-        <p>Entre em contato pelo Instagram <strong>@tryflowi</strong> informando o e-mail utilizado na compra e o número da transação (disponível no comprovante do Mercado Pago).</p>
-        <h3>3. Processamento</h3>
-        <p>O reembolso é processado em até 10 dias úteis pelo Mercado Pago, na mesma forma de pagamento original.</p>
-      </div>
-    </div>
-  </div>
 
   <header class="top-header">
     <div class="top-bar">
@@ -373,48 +195,13 @@
     </div>
   </header>
 
-  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleMenu()"></div>
-  <div class="drawer" id="drawer">
-    <div style="background:#0B132B;margin:-24px -24px 16px -24px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
-      <div style="display:flex;align-items:flex-end;gap:2px">
-        <div style="display:flex;flex-direction:column;gap:3px">
-          <span style="width:18px;height:2px;background:white;border-radius:2px;display:block"></span>
-          <span style="width:12px;height:2px;background:white;border-radius:2px;display:block"></span>
-          <span style="width:7px;height:2px;background:white;border-radius:2px;display:block"></span>
-        </div>
-        <div style="width:6px;height:6px;background:white;border-radius:50%;margin-bottom:1px;margin-left:-3px"></div>
-        <span style="font-size:14px;font-weight:600;letter-spacing:2px;color:white;margin-left:5px">flowi</span>
-      </div>
-      <button onclick="toggleMenu()" style="color:rgba(255,255,255,0.7);font-size:20px;background:none;border:none;cursor:pointer">✕</button>
-    </div>
-    <a href="https://tryflowi.github.io/" class="drawer-link">🏠 Home</a>
-    <a href="#" id="drawerMenuPrincipal" class="drawer-link"></a>
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border-color)">Legal</div>
-    <a href="#" onclick="abrirModalTermos('modalTermos')" class="drawer-link">Termos de uso</a>
-    <a href="#" onclick="abrirModalTermos('modalPrivacidade')" class="drawer-link">Privacidade</a>
-    <a href="#" onclick="abrirModalTermos('modalReembolso')" class="drawer-link">Reembolso</a>
-  </div>
-
   <main class="main-container">
     <div id="alertFreeData" class="alert-free-data">
-      <div>💾 <strong>Aviso:</strong> Seus dados ficam salvos apenas neste dispositivo e navegador. Se trocar de aparelho, baixe o arquivo offline primeiro.</div>
+      <div>💾 <strong>Aviso:</strong> Seus dados ficam salvos apenas neste dispositivo e navegador.</div>
     </div>
 
     <!-- TAB 1: INÍCIO -->
     <div id="tab-inicio" class="tab-content active">
-
-      <!-- 3 botões de acesso rápido -->
-      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-        <button onclick="abrirModalPremium('modalDicas')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
-          💡 Dicas da Viagem
-        </button>
-        <button onclick="abrirModalPremium('modalMetas')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
-          🎯 Metas de Economia
-        </button>
-        <button onclick="abrirModalPremium('modalMala')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
-          🧳 Checklist de Mala
-        </button>
-      </div>
 
       <div class="card no-print">
         <div class="card-title">
@@ -447,15 +234,9 @@
         </div>
       </div>
 
-      <!-- ALERTAS DE PRAZO (PREMIUM) -->
-      <div class="card" id="cardAlertasPrazo" style="display:none;">
-        <div class="card-title">⚠️ Alertas de Prazo</div>
-        <div id="alertasPrazoLista"></div>
-      </div>
-
       <!-- PAINEL DE RESUMO E INDICADORES CONSOLIDADOS -->
       <div class="card">
-        <div class="card-title">Resumo do Orçamento <span style="font-weight:400;font-size:11px;color:var(--text-muted);text-transform:none;letter-spacing:0;">(valores em R$)</span></div>
+        <div class="card-title">Resumo do Orçamento <span id="lblMoedaResumo" style="font-weight:400;font-size:11px;color:var(--text-muted);text-transform:none;">(valores em R$)</span></div>
         
         <div class="info-box" id="infoBoxResumo">
           ℹ️ <strong>Aviso:</strong> No modo Free, todos os lançamentos e o resumo do orçamento são exibidos apenas em Reais (BRL).
@@ -463,147 +244,75 @@
 
         <div class="grid-4" style="margin-bottom: 20px;" id="kpiGridPrincipal">
           <div class="kpi-card">
-            <div class="kpi-label">Gasto Total em Reais (BRL)</div>
+            <div class="kpi-label" id="lblKpiTotal">Gasto Total em Reais (BRL)</div>
             <div class="kpi-value blue" id="kpiTotalBrl">R$ 0,00</div>
             <div class="kpi-subtext" id="kpiTotalBrlSub">Total lançado</div>
           </div>
         </div>
 
-        <div class="grid-3">
+        <div class="grid-4">
           <div class="kpi-card"><div class="kpi-label">Gasto Por Pessoa</div><div class="kpi-value" id="kpiPerPerson">R$ 0,00</div></div>
-          <div class="kpi-card"><div class="kpi-label">Total Pago</div><div id="kpiTotalPaidContainer"></div></div>
-          <div class="kpi-card"><div class="kpi-label">Total Pendente</div><div id="kpiTotalPendingContainer"></div></div>
-          <div class="kpi-card"><div class="kpi-label">💰 Economia Realizada</div><div id="kpiEconomiaContainer" style="font-size:18px;font-weight:700;color:#16A34A;">R$ 0,00</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total Pago</div><div class="kpi-value green" id="kpiTotalPaid">R$ 0,00</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total Pendente</div><div class="kpi-value red" id="kpiTotalPending">R$ 0,00</div></div>
+          <div class="kpi-card"><div class="kpi-label">💰 Economia Realizada</div><div class="kpi-value green" id="kpiEconomia">R$ 0,00</div></div>
         </div>
       </div>
 
-      <div class="card" id="cardVisualizacaoMoeda" style="display:none;">
-        <div class="card-title">Visualizar Saldo Em</div>
-        <div class="radio-group">
-          <label class="radio-label">
-            <input type="radio" name="viewCurrency" value="BRL" checked onchange="atualizarMoedaVisualizacao()"> Reais (R$)
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="viewCurrency" value="USD" onchange="atualizarMoedaVisualizacao()"> Dólar (US$)
-          </label>
+      <div class="card" id="cardVisualizacaoMoeda">
+        <div class="card-title">
+          <span>Visualizar Saldo Em</span>
+          <div class="radio-group" style="width: auto;">
+            <label class="radio-label">
+              <input type="radio" name="viewCurrency" value="BRL" checked onchange="renderDashboardCalculos()"> Reais (R$)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="viewCurrency" value="USD" onchange="renderDashboardCalculos()"> Dólar (US$)
+            </label>
+          </div>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-title" id="tituloDivisaoCategoria">Divisão por Categoria (Consolidado em BRL)</div>
-        <div id="categoriesWrapper"></div>
-      </div>
-
-      <div class="card" id="cardSalvarOffline" style="text-align: center; padding: 24px 16px;">
-        <div style="font-size: 28px; margin-bottom: 8px;">💾</div>
-        <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">Salvar para Uso Offline</div>
-        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Baixe com seus dados salvos. Se trocar de dispositivo, abra este arquivo para recuperar tudo.</div>
-        <button class="btn-submit" style="width: auto; padding: 10px 20px; background: #0B132B;" onclick="baixarArquivoOffline()">↓ Baixar para usar offline</button>
+        <div class="card-title" id="tituloDivisaoCategoria">Divisão por Categoria</div>
+        <div id="categoriesWrapper" class="grid-3"></div>
       </div>
     </div>
 
-    <!-- TAB 2: PLANEJADOR DIA A DIA -->
-    <div id="tab-roteiro" class="tab-content">
-      <div class="card no-print" style="margin-bottom:12px;">
-        <input type="hidden" id="actEditId" value="">
-        <button id="actFormToggle" onclick="toggleFormRoteiro()" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--brand-primary);padding:0;font-family:inherit;display:flex;justify-content:space-between;align-items:center;">
-          <span>+ Adicionar atividade ao roteiro</span>
-          <span id="actFormToggleIcon" style="font-size:12px;color:var(--text-muted);">▼</span>
-        </button>
-        <div id="actFormBody" style="display:none;margin-top:16px;">
-          <div class="grid-2">
-            <div class="form-group">
-              <label>Data da Atividade</label>
-              <input type="date" id="actDate" class="form-control" onchange="atualizarDiaSemanaForm()">
-              <div id="actDiaSemana" style="display:none;font-size:12px;color:var(--brand-primary);font-weight:600;margin-top:4px;"></div>
-            </div>
-            <div class="form-group"><label>Horário</label><input type="time" id="actTime" class="form-control" value="09:00"></div>
-          </div>
-          <div class="form-group"><label>Título da Atividade / Local</label><input type="text" id="actTitle" class="form-control" placeholder="Ex: Magic Kingdom - Parque"></div>
-          <div class="form-group"><label>Observações</label><textarea id="actDesc" class="form-control" placeholder="Ex: Chegar para o Rope Drop" rows="3" style="resize:vertical;line-height:1.5;"></textarea></div>
-          <div style="display:flex;gap:8px;">
-            <button class="btn-submit" id="btnActSubmit" onclick="salvarAtividade()">Salvar</button>
-            <button class="btn-cancel" id="btnActCancel" style="display:none;" onclick="cancelarEdicaoAtividade()">Cancelar</button>
-          </div>
-        </div>
-      </div>
-
-      <div id="promoRoteiroD1" style="display:none;background:#EFF6FF;border:1px dashed #2563EB;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#1E40AF;">
-        🔒 <strong>Recurso Premium:</strong> Desbloqueie a organização dinâmica por dias de viagem (D1, D2, D3...) agrupada cronologicamente. <a href="#" onclick="abrirPaywall();return false;" style="color:#2563EB;font-weight:700;text-decoration:underline;">Saber mais</a>
-      </div>
-
-      <div id="cronogramaContainer"></div>
-    </div>
-
-    <!-- TAB 3: ORÇAMENTO -->
+    <!-- TAB 2: ORÇAMENTO -->
     <div id="tab-orcamento" class="tab-content">
-
-      <!-- Campos hidden para compatibilidade -->
-      <input type="hidden" id="budEditId" value="">
-      <input type="hidden" id="budAmountUsd" value="0">
-      <input type="hidden" id="budRate" value="0">
-
-      <!-- Accordion: formulário minimizado por padrão -->
-      <div class="card no-print" style="margin-bottom:12px;">
-        <button id="budFormToggle" onclick="toggleFormOrcamento()" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--brand-primary);padding:0;font-family:inherit;display:flex;justify-content:space-between;align-items:center;">
-          <span>+ Adicionar item ao orçamento</span>
-          <span id="budFormToggleIcon" style="font-size:12px;color:var(--text-muted);">▼</span>
-        </button>
-
-        <div id="budFormBody" style="display:none;margin-top:16px;">
-
-          <!-- CAMPOS FREE -->
+      <div class="card no-print">
+        <div class="card-title">Adicionar Item ao Orçamento</div>
+        <div class="form-group"><label>Descrição do Gasto</label><input type="text" id="budDesc" class="form-control" placeholder="Ex: Passagens aéreas, Hospedagem..."></div>
+        <div class="grid-2">
+          <div class="form-group"><label>Valor Estimado (R$)</label><input type="number" id="budAmountBrl" class="form-control" placeholder="0.00" step="0.01"></div>
           <div class="form-group">
-            <label>Descrição do Gasto</label>
-            <input type="text" id="budDesc" class="form-control" placeholder="Ex: Passagens aéreas, Hospedagem...">
-          </div>
-          <div class="form-group">
-            <label>Valor Estimado (R$)</label>
-            <input type="number" id="budAmountBrl" class="form-control" placeholder="0.00" step="0.01">
-          </div>
-
-          <!-- CAMPOS PREMIUM -->
-          <div id="budCamposPremium" style="display:none;">
-            <div class="form-group">
-              <label>Categoria</label>
-              <select id="budCategory" class="form-control">
-                <option value="Passagens">✈️ Passagens</option>
-                <option value="Hospedagem">🏨 Hospedagem</option>
-                <option value="Parques e Ingressos">🏰 Parques & Ingressos</option>
-                <option value="Alimentação">🍕 Alimentação</option>
-                <option value="Compras">🛍️ Compras</option>
-                <option value="Outros">📌 Outros (exceto transporte — use a aba Transporte)</option>
-              </select>
-            </div>
-            <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
-              <span style="font-weight:500;font-size:13px;">Status:</span>
-              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
-                <input type="radio" name="budStatus" value="Pendente" checked onchange="onStatusChange(this)"> 🟡 Pendente
-              </label>
-              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
-                <input type="radio" name="budStatus" value="Pago" onchange="onStatusChange(this)"> 🟢 Pago
-              </label>
-            </div>
-            <div id="budPaidGroup" style="display:none;">
-              <div class="form-group">
-                <label>Valor efetivamente pago (R$)
-                  <span style="font-weight:400;font-size:11px;color:var(--text-muted);"> — se diferente do estimado, informe aqui para refletir corretamente na economia</span>
-                </label>
-                <input type="number" id="budPaidBrl" class="form-control" placeholder="0.00">
-              </div>
-            </div>
-          </div>
-
-          <!-- AVISO FREE -->
-          <div id="promoOrcamentoFree" style="display:none;background:#F8FAFC;border:1px solid var(--border-color);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--text-muted);">
-            🔒 <strong>Modo Free:</strong> Categoria, valor pago e status são exclusivos da <a href="#" onclick="abrirPaywall();return false;" style="color:var(--brand-primary);font-weight:700;">versão Premium</a>.
-          </div>
-
-          <div style="display:flex;gap:8px;">
-            <button class="btn-submit" id="btnBudSubmit" onclick="salvarOrcamento()" style="flex:1;">Salvar</button>
-            <button class="btn-cancel" id="btnBudCancel" style="display:none;" onclick="cancelarEdicaoOrcamento()">Cancelar</button>
+            <label>Categoria</label>
+            <select id="budCategory" class="form-control">
+              <option value="Passagens">✈️ Passagens</option>
+              <option value="Hospedagem">🏨 Hospedagem</option>
+              <option value="Parques e Ingressos">🏰 Parques & Ingressos</option>
+              <option value="Alimentação">🍕 Alimentação</option>
+              <option value="Compras">🛍️ Compras</option>
+              <option value="Outros">📌 Outros</option>
+            </select>
           </div>
         </div>
+        
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Status</label>
+            <select id="budStatus" class="form-control" onchange="togglePagoInput()">
+              <option value="Pendente">🟡 Pendente</option>
+              <option value="Pago">🟢 Pago</option>
+            </select>
+          </div>
+          <div class="form-group" id="groupPaidBrl" style="display:none;">
+            <label>Valor efetivamente pago (R$)</label>
+            <input type="number" id="budPaidBrl" class="form-control" placeholder="0.00" step="0.01">
+          </div>
+        </div>
+
+        <button class="btn-submit" onclick="salvarOrcamento()">Salvar Item</button>
       </div>
 
       <div class="card">
@@ -612,21 +321,20 @@
       </div>
     </div>
 
-    <!-- TAB 4: TRANSPORTE (reformulada) -->
+    <!-- TAB 3: TRANSPORTE -->
     <div id="tab-transporte" class="tab-content">
       <div class="card no-print">
-        <div class="card-title">🚗 Como vai se deslocar?</div>
+        <div class="card-title">🚗 Transporte / Deslocamento em Orlando</div>
         <div style="display:flex;gap:10px;margin-bottom:16px;">
-          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;border:2px solid var(--border-color);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;" id="lblModoCarro">
-            <input type="radio" name="modoTransporte" value="carro" id="modoCarro" onchange="alternarModoTransporte()"> 🚗 Carro Alugado
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;border:2px solid var(--border-color);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+            <input type="radio" name="modoTransporte" value="carro" id="modoCarro" checked onchange="calcularTransporte()"> 🚗 Carro Alugado
           </label>
-          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;border:2px solid var(--border-color);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;" id="lblModoApp">
-            <input type="radio" name="modoTransporte" value="app" id="modoApp" onchange="alternarModoTransporte()"> 🚌 Uber / App / Transporte
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;border:2px solid var(--border-color);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+            <input type="radio" name="modoTransporte" value="app" id="modoApp" onchange="calcularTransporte()"> 🚌 Uber / App / Transporte
           </label>
         </div>
 
-        <!-- Campos modo Carro -->
-        <div id="campusCarro" style="display:none;">
+        <div id="campusCarro">
           <div class="grid-2">
             <div class="form-group"><label>Dias de aluguel</label><input type="number" id="carDays" class="form-control" value="7" oninput="calcularTransporte()"></div>
             <div class="form-group"><label>Diária do carro (US$)</label><input type="number" id="carDaily" class="form-control" value="45" oninput="calcularTransporte()"></div>
@@ -636,668 +344,54 @@
             <div class="form-group"><label>Combustível estimado total (US$)</label><input type="number" id="carFuel" class="form-control" value="80" oninput="calcularTransporte()"></div>
           </div>
         </div>
-
-        <!-- Campos modo App/Uber -->
-        <div id="campusApp" style="display:none;">
-          <div class="grid-2">
-            <div class="form-group"><label>Origem</label><input type="text" id="trajOrigem" class="form-control" placeholder="Ex: Hotel Rosen Inn"></div>
-            <div class="form-group"><label>Destino</label><input type="text" id="trajDestino" class="form-control" placeholder="Ex: Magic Kingdom"></div>
-          </div>
-          <div class="grid-2">
-            <div class="form-group"><label>App / Meio</label><input type="text" id="trajApp" class="form-control" placeholder="Ex: Uber, Lyft, Ônibus I-Ride..."></div>
-            <div class="form-group"><label>Valor estimado (US$)</label><input type="number" id="trajValor" class="form-control" placeholder="0.00" step="0.01"></div>
-          </div>
-          <button class="btn-submit" onclick="adicionarTrajeto()">+ Adicionar Trajeto</button>
-        </div>
-      </div>
-
-      <div class="card" id="cardTransporteComparativo" style="display:none;">
-        <div class="card-title">💡 Vale mais a pena Carro ou App?</div>
-        <div id="transporteComparativoTexto" style="font-size:13px;color:var(--text-muted);"></div>
-      </div>
-
-      <div class="card" id="cardTransporteRoteiro" style="display:none;">
-        <div class="card-title">🗺️ Trajetos do Roteiro</div>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Itens marcados como 🚗 Transporte nas atividades do roteiro. Somente leitura — edite pelo Roteiro da Viagem.</p>
-        <div id="trajetosRoteiro"></div>
-      </div>
-
-      <div class="card" id="cardTransporteResultado">
-        <div class="card-title">Estimativa Total de Transporte</div>
-        <div class="kpi-grid">
-          <div class="kpi-card"><div class="kpi-label">Total Estimado (US$)</div><div class="kpi-value blue" id="kpiTransporteTotal">US$ 0,00</div></div>
-          <div class="kpi-card"><div class="kpi-label">Total Estimado (R$)</div><div class="kpi-value" id="kpiTransporteTotalBrl">R$ 0,00</div></div>
-          <div class="kpi-card"><div class="kpi-label">Modo Escolhido</div><div class="kpi-value" id="kpiTransporteModo" style="font-size:13px;">—</div></div>
-        </div>
-        <div id="trajetosLista" style="margin-top:16px;"></div>
-      </div>
-    </div>
-
-    <!-- TAB 5: LISTA DE COMPRAS (consolidada por dia) -->
-    <div id="tab-compras" class="tab-content">
-      <div class="card">
-        <div class="card-title">🛍️ Lista de Compras por Dia</div>
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Itens adicionados nas atividades do roteiro, agrupados por dia.</p>
-        <div id="comprasConsolidada"></div>
-      </div>
-    </div>
-
-    <!-- MODAL: DICAS (substituiu a aba) -->
-    <div class="modal-termos-overlay" id="modalDicas">
-      <div class="modal-termos-card" style="max-width:720px;">
-        <button class="modal-termos-close" onclick="fecharModalTermos('modalDicas')">✕</button>
-        <div class="modal-termos-titulo">💡 Dicas para sua Viagem Disney</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;" id="dicasGrid">
-          <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px;">
-            <div style="font-size:15px;font-weight:700;color:#1E40AF;margin-bottom:8px;">📲 Apps Essenciais</div>
-            <ul style="font-size:12px;color:#1E3A5F;line-height:1.7;margin:0;padding-left:16px;">
-              <li>Baixe o <strong>My Disney Experience</strong> antes de viajar</li>
-              <li>Vincule seus ingressos assim que chegar</li>
-              <li>Use o Mobile Order para pular fila de comida</li>
-            </ul>
-          </div>
-          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:14px;">
-            <div style="font-size:15px;font-weight:700;color:#166534;margin-bottom:8px;">🎢 Nos Parques</div>
-            <ul style="font-size:12px;color:#14532D;line-height:1.7;margin:0;padding-left:16px;">
-              <li>Chegue 45-60 min antes da abertura (Rope Drop)</li>
-              <li>Atração mais concorrida primeiro</li>
-              <li>Intercale dias de parque com descanso</li>
-            </ul>
-          </div>
-          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px;">
-            <div style="font-size:15px;font-weight:700;color:#9A3412;margin-bottom:8px;">⏰ Genie+ & Lightning Lane</div>
-            <ul style="font-size:12px;color:#7C2D12;line-height:1.7;margin:0;padding-left:16px;">
-              <li>Agende o 1º Lightning Lane às 07:00 no app</li>
-              <li>Priorize: Rise of the Resistance, Tron, TSMM</li>
-              <li>Avatar (AK) e Guardians (EPCOT) têm fila individual paga</li>
-            </ul>
-          </div>
-          <div style="background:#FDF4FF;border:1px solid #E9D5FF;border-radius:10px;padding:14px;">
-            <div style="font-size:15px;font-weight:700;color:#6B21A8;margin-bottom:8px;">🛡️ Seguro & Chip</div>
-            <ul style="font-size:12px;color:#581C87;line-height:1.7;margin:0;padding-left:16px;">
-              <li>Seguro com cobertura médica mínima US$60k</li>
-              <li>eSIM: ative antes de embarcar</li>
-              <li>Mínimo 10GB para 7 dias de uso normal</li>
-            </ul>
-          </div>
-          <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:10px;padding:14px;grid-column:1/-1;">
-            <div style="font-size:15px;font-weight:700;color:#0C4A6E;margin-bottom:8px;">📋 Ordem de Contratações</div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;color:#0C4A6E;">
-              <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">✈️</div><strong>12-6 meses</strong><br>Passagens e passaporte</div>
-              <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">🏨</div><strong>6 meses</strong><br>Hotel e ingressos</div>
-              <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">🍽️</div><strong>60 dias</strong><br>Restaurantes (6h da manhã)</div>
-              <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">🎢</div><strong>7-3 dias</strong><br>Lightning Lane Individual</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL: LISTA DE COMPRAS POR ATIVIDADE -->
-    <div class="modal-termos-overlay" id="modalComprasAtividade">
-      <div class="modal-termos-card" style="max-width:500px;">
-        <button class="modal-termos-close" onclick="fecharModalComprasAtividade()">✕</button>
-        <div class="modal-termos-titulo" id="modalComprasTitulo">📋 Lista da Atividade</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;" id="modalComprasSubtitulo"></div>
-
-        <div class="grid-2" style="margin-bottom:8px;">
-          <div class="form-group">
-            <label>Tipo</label>
-            <select id="cmpTipo" class="form-control">
-              <option value="compras">🛍️ Compras</option>
-              <option value="mercado">🛒 Mercado</option>
-              <option value="alimentacao">🍽️ Alimentação</option>
-              <option value="transporte">🚗 Transporte</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Descrição</label><input type="text" id="cmpProduto" class="form-control" placeholder="Ex: Tênis Nike, Jantar..."></div>
-        </div>
-        <div class="grid-2" style="margin-bottom:8px;">
-          <div class="form-group"><label>Marca / Detalhe <span style="font-weight:400;font-size:11px;color:var(--text-muted);">opcional</span></label><input type="text" id="cmpMarca" class="form-control" placeholder="Ex: Nike, Texas Roadhouse..."></div>
-          <div class="form-group"><label>Teto (US$)</label><input type="number" id="cmpTeto" class="form-control" placeholder="0.00" step="0.01"></div>
-        </div>
-        <button class="btn-submit" onclick="adicionarItemCompra()" style="margin-bottom:16px;">+ Adicionar</button>
-
-        <div id="listaItensCompra" style="margin-bottom:12px;"></div>
-
-        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px 14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <span style="font-size:13px;color:#166534;font-weight:600;">Teto total desta parada:</span>
-            <span style="font-size:16px;font-weight:700;color:#16A34A;" id="totalTetoAtividade">US$ 0,00</span>
-          </div>
-          <div id="totalTetoTipos" style="font-size:11px;color:#166534;display:flex;gap:12px;flex-wrap:wrap;"></div>
-        </div>
-      </div>
-    </div>
-
-
-
-    <!-- TAB 8: CRONOGRAMA DE TAREFAS -->
-    <div id="tab-cronograma" class="tab-content">
-      <div class="card no-print">
-        <div class="card-title" id="croFormTitle">Adicionar Tarefa ao Cronograma</div>
-        <input type="hidden" id="croEditId" value="">
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Mês/Ano da tarefa</label>
-            <input type="month" id="croMes" class="form-control">
-          </div>
-          <div class="form-group">
-            <label>Tarefa</label>
-            <input type="text" id="croTitulo" class="form-control" placeholder="Ex: Pagar passaporte, Comprar passagens...">
-          </div>
-        </div>
-        <div class="form-group" style="max-width:200px;">
-          <label>Valor (R$) <span style="font-weight:400;color:var(--text-muted);font-size:11px;">opcional</span></label>
-          <input type="number" id="croValor" class="form-control" placeholder="0.00" step="0.01">
-        </div>
-        <button class="btn-submit" id="btnCroSubmit" onclick="salvarTarefaCronograma()">Adicionar ao Cronograma</button>
-        <button class="btn-cancel" id="btnCroCancel" style="display:none;" onclick="cancelarEdicaoCronograma()">Cancelar Edição</button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Tarefas Organizadas por Mês</div>
-        <div id="cronogramaLista"></div>
       </div>
     </div>
 
   </main>
 
-
-
-  <!-- MODAL METAS DE ECONOMIA -->
-  <div class="modal-termos-overlay" id="modalMetas">
-    <div class="modal-termos-card" style="max-width:600px;">
-      <button class="modal-termos-close" onclick="fecharModalTermos('modalMetas')">✕</button>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <div class="modal-termos-titulo" style="margin-bottom:0;">🎯 Metas de Economia</div>
-        <button onclick="exportarPDF('metas')" style="background:none;border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;">📄 Exportar PDF</button>
-      </div>
-      <div id="tab-metas">
-      <div class="card no-print">
-        <div class="card-title">🎯 Meta de Economia Mensal</div>
-        <div class="info-box">
-          ℹ️ <strong>Como funciona:</strong> a meta em reais é calculada automaticamente com base no <strong>total já orçado</strong> na aba Orçamento. Escolha o mês de início e o app divide esse valor igualmente entre os meses restantes até a data da viagem.
-        </div>
-
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Mês/Ano de início das reservas</label>
-            <input type="month" id="metaMesInicio" class="form-control" onchange="salvarMetaConfig()">
-          </div>
-          <div class="form-group">
-            <label>Meta total (puxada do Orçamento)</label>
-            <input type="text" id="metaValorTotal" class="form-control" value="R$ 0,00" disabled style="background:#F1F5F9; color:var(--text-muted); font-weight:700;">
-          </div>
-        </div>
-
-        <div id="metaAvisoSemData" style="display:none; background:#FEF3C7; border:1px solid #FDE68A; color:#92400E; padding:10px 14px; border-radius:8px; font-size:13px;">
-          ⚠️ Defina a <strong>Data de ida</strong> na aba Início para calcular o prazo até a viagem.
-        </div>
-      </div>
-
-      <div class="card" id="cardResumoMetas" style="display:none;">
-        <div class="card-title">Resumo da Meta</div>
-        <div class="grid-3">
-          <div class="kpi-card">
-            <div class="kpi-label">Valor por Mês</div>
-            <div class="kpi-value blue" id="metaValorMensal">R$ 0,00</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Meses Restantes</div>
-            <div class="kpi-value" id="metaMesesRestantes">0</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Meta Total</div>
-            <div class="kpi-value green" id="metaTotalDisplay">R$ 0,00</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" id="cardListaMetas" style="display:none;">
-        <div class="card-title">Reserva Mês a Mês</div>
-        <div id="metasLista"></div>
-      </div>
-    </div>
-    </div>
-  </div>
-
-  <!-- MODAL CHECKLIST DE MALA -->
-  <div class="modal-termos-overlay" id="modalMala">
-    <div class="modal-termos-card" style="max-width:600px;">
-      <button class="modal-termos-close" onclick="fecharModalTermos('modalMala')">✕</button>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <div class="modal-termos-titulo" style="margin-bottom:0;">🧳 Checklist de Mala</div>
-        <button onclick="exportarPDF('mala')" style="background:none;border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;">📄 Exportar PDF</button>
-      </div>
-      <div id="tab-mala">
-      <div class="card no-print">
-        <div class="card-title" id="malaFormTitle">Adicionar Item à Mala</div>
-        <input type="hidden" id="malaEditId" value="">
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Categoria</label>
-            <select id="malaCategoria" class="form-control">
-              <option value="Documentos">📄 Documentos</option>
-              <option value="Roupas">👕 Roupas</option>
-              <option value="Eletrônicos">🔌 Eletrônicos</option>
-              <option value="Itens de Parque">🎢 Itens de Parque</option>
-              <option value="Higiene e Saúde">🧴 Higiene e Saúde</option>
-              <option value="Outros">📦 Outros</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Item</label>
-            <input type="text" id="malaItem" class="form-control" placeholder="Ex: Passaporte, Protetor solar...">
-          </div>
-        </div>
-        <button class="btn-submit" id="btnMalaSubmit" onclick="salvarItemMala()">Adicionar à Mala</button>
-        <button class="btn-cancel" id="btnMalaCancel" style="display:none;" onclick="cancelarEdicaoMala()">Cancelar Edição</button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">
-          <span>Itens por Categoria</span>
-          <span id="malaProgressoTexto" style="font-weight:700; color:var(--brand-primary); text-transform:none; font-size:13px;">0% embalado</span>
-        </div>
-        <div class="barra-progresso" style="width:100%; height:8px; background:var(--border-color); border-radius:20px; overflow:hidden; margin-bottom:16px;">
-          <div id="malaBarraFill" style="height:100%; width:0%; background:linear-gradient(90deg,var(--brand-primary),var(--brand-light)); border-radius:20px; transition:width .3s;"></div>
-        </div>
-        <div id="malaLista"></div>
-      </div>
-    </div>
-    </div>
-  </div>
-
-  <!-- MODAL PAYWALL PREMIUM -->
-  <div class="modal-overlay" id="paywallModal">
-    <div class="paywall-card">
-      <button class="modal-close" style="color:#FFF;" onclick="fecharPaywall()">✕</button>
-      <div class="paywall-title">Da economia ao embarque.<br>Sem fila, sem susto, sem esquecer nada.</div>
-      <div class="paywall-subtitle">Do primeiro real guardado até a última mala fechada.</div>
-      <div class="paywall-list">
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Roteiro dinâmico D1, D2:</strong> agrupamento automático e cronológico por dia da viagem, com dia da semana</div></div>
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Orçamento completo:</strong> categorias, orçado vs. pago e conversão Real ↔ Dólar</div></div>
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Câmbio dinâmico:</strong> lance em USD e veja o saldo em qualquer uma das duas moedas</div></div>
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Metas de economia:</strong> quanto guardar por mês para atingir o orçamento total</div></div>
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Cronograma de tarefas:</strong> organize o que precisa fazer mês a mês até a viagem</div></div>
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Checklist de mala:</strong> itens por categoria com progresso de embalagem</div></div>
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Alertas de prazo:</strong> avisos automáticos de tarefas atrasadas e contagem regressiva</div></div>
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Calculadora Uber vs. Carro:</strong> saiba onde economizar</div></div>
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Dicas para uma viagem segura e confortável:</strong> app, ingressos, seguro viagem, internet, Genie+ e mais</div></div>
-        <div class="paywall-item" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;"><div class="paywall-check">✓</div><div><strong>📄 Exportar PDF completo:</strong> imprima ou compartilhe todo o seu planejamento — roteiro, orçamento, checklist e cronograma — em um único documento</div></div>
-      </div>
-      <div class="paywall-price-label">R$ 15,90</div>
-      <div class="paywall-price-sub">pagamento único - acesso vitalício</div>
-      <button onclick="fecharPaywall(); irParaCompraPremium();" class="btn-buy-paywall">Garantir o Premium por R$ 15,90 →</button>
-    </div>
-  </div>
-
-  <!-- MODAL LOGIN -->
-  <div class="modal-overlay" id="loginModal">
-    <div class="modal-card">
-      <button class="modal-close" onclick="fecharLoginModal()">✕</button>
-      <h3 style="margin-bottom:12px; font-size:18px;">Acessar Meus Flowis</h3>
-      <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Digite o e-mail usado na compra para liberar todas as funções neste dispositivo.</p>
-      <div class="form-group"><label>E-mail</label><input type="email" id="loginEmail" class="form-control" placeholder="seuemail@exemplo.com"></div>
-      <button class="btn-submit" id="btnAtivarPremium" style="margin-top:8px;" onclick="verificarLicencaPremium()">Verificar e Acessar</button>
-      <div id="loginStatus" style="font-size:13px; margin-top:12px; text-align:center; min-height:18px;"></div>
-    </div>
-  </div>
-
-  <!-- MODAL E-MAIL PARA COMPRA -->
-  <div class="modal-overlay" id="emailCompraModal">
-    <div class="modal-card">
-      <button class="modal-close" onclick="fecharEmailCompraModal()">✕</button>
-      <h3 style="margin-bottom:12px; font-size:18px;">Quase lá!</h3>
-      <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Digite o e-mail que você quer usar para acessar o Premium depois da compra.</p>
-      <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:10px 12px; font-size:12px; color:#166534; margin-bottom:16px;">
-        💡 Já comprou outro Flowi antes? Use o <strong>mesmo e-mail</strong> para juntar todos os seus produtos na sua Central Flowi.
-      </div>
-      <div class="form-group"><label>E-mail</label><input type="email" id="emailCompraInput" class="form-control" placeholder="seuemail@exemplo.com"></div>
-      <button class="btn-submit" id="btnIrParaPagamento" style="margin-top:8px;" onclick="confirmarEmailEIrParaPagamento()">Continuar para o pagamento</button>
-      <div id="emailCompraStatus" style="font-size:13px; margin-top:12px; text-align:center; min-height:18px;"></div>
-    </div>
-  </div>
-
-  <footer>
-    <div style="font-weight:600;letter-spacing:1px;color:var(--text-muted);">FLOWI · Cada destino, uma experiência · <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a></div>
-    <div>Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a></div>
-    <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;justify-content:center">
-      <button class="btn-reset-discreet" style="margin-top:0" onclick="confirmarReset()">🔄 Resetar aplicativo</button>
-    </div>
-  </footer>
-
   <script>
-    const CHECKOUT_BASE_URL = 'https://flowi-webhook-mercadopago.tryflowicontato.workers.dev/criar-checkout?produto=flowi-disney';
-
-    // Identificador deste produto na tabela licencas_flowi — precisa bater
-    // com o produto_id cadastrado em produtos_flowi para o link de pagamento
-    // "Flowi Viagens - Disney Premium".
-    const PRODUTO_ID = 'flowi-disney';
-
-    // Configuração do Supabase — usada para verificar licenças reais de
-    // compra no modal "Já sou Premium".
-    const SUPABASE_URL = 'https://gkvanakreiiiprriyats.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_1Lx3D9jBwegVvvqTK39JAg_yV6zuw3s';
-    let supabaseClient = null;
-    try {
-      if (window.supabase) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }
-    } catch (e) {
-      console.warn('Supabase não inicializado:', e);
-    }
-
-    let isPremium = false;
+    let isPremium = true; // Forçado para teste Premium (mude para false caso queira testar a visão Free)
     let activeTabId = 'inicio';
 
     let appData = {
       config: { tripName: 'Minha Viagem Disney', startDate: '', endDate: '', travelers: 1, dollarRate: 5.20 },
-      activities: [],
       budgetItems: [],
-      metas: { mesInicio: '' },
-      cronograma: [],
-      mala: []
+      transporte: { modo: 'carro', dias: 7, diariaUsd: 45, estacUsd: 35, combUsd: 80 }
     };
 
     const TABS_CONFIG = [
-      { id: 'inicio', label: 'Início', premium: false },
-      { id: 'orcamento', label: 'Orçamento', premium: false },
-      { id: 'roteiro', label: 'Roteiro da Viagem', premium: false },
-      { id: 'cronograma', label: '🗓️ Cronograma', premium: true },
-      { id: 'compras', label: '🛍️ Lista de Compras', premium: true },
-      { id: 'transporte', label: '🚗 Transporte', premium: true }
+      { id: 'inicio', label: 'Início' },
+      { id: 'orcamento', label: 'Orçamento' },
+      { id: 'transporte', label: '🚗 Transporte' }
     ];
 
-    /* --- FUNÇÕES AUXILIARES DE FORMATAÇÃO DE MOEDA (CONTÁBIL) --- */
     function formatarBRL(valor) {
-      return (valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
     function formatarUSD(valor) {
-      return (valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return (valor || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     }
 
-    window.addEventListener('DOMContentLoaded', () => { carregar(); });
-
-    // Restaura estado após impressão (funciona em Android/Desktop; iOS não dispara este evento)
-    window.addEventListener('afterprint', () => {
-      if (window._restaurarPrint) { window._restaurarPrint(); window._restaurarPrint = null; }
+    window.addEventListener('DOMContentLoaded', () => { 
+      carregar(); 
     });
 
-    function irParaCompraPremium() {
-      document.getElementById('emailCompraModal').classList.add('active');
-      document.getElementById('emailCompraStatus').textContent = '';
-    }
-
-    function fecharEmailCompraModal() {
-      document.getElementById('emailCompraModal').classList.remove('active');
-    }
-
-    function confirmarEmailEIrParaPagamento() {
-      const emailInput = document.getElementById('emailCompraInput');
-      const statusEl = document.getElementById('emailCompraStatus');
-      const email = emailInput.value.trim().toLowerCase();
-
-      if (!email || !email.includes('@') || !email.includes('.')) {
-        statusEl.textContent = 'Digite um e-mail válido.';
-        statusEl.style.color = 'var(--danger)';
-        return;
-      }
-
-      // Guarda o e-mail localmente também, para reconhecimento automático
-      // assim que a licença for confirmada.
-      localStorage.setItem('flowi_hub_email', email);
-
-      const urlFinal = `${CHECKOUT_BASE_URL}&email=${encodeURIComponent(email)}`;
-      window.open(urlFinal, '_blank');
-      fecharEmailCompraModal();
-    }
-
-    function exportarPDF(abaId) {
-      if (!isPremium) { abrirPaywall(); return; }
-
-      const titulo = appData.config?.tripName || 'Minha Viagem Disney';
-      const viajantes = appData.config?.travelers || 1;
-      const dataIda = appData.config?.travelDate || '';
-      const elTitulo = document.getElementById('printTitulo');
-      const elSub = document.getElementById('printSubtitulo');
-
-      // Garante que todas as abas premium estejam renderizadas antes de imprimir
-      renderAllData();
-
-      // Remove elementos de formulário do DOM fisicamente (não só CSS)
-      // para garantir zero espaço em todos os browsers/dispositivos.
-      const removidos = [];
-      document.querySelectorAll('.no-print, #cardVisualizacaoMoeda, #cardSalvarOffline, #promoRoteiroD1, #promoOrcamentoFree, #promoMoedaFree').forEach(el => {
-        const placeholder = document.createComment('no-print-placeholder');
-        el.parentNode.insertBefore(placeholder, el);
-        el.parentNode.removeChild(el);
-        removidos.push({ el, placeholder });
-      });
-
-      // Remove classes de impressão anteriores
-      document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
-
-      if (abaId) {
-        const nomesAbas = { inicio: 'Início', roteiro: 'Roteiro da Viagem', orcamento: 'Orçamento', metas: 'Metas de Economia', cronograma: 'Cronograma', mala: 'Checklist de Mala', transporte: 'Uber vs. Carro', dicas: 'Dicas' };
-        if (elTitulo) elTitulo.textContent = titulo;
-        if (elSub) elSub.textContent = `${nomesAbas[abaId] || abaId} · ${viajantes} viajante(s) · Flowi Viagens`;
-        const alvo = document.getElementById(`tab-${abaId}`);
-        if (alvo) alvo.classList.add('print-show');
-      } else {
-        if (elTitulo) elTitulo.textContent = titulo;
-        if (elSub) elSub.textContent = `${viajantes} viajante(s)${dataIda ? ' · Ida: ' + dataIda : ''} · Planejamento completo · Flowi Viagens`;
-        document.querySelectorAll('.tab-content').forEach(s => s.classList.add('print-show'));
-      }
-
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-      const restaurar = () => {
-        // Restaura todos os elementos removidos nas posições originais
-        removidos.forEach(({ el, placeholder }) => {
-          if (placeholder.parentNode) {
-            placeholder.parentNode.insertBefore(el, placeholder);
-            placeholder.parentNode.removeChild(placeholder);
-          }
-        });
-        document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
-        renderTabs();
-      };
-
-      if (isIOS || isSafari) {
-        const aviso = document.getElementById('avisoImpressaoIOS');
-        if (aviso) aviso.style.display = 'flex';
-        // Restaura após o usuário fechar o aviso (handled inline no botão)
-        window._restaurarPrint = restaurar;
-        setTimeout(() => { try { window.print(); } catch(e) {} }, 100);
-        return;
-      }
-
-      window.print();
-      restaurar();
-    }
-
-    function abrirModalTermos(id) {
-      const drawer = document.getElementById('drawer');
-      if (drawer && drawer.classList.contains('active')) toggleMenu();
-      document.getElementById(id || 'modalTermos').classList.add('active');
-    }
-
-    function abrirModalPremium(id) {
-      if (!isPremium) { abrirPaywall(); return; }
-      abrirModalTermos(id);
-      // Renderiza o conteúdo do modal após abrir
-      if (id === 'modalMetas') renderMetas();
-      if (id === 'modalMala') renderMala();
-    }
-
-    function fecharModalTermos(id) {
-      document.getElementById(id || 'modalTermos').classList.remove('active');
-    }
-
-    // Fechar modal de termos clicando fora do card
-    document.querySelectorAll('.modal-termos-overlay').forEach(el => {
-      el.addEventListener('click', function(e) {
-        if (e.target === el) el.classList.remove('active');
-      });
-    });
-
-    function confirmarReset() {
-      if (confirm("⚠️ ATENÇÃO: Deseja realmente resetar o aplicativo?\n\nIsso apagará todas as atividades, itens do orçamento e configurações salvas.")) {
-        localStorage.removeItem('flowi_disney_user_data');
-        location.reload();
-      }
-    }
-
-    async function carregar() {
-      // PASSO 1 — Dados locais → render imediato, zero delay.
+    function carregar() {
       const saved = localStorage.getItem('flowi_disney_user_data');
-      let dadosLocais = null;
       if (saved) {
-        try { dadosLocais = JSON.parse(saved); } catch(e) {}
+        try { appData = { ...appData, ...JSON.parse(saved) }; } catch(e) {}
       }
-      if (dadosLocais) appData = { ...appData, ...dadosLocais };
-      if (!appData.metas) appData.metas = { mesInicio: '' };
-      if (!appData.cronograma) appData.cronograma = [];
-      if (!appData.mala) appData.mala = [];
-      if (!appData.compras) appData.compras = [];
-      if (!appData.transporte) appData.transporte = { modo: 'carro', trajetos: [] };
 
-      isPremium = localStorage.getItem('flowi_is_premium') === 'true';
-
-      // Renderiza IMEDIATAMENTE com dados locais — usuário nunca vê tela em branco.
-      atualizarInterfaceState();
-      renderTabs();
       carregarInputsConfig();
-      renderAllData();
-      iniciarContador();
-
-      // PASSO 2 — Verificação e sincronização em background, completamente silenciosa.
-      // Nenhuma parte deste bloco toca na UI enquanto estiver carregando.
-      const emailSalvo = localStorage.getItem('flowi_hub_email');
-      if (!emailSalvo || !supabaseClient) return;
-
-      // Snapshot do estado atual para comparar depois
-      const snapshotAntes = JSON.stringify(appData);
-      const premiumAntes = isPremium;
-
-      try {
-        // Verifica licença em background
-        const { data: licenca } = await supabaseClient
-          .from('licencas_flowi')
-          .select('ativo')
-          .eq('email', emailSalvo.toLowerCase().trim())
-          .eq('produto', PRODUTO_ID)
-          .eq('ativo', true)
-          .maybeSingle();
-
-        if (licenca && !isPremium) {
-          isPremium = true;
-          localStorage.setItem('flowi_is_premium', 'true');
-        }
-
-        // Sincroniza dados com nuvem se for Premium
-        if (isPremium) {
-          await sincronizarComNuvem(emailSalvo, dadosLocais);
-        }
-      } catch(e) {
-        console.warn('Erro na sincronização em background:', e);
-      }
-
-      // Só atualiza a UI se algo mudou de verdade — sem flash desnecessário
-      const mudouPremium = isPremium !== premiumAntes;
-      const mudouDados = JSON.stringify(appData) !== snapshotAntes;
-
-      if (mudouPremium) {
-        atualizarInterfaceState();
-        renderTabs();
-      }
-      if (mudouDados) {
-        carregarInputsConfig();
-        renderAllData();
-      }
+      renderTabs();
+      renderDashboardCalculos();
+      renderOrcamento();
     }
-
-    async function sincronizarComNuvem(email, dadosLocais) {
-      try {
-        const { data: registroNuvem } = await supabaseClient
-          .from('dados_flowi')
-          .select('dados, atualizado_em')
-          .eq('email', email.toLowerCase().trim())
-          .eq('produto', PRODUTO_ID)
-          .maybeSingle();
-
-        if (!registroNuvem) {
-          // Primeira vez ficando Premium: sobe os dados locais que já
-          // existirem (virada Free → Premium), sem perguntar nada.
-          if (dadosLocais) await salvarNaNuvem(email, appData);
-          return;
-        }
-
-        const dadosDaNuvem = registroNuvem.dados;
-        const localTemDados = dadosLocais && Object.keys(dadosLocais).length > 0;
-
-        if (!localTemDados) {
-          // Aparelho novo sem dados locais: usa a nuvem diretamente.
-          appData = { ...appData, ...dadosDaNuvem };
-          localStorage.setItem('flowi_disney_user_data', JSON.stringify(appData));
-          return;
-        }
-
-        // Nuvem sempre prevalece — garante consistência entre aparelhos sem
-        // interromper o usuário com confirmações confusas. O localStorage
-        // anterior fica sobrescrito, mas a nuvem é a fonte confiável porque
-        // é ela que recebe cada edição em tempo real (com debounce).
-        appData = { ...appData, ...dadosDaNuvem };
-        localStorage.setItem('flowi_disney_user_data', JSON.stringify(appData));
-
-      } catch (e) {
-        console.warn('Erro ao sincronizar com a nuvem:', e);
-      }
-    }
-
-    async function salvarNaNuvem(email, dados) {
-      if (!supabaseClient) return;
-      try {
-        const { data, error } = await supabaseClient
-          .from('dados_flowi')
-          .upsert(
-            {
-              email: email.toLowerCase().trim(),
-              produto: PRODUTO_ID,
-              dados: dados,
-              atualizado_em: new Date().toISOString(),
-            },
-            { onConflict: 'email,produto' },
-          )
-          .select('atualizado_em')
-          .maybeSingle();
-
-        if (error) throw error;
-        if (data) ultimaSincronizacaoNuvem = data.atualizado_em;
-      } catch (e) {
-        console.warn('Erro ao salvar na nuvem:', e);
-      }
-    }
-
-    let debounceSincronizacao = null;
 
     function salvar() {
       localStorage.setItem('flowi_disney_user_data', JSON.stringify(appData));
       renderDashboardCalculos();
-
-      // Se Premium, sincroniza com a nuvem automaticamente (com pequeno
-      // atraso para agrupar edições rápidas em sequência numa só chamada).
-      const emailSalvo = localStorage.getItem('flowi_hub_email');
-      if (isPremium && emailSalvo && supabaseClient) {
-        clearTimeout(debounceSincronizacao);
-        debounceSincronizacao = setTimeout(() => {
-          salvarNaNuvem(emailSalvo, appData);
-        }, 400);
-      }
     }
 
     function renderTabs() {
@@ -1306,33 +400,10 @@
       TABS_CONFIG.forEach(tab => {
         const btn = document.createElement('button');
         btn.className = `tab-btn ${activeTabId === tab.id ? 'active' : ''}`;
-        if (tab.premium && !isPremium) {
-          btn.innerHTML = `<span>🔒</span> ${tab.label}`;
-          btn.onclick = () => abrirPaywall();
-        } else {
-          btn.innerHTML = tab.label;
-          btn.onclick = () => switchTab(tab.id);
-        }
+        btn.innerHTML = tab.label;
+        btn.onclick = () => switchTab(tab.id);
         nav.appendChild(btn);
       });
-
-      // Injeta botão de exportar PDF no início de cada aba (só Premium)
-      if (isPremium) {
-        TABS_CONFIG.forEach(tab => {
-          const el = document.getElementById(`tab-${tab.id}`);
-          if (!el) return;
-          // Remove botão anterior se existir
-          const anterior = el.querySelector('.btn-exportar-aba');
-          if (anterior) anterior.remove();
-          // Cria novo botão
-          const btnExp = document.createElement('button');
-          btnExp.className = 'btn-exportar-aba';
-          btnExp.innerHTML = '📄 Exportar esta aba em PDF';
-          btnExp.style.cssText = 'display:block;margin:0 0 16px auto;background:none;border:1px solid var(--border-color);border-radius:8px;padding:6px 14px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;';
-          btnExp.onclick = () => exportarPDF(tab.id);
-          el.insertBefore(btnExp, el.firstChild);
-        });
-      }
     }
 
     function switchTab(id) {
@@ -1342,50 +413,7 @@
       const target = document.getElementById(`tab-${id}`);
       if (target) target.classList.add('active');
 
-      if (id === 'transporte') calcularTransporte();
-      if (id === 'metas') renderMetas();
-      if (id === 'cronograma') renderCronograma();
-      if (id === 'mala') renderMala();
-    }
-
-    function atualizarInterfaceState() {
-      const badge = document.getElementById('badgePlan');
-      const btnHeader = document.getElementById('btnHeaderAction');
-      const alertFree = document.getElementById('alertFreeData');
-      const cardOffline = document.getElementById('cardSalvarOffline');
-      const promoD1 = document.getElementById('promoRoteiroD1');
-      const promoOrc = document.getElementById('promoOrcamentoFree');
-      const cardVisualizacaoMoeda = document.getElementById('cardVisualizacaoMoeda');
-      const kpiTotalBrlSub = document.getElementById('kpiTotalBrlSub');
-
-      if (isPremium) {
-        badge.className = 'badge-plan badge-premium';
-        badge.textContent = 'PREMIUM';
-        btnHeader.textContent = 'Meus Flowis';
-        btnHeader.onclick = () => window.location.href = 'https://tryflowi.github.io/hub.html';
-        alertFree.style.display = 'none';
-        if (cardOffline) cardOffline.style.display = 'none';
-        if (promoD1) promoD1.style.display = 'none';
-        if (promoOrc) promoOrc.style.display = 'none';
-        if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none';
-        if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Total lançado';
-        const btnPDF = document.getElementById('btnExportarPDF');
-        if (btnPDF) btnPDF.style.display = 'inline-flex';
-      } else {
-        badge.className = 'badge-plan badge-free';
-        badge.textContent = 'FREE';
-        btnHeader.textContent = 'Garantir Premium R$ 15,90';
-        btnHeader.onclick = () => irParaCompraPremium();
-        alertFree.style.display = 'flex';
-        if (cardOffline) cardOffline.style.display = 'block';
-        if (promoD1) promoD1.style.display = 'block';
-        if (promoOrc) promoOrc.style.display = 'block';
-        if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none';
-        if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Total lançado em Reais';
-      }
-
-      atualizarDiaSemanaForm();
-      renderAlertasPrazo();
+      if (id === 'inicio') renderDashboardCalculos();
     }
 
     function carregarInputsConfig() {
@@ -1394,8 +422,6 @@
       document.getElementById('cfgEndDate').value = appData.config.endDate || '';
       document.getElementById('cfgTravelers').value = appData.config.travelers || 1;
       document.getElementById('cfgDollarRate').value = appData.config.dollarRate || 5.20;
-      document.getElementById('budRate').value = appData.config.dollarRate || 5.20;
-      atualizarHeaderTitles();
     }
 
     function salvarConfig() {
@@ -1404,1614 +430,176 @@
       appData.config.endDate = document.getElementById('cfgEndDate').value;
       appData.config.travelers = parseInt(document.getElementById('cfgTravelers').value) || 1;
       appData.config.dollarRate = parseFloat(document.getElementById('cfgDollarRate').value) || 5.20;
-      atualizarHeaderTitles();
       salvar();
-      renderRoteiroCronologico();
-      renderMetas();
-      renderAlertasPrazo();
-      // Não chama renderDashboardCalculos aqui para preservar o estado
-      // dos botões 💱 nos cards de categoria ao editar a cotação.
     }
 
-    function atualizarHeaderTitles() {
-      document.getElementById('displayTripTitle').textContent = appData.config.tripName || 'Minha Viagem Disney';
-      document.getElementById('displayTravelersCount').textContent = appData.config.travelers || 1;
-    }
-
-    function iniciarContador() {
-      setInterval(() => {
-        if (!appData.config.startDate) return;
-        const target = new Date(appData.config.startDate + 'T00:00:00');
-        const now = new Date();
-        const diff = target - now;
-        if (diff <= 0) return;
-        document.getElementById('cntDays').textContent = Math.floor(diff / (1000 * 60 * 60 * 24));
-        document.getElementById('cntHours').textContent = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        document.getElementById('cntMins').textContent = Math.floor((diff / 1000 / 60) % 60);
-      }, 1000);
-    }
-
-    function formatarDataBR(dataIso) {
-      if(!dataIso) return '';
-      const partes = dataIso.split('-');
-      return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    }
-
-    function obterDiaSemana(dataIso) {
-      if (!dataIso) return '';
-      const dias = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-      const data = new Date(dataIso + 'T00:00:00');
-      return dias[data.getDay()];
-    }
-
-    function atualizarDiaSemanaForm() {
-      const el = document.getElementById('actDiaSemana');
-      if (!el) return;
-      const dataVal = document.getElementById('actDate').value;
-      if (isPremium && dataVal) {
-        el.textContent = '📅 ' + obterDiaSemana(dataVal);
-        el.style.display = 'block';
-      } else {
-        el.style.display = 'none';
-      }
-    }
-
-    /* --- LÓGICA DE ENTRADA DO FORMULÁRIO (USD -> BRL) --- */
-    function toggleFormularioEstrangeiro() {
-      const isEstrangeiro = isPremium && document.querySelector('input[name="budType"]:checked').value === 'estrangeiro';
-
-      document.getElementById('groupBudBrl').style.display = isEstrangeiro ? 'none' : 'flex';
-      document.getElementById('groupBudUsd').style.display = isEstrangeiro ? 'flex' : 'none';
-      document.getElementById('groupBudRate').style.display = isEstrangeiro ? 'flex' : 'none';
-      document.getElementById('brlPreviewBox').style.display = isEstrangeiro ? 'block' : 'none';
-
-      if (isEstrangeiro && !document.getElementById('budRate').value) {
-        document.getElementById('budRate').value = appData.config.dollarRate || 5.20;
-      }
-      calcularPreviewBRL();
-    }
-
-    function calcularPreviewBRL() {
-      const isEstrangeiro = document.querySelector('input[name="budType"]:checked').value === 'estrangeiro';
-      if (!isEstrangeiro) return;
-
-      const usd = parseFloat(document.getElementById('budAmountUsd').value) || 0;
-      const rate = parseFloat(document.getElementById('budRate').value) || appData.config.dollarRate || 5.20;
-      
-      const brlConverted = usd * rate;
-      document.getElementById('brlPreviewValue').textContent = `R$ ${formatarBRL(brlConverted)}`;
+    function togglePagoInput() {
+      const status = document.getElementById('budStatus').value;
+      document.getElementById('groupPaidBrl').style.display = status === 'Pago' ? 'flex' : 'none';
     }
 
     function salvarOrcamento() {
-      const editId = document.getElementById('budEditId').value;
       const desc = document.getElementById('budDesc').value.trim();
-      const amountBrl = parseFloat(document.getElementById('budAmountBrl').value) || 0;
+      const amount = parseFloat(document.getElementById('budAmountBrl').value) || 0;
+      const cat = document.getElementById('budCategory').value;
+      const status = document.getElementById('budStatus').value;
+      const paid = status === 'Pago' ? (parseFloat(document.getElementById('budPaidBrl').value) || amount) : 0;
 
-      if (!desc || amountBrl <= 0) return alert('Informe a descrição e o valor em Reais (BRL).');
-
-      let category = 'Outros';
-      let paidBrl = 0;
-      let status = 'Pendente';
-
-      if (isPremium) {
-        category = document.getElementById('budCategory')?.value || 'Outros';
-        paidBrl = parseFloat(document.getElementById('budPaidBrl')?.value) || 0;
-        const statusRadio = document.querySelector('input[name="budStatus"]:checked');
-        status = statusRadio ? statusRadio.value : 'Pendente';
+      if (!desc || amount <= 0) {
+        alert("Preencha a descrição e o valor estimado.");
+        return;
       }
 
-      if (editId) {
-        const item = appData.budgetItems.find(i => String(i.id) === String(editId));
-        if (item) {
-          item.desc = desc;
-          item.amountBrl = amountBrl;
-          item.category = category;
-          item.paidBrl = paidBrl;
-          item.status = status;
-        }
-      } else {
-        appData.budgetItems.push({ id: Date.now(), desc, category, amountBrl, paidBrl, status });
-      }
+      appData.budgetItems.push({ id: Date.now(), desc, amountBrl: amount, category: cat, status, paidBrl: paid });
+      
+      document.getElementById('budDesc').value = '';
+      document.getElementById('budAmountBrl').value = '';
+      document.getElementById('budPaidBrl').value = '';
 
       salvar();
       renderOrcamento();
-      renderMetas();
-      cancelarEdicaoOrcamento();
-      // Fecha o formulário após salvar
-      const formBody = document.getElementById('budFormBody');
-      if (formBody) formBody.style.display = 'none';
-      const toggleBtn = document.getElementById('budFormToggle');
-      if (toggleBtn) toggleBtn.textContent = '+ Adicionar item ao orçamento';
-    }
-
-    function editarOrcamento(id) {
-      const item = appData.budgetItems.find(i => String(i.id) === String(id));
-      if (!item) return;
-      document.getElementById('budEditId').value = item.id;
-      document.getElementById('budDesc').value = item.desc;
-      document.getElementById('budAmountBrl').value = item.amountBrl || 0;
-      if (isPremium) {
-        const catEl = document.getElementById('budCategory');
-        if (catEl) catEl.value = item.category || 'Outros';
-        const paidEl = document.getElementById('budPaidBrl');
-        if (paidEl) paidEl.value = item.paidBrl || '';
-        const radios = document.querySelectorAll('input[name="budStatus"]');
-        radios.forEach(r => {
-          r.checked = r.value === (item.status || 'Pendente');
-        });
-        // Mostra/oculta campo valor pago conforme status
-        const paidGroup = document.getElementById('budPaidGroup');
-        if (paidGroup) paidGroup.style.display = item.status === 'Pago' ? 'block' : 'none';
-      }
-      const cancelBtn = document.getElementById('btnBudCancel');
-      const submitBtn = document.getElementById('btnBudSubmit');
-      if (cancelBtn) cancelBtn.style.display = 'inline-block';
-      if (submitBtn) submitBtn.textContent = 'Salvar Alterações';
-      toggleFormOrcamento(true);
-      window.scrollTo({ top: document.getElementById('tab-orcamento').offsetTop - 20, behavior: 'smooth' });
-    }
-
-    function cancelarEdicaoOrcamento() {
-      document.getElementById('budEditId').value = '';
-      document.getElementById('budDesc').value = '';
-      document.getElementById('budAmountBrl').value = '';
-      const paidEl = document.getElementById('budPaidBrl');
-      if (paidEl) paidEl.value = '';
-      const catEl = document.getElementById('budCategory');
-      if (catEl) catEl.value = 'Passagens';
-      const radios = document.querySelectorAll('input[name="budStatus"]');
-      if (radios.length) radios[0].checked = true;
-      const cancelBtn = document.getElementById('btnBudCancel');
-      const submitBtn = document.getElementById('btnBudSubmit');
-      if (cancelBtn) cancelBtn.style.display = 'none';
-      if (submitBtn) submitBtn.textContent = 'Salvar';
-      toggleFormOrcamento(false);
-    }
-
-    function toggleStatusOrcamento(id) {
-      if (!isPremium) { abrirPaywall(); return; }
-      const item = appData.budgetItems.find(i => i.id === id);
-      if (item) {
-        item.status = item.status === 'Pago' ? 'Pendente' : 'Pago';
-        if (item.status === 'Pago' && (!item.paidBrl || item.paidBrl === 0)) {
-          item.paidBrl = item.amountBrl;
-        }
-        salvar();
-        renderOrcamento();
-      }
     }
 
     function removerOrcamento(id) {
       appData.budgetItems = appData.budgetItems.filter(i => i.id !== id);
       salvar();
       renderOrcamento();
-      renderMetas();
     }
-
-    function onStatusChange(radio) {
-      const paidGroup = document.getElementById('budPaidGroup');
-      const paidInput = document.getElementById('budPaidBrl');
-      if (!paidGroup || !paidInput) return;
-      if (radio.value === 'Pago') {
-        paidGroup.style.display = 'block';
-        // Pré-popula com o valor estimado se o campo estiver vazio
-        if (!paidInput.value) {
-          const estimado = document.getElementById('budAmountBrl')?.value;
-          if (estimado) paidInput.value = estimado;
-        }
-      } else {
-        paidGroup.style.display = 'none';
-        paidInput.value = '';
-      }
-    }
-
-    function toggleFormOrcamento(forcarAbrir) {
-      const body = document.getElementById('budFormBody');
-      const icon = document.getElementById('budFormToggleIcon');
-      const toggle = document.getElementById('budFormToggle');
-      if (!body) return;
-      const abrir = forcarAbrir !== undefined ? forcarAbrir : body.style.display === 'none';
-      body.style.display = abrir ? 'block' : 'none';
-      if (icon) icon.textContent = abrir ? '▲' : '▼';
-      if (toggle) toggle.querySelector('span').textContent = abrir ? '− Fechar formulário' : '+ Adicionar item ao orçamento';
-      // Mostra campos premium ou free
-      const campoPremium = document.getElementById('budCamposPremium');
-      const promoFree = document.getElementById('promoOrcamentoFree');
-      if (campoPremium) campoPremium.style.display = isPremium ? 'block' : 'none';
-      if (promoFree) promoFree.style.display = isPremium ? 'none' : 'block';
-    }
-
-    function toggleFormRoteiro(forcarAbrir) {
-      const body = document.getElementById('actFormBody');
-      const icon = document.getElementById('actFormToggleIcon');
-      const toggle = document.getElementById('actFormToggle');
-      if (!body) return;
-      const abrir = forcarAbrir !== undefined ? forcarAbrir : body.style.display === 'none';
-      body.style.display = abrir ? 'block' : 'none';
-      if (icon) icon.textContent = abrir ? '▲' : '▼';
-      if (toggle) toggle.querySelector('span').textContent = abrir ? '− Fechar formulário' : '+ Adicionar atividade ao roteiro';
-    }
-
-    // ID do dia expandido no roteiro (para expandir só o dia certo ao editar)
-    let _diaExpandidoId = null;
 
     function renderOrcamento() {
       const container = document.getElementById('orcamentoLista');
-      container.innerHTML = '';
+      if (!container) return;
 
       if (appData.budgetItems.length === 0) {
-        container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">Nenhum item orçado ainda. Clique em "+ Adicionar" acima para começar.</div>';
+        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:20px;">Nenhum item cadastrado.</div>`;
         return;
       }
 
-      if (!isPremium) {
-        // Free: lista simples, sem agrupamento
-        const itens = [...appData.budgetItems].sort((a, b) => (a.desc || '').localeCompare(b.desc || '', 'pt'));
-        itens.forEach(item => {
-          const row = document.createElement('div');
-          row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border-color);font-size:13px;gap:8px;';
-          row.innerHTML = `
-            <strong style="flex:1;">${item.desc}</strong>
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-weight:700;color:var(--brand-primary);">R$ ${formatarBRL(item.amountBrl)}</span>
-              <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
-              <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
-            </div>
-          `;
-          container.appendChild(row);
-        });
-        return;
-      }
+      let html = `<table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border-color);text-align:left;">
+            <th style="padding:8px;">Item</th>
+            <th style="padding:8px;">Categoria</th>
+            <th style="padding:8px;">Orçado</th>
+            <th style="padding:8px;">Status</th>
+            <th style="padding:8px;">Pago</th>
+            <th style="padding:8px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>`;
 
-      // Premium: agrupa por categoria em accordion, minimizado, alfabético
-      const ordemCats = ['Passagens','Hospedagem','Parques e Ingressos','Alimentação','Compras','Outros'];
-      const porCat = {};
-      appData.budgetItems.forEach(item => {
-        const cat = item.category || 'Outros';
-        if (!porCat[cat]) porCat[cat] = [];
-        porCat[cat].push(item);
+      appData.budgetItems.forEach(i => {
+        html += `<tr style="border-bottom:1px solid var(--border-color);">
+          <td style="padding:8px;font-weight:600;">${i.desc}</td>
+          <td style="padding:8px;">${i.category}</td>
+          <td style="padding:8px;">${formatarBRL(i.amountBrl)}</td>
+          <td style="padding:8px;"><span class="badge-status ${i.status === 'Pago' ? 'status-pago' : 'status-pendente'}">${i.status}</span></td>
+          <td style="padding:8px;">${formatarBRL(i.paidBrl || 0)}</td>
+          <td style="padding:8px;"><button class="btn-action-icon" onclick="removerOrcamento(${i.id})">🗑️</button></td>
+        </tr>`;
       });
 
-      // Ordena categorias pela ordem padrão, colocando as demais no final
-      const cats = [...new Set([...ordemCats, ...Object.keys(porCat)])].filter(c => porCat[c]);
-
-      cats.forEach((cat, idx) => {
-        const itens = [...porCat[cat]].sort((a, b) => (a.desc || '').localeCompare(b.desc || '', 'pt'));
-        const totalCat = itens.reduce((s, i) => s + (i.amountBrl || 0), 0);
-        const pagosCat = itens.filter(i => i.status === 'Pago').reduce((s, i) => s + (i.paidBrl || i.amountBrl || 0), 0);
-        const acordId = `catAccord_${idx}`;
-
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = 'border:1px solid var(--border-color);border-radius:10px;margin-bottom:8px;overflow:hidden;';
-
-        // Header do accordion
-        const header = document.createElement('div');
-        header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;background:var(--bg-card);';
-        header.innerHTML = `
-          <div style="display:flex;align-items:center;gap:10px;">
-            <strong style="font-size:14px;font-weight:700;">${cat}</strong>
-            <span style="font-size:11px;color:var(--text-muted);font-weight:400;">${itens.length} ite${itens.length > 1 ? 'ns' : 'm'}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <span style="font-size:12px;font-weight:600;">R$ ${formatarBRL(totalCat)}</span>
-            ${pagosCat > 0 ? `<span style="font-size:11px;color:var(--success);">Pago: R$ ${formatarBRL(pagosCat)}</span>` : ''}
-            <span class="caret-cat" style="font-size:11px;color:var(--text-muted);transition:transform .2s;">▼</span>
-          </div>
-        `;
-
-        // Body do accordion (minimizado por padrão)
-        const body = document.createElement('div');
-        body.id = acordId;
-        body.style.display = 'none';
-
-        header.onclick = () => {
-          const aberto = body.style.display !== 'none';
-          body.style.display = aberto ? 'none' : 'block';
-          header.querySelector('.caret-cat').style.transform = aberto ? 'rotate(0deg)' : 'rotate(180deg)';
-        };
-
-        itens.forEach(item => {
-          const status = item.status || 'Pendente';
-          const row = document.createElement('div');
-          row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid var(--border-color);font-size:13px;gap:8px;';
-          row.innerHTML = `
-            <div style="flex:1;">
-              <span style="font-weight:500;color:var(--text-main);">${item.desc}</span>
-              ${status === 'Pago' ? `<div style="font-size:11px;color:var(--success);">Pago: R$ ${formatarBRL(item.paidBrl || item.amountBrl)}</div>` : ''}
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-weight:600;white-space:nowrap;">R$ ${formatarBRL(item.amountBrl)}</span>
-              <button class="badge-status ${status === 'Pago' ? 'status-pago' : 'status-pendente'}" onclick="toggleStatusOrcamento(${item.id})">${status}</button>
-              <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
-              <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
-            </div>
-          `;
-          body.appendChild(row);
-        });
-
-        wrapper.appendChild(header);
-        wrapper.appendChild(body);
-        container.appendChild(wrapper);
-      });
-    }
-
-    function atualizarMoedaVisualizacao() {
-      if (!isPremium) return;
-      renderDashboardCalculos();
-    }
-
-    /* --- CÁLCULO DAS DASHBOARDS E RESUMOS CONSOLIDADOS --- */
-    function renderDashboardCalculos() {
-      // Salva estado dos botões 💱 antes de re-renderizar os cards de categoria
-      const estadosBotoes = {};
-      document.querySelectorAll('.category-card[id]').forEach(card => {
-        estadosBotoes[card.id] = card.dataset.modo || 'brl';
-      });
-const valorAbaTransporte = (typeof calcularTransporte === 'function') ? calcularTransporte() : 0;
-      let totalBrl = 0;
-      let totalNationalBrl = 0;
-      let totalForeignBrl = 0;
-      let totalUsdEstimated = 0;
-
-      let totalPaidBrl = 0;
-      let totalPendingBrl = 0;
-
-      const catTotalsBrl = {};
-
-      appData.budgetItems.forEach(item => {
-        const brl = item.amountBrl || 0;
-        totalBrl += brl;
-
-        if (item.isEstrangeiro) {
-          totalForeignBrl += brl;
-          totalUsdEstimated += (item.amountUsd || 0);
-        } else {
-          totalNationalBrl += brl;
-        }
-
-        const paid = item.paidBrl || 0;
-        if (item.status === 'Pago') {
-          totalPaidBrl += paid || brl;
-        } else {
-          // Status Pendente: não soma nada no total pago, independente de ter valor pago preenchido
-          totalPendingBrl += brl;
-        }
-
-        const cat = item.category || 'Outros';
-        catTotalsBrl[cat] = (catTotalsBrl[cat] || 0) + brl;
-      });
-// 1. Obtém o valor do transporte em BRL para somar nos totais gerais
-  totalBrl += valorAbaTransporte;
-  totalNationalBrl += valorAbaTransporte;
-
-  // 2. Garante que o totalizador geral em BRL receba a soma correta
-  // (NÃO sobrescreve catTotalsBrl['Transporte'] para preservar o valor original em USD do card)
-  if (!catTotalsBrl['Transporte']) {
-    catTotalsBrl['Transporte'] = valorAbaTransporte;
-  }
-      const travelers = appData.config.travelers || 1;
-      const rate = appData.config.dollarRate || 5.20;
-      const viewCurrencyEl = document.querySelector('input[name="viewCurrency"]:checked');
-      const viewCurrency = (isPremium && viewCurrencyEl) ? viewCurrencyEl.value : 'BRL';
-
-      if (viewCurrency === 'USD') {
-        const totalUsdConsolidado = rate > 0 ? (totalBrl / rate) : 0;
-        const perPersonUsd = rate > 0 ? ((totalBrl / travelers) / rate) : 0;
-        document.getElementById('kpiTotalBrl').textContent = `US$ ${formatarUSD(totalUsdConsolidado)}`;
-        document.getElementById('kpiPerPerson').textContent = `US$ ${formatarUSD(perPersonUsd)}`;
-      } else {
-        document.getElementById('kpiTotalBrl').textContent = `R$ ${formatarBRL(totalBrl)}`;
-        document.getElementById('kpiPerPerson').textContent = `R$ ${formatarBRL(totalBrl / travelers)}`;
-      }
-
-      const paidBox = document.getElementById('kpiTotalPaidContainer');
-      const pendingBox = document.getElementById('kpiTotalPendingContainer');
-      const economiaBox = document.getElementById('kpiEconomiaContainer');
-
-      if (!isPremium) {
-        paidBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
-        pendingBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
-        if (economiaBox) economiaBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
-      } else {
-    // Calcula os valores pagos e pendentes da aba Transporte
-    const transpPago = (typeof calcularTransportePago === 'function') ? calcularTransportePago() : 0;
-    const transpPendente = Math.max(0, valorAbaTransporte - transpPago);
-
-    paidBox.innerHTML = `<div class="kpi-value green">R$ ${formatarBRL(totalPaidBrl + transpPago)}</div>`;
-    pendingBox.innerHTML = `<div class="kpi-value red">R$ ${formatarBRL(totalPendingBrl + transpPendente)}</div>`;
-        // Economia = diferença entre o valor orçado e o valor efetivamente pago nos itens já pagos
-        let totalOrcadoPago = 0;
-        let totalEfetivamentePago = 0;
-        appData.budgetItems.forEach(item => {
-          if (item.status === 'Pago') {
-            totalOrcadoPago += item.amountBrl || 0;
-            totalEfetivamentePago += item.paidBrl || item.amountBrl || 0;
-          }
-        });
-        const economia = Math.max(0, totalOrcadoPago - totalEfetivamentePago);
-        if (economiaBox) {
-          economiaBox.style.color = economia > 0 ? '#16A34A' : '#64748B';
-          economiaBox.textContent = `R$ ${formatarBRL(economia)}`;
-        }
-      }
-
-      const tituloCategoria = document.getElementById('tituloDivisaoCategoria');
-      if (tituloCategoria) {
-        tituloCategoria.textContent = viewCurrency === 'USD'
-          ? 'Divisão por Categoria (Consolidado em USD)'
-          : 'Divisão por Categoria (Consolidado em BRL)';
-      }
-
-      const wrapper = document.getElementById('categoriesWrapper');
-      wrapper.innerHTML = '';
-
-      if (!isPremium) {
-        wrapper.innerHTML = `
-          <div style="background:#F8FAFC; border:1px dashed var(--border-color); padding:20px; border-radius:8px; text-align:center; font-size:13px; color:var(--text-muted);">
-            🔒 <strong>Organização por Categorias exclusiva do Premium</strong><br>
-            Acompanhe a distribuição exata dos gastos em Passagens, Hospedagem, Ingressos, Alimentação e mais.<br>
-            <button onclick="abrirPaywall()" class="btn-submit" style="width:auto; margin-top:12px; padding:8px 16px; font-size:12px;">Desbloquear por R$ 15,90</button>
-          </div>
-        `;
-      } else {
-        const grid = document.createElement('div');
-        grid.className = 'grid-3';
-        const categoriasPadrao = ['Passagens', 'Hospedagem', 'Parques e Ingressos', 'Alimentação', 'Compras', 'Outros'];
-
-        categoriasPadrao.forEach(cat => {
-          const valorBrl = catTotalsBrl[cat] || 0;
-          const card = document.createElement('div');
-          card.className = 'category-card';
-          const cardId = `cat_${cat.replace(/\s+/g,'_')}`;
-          card.id = cardId;
-          card.dataset.brl = valorBrl;
-          card.dataset.modo = 'brl';
-          const podeConverter = ['Alimentação', 'Compras', 'Outros'].includes(cat);
-          card.innerHTML = `
-            <div class="category-name">${cat}</div>
-            <div class="category-amount" id="${cardId}_val">R$ ${formatarBRL(valorBrl)}</div>
-            ${podeConverter && isPremium ? `
-              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Lançado em R$ · cotação R$ ${rate}/US$</div>
-              <button onclick="toggleCategoriaMoeda('${cardId}',${valorBrl},${rate})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>
-            ` : ''}
-          `;
-          grid.appendChild(card);
-        });
-
-        // Transporte: valor em USD da aba Transporte, exibido em BRL por padrão
-        const transpCard = document.createElement('div');
-        transpCard.className = 'category-card';
-        transpCard.id = 'cat_Transporte';
-        const transpUsd = (() => {
-          let manual = 0;
-          if (!appData.transporte) return 0;
-          if (appData.transporte.modo === 'app') {
-            manual = (appData.transporte.trajetos || []).reduce((a, t) => a + (t.valor || 0), 0);
-          } else {
-            const days = parseFloat(document.getElementById('carDays')?.value) || 0;
-            const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
-            const park = parseFloat(document.getElementById('carPark')?.value) || 0;
-            const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
-            manual = days * (daily + park) + fuel;
-          }
-          const doRoteiro = (appData.activities || []).reduce((s, at) =>
-            s + (at.compras || []).filter(c => c.tipo === 'transporte').reduce((a, c) => a + (c.teto || 0), 0), 0);
-          return manual + doRoteiro;
-        })();
-        const transpBrl = transpUsd * rate;
-        transpCard.dataset.modo = 'brl';
-        transpCard.dataset.usdOriginal = transpUsd;
-        transpCard.innerHTML = `
-          <div class="category-name">🚗 Transporte</div>
-          <div class="category-amount" id="cat_Transporte_val">R$ ${formatarBRL(transpBrl)}</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Calculado na aba Transporte · cotação R$ ${rate}/US$</div>
-          ${isPremium ? `<button onclick="toggleCategoriaMoeda('cat_Transporte',${transpBrl},${rate},${transpUsd})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>` : ''}
-        `;
-        grid.appendChild(transpCard);
-        wrapper.appendChild(grid);
-
-        // Restaura estado dos botões 💱 que estavam ativos antes do re-render
-        Object.entries(estadosBotoes).forEach(([id, modo]) => {
-          if (modo === 'usd') {
-            const card = document.getElementById(id);
-            if (!card) return;
-            const valEl = document.getElementById(id + '_val');
-            const btn = card.querySelector('button');
-            if (!valEl || !btn) return;
-            const brl = parseFloat(card.dataset.brl) || 0;
-            // Transporte: usa USD original; outros: divide BRL pela cotação
-            if (id === 'cat_Transporte') {
-              const usdOriginal = parseFloat(card.dataset.usdOriginal) || 0;
-              valEl.textContent = `US$ ${formatarUSD(usdOriginal)}`;
-            } else {
-              const r = appData.config?.dollarRate || 5.20;
-              valEl.textContent = `US$ ${formatarUSD(r > 0 ? brl / r : 0)}`;
-            }
-            btn.textContent = '💱 ver em R$';
-            card.dataset.modo = 'usd';
-          }
-        });
-      }
-    }
-
-    /* --- METAS DE ECONOMIA (PREMIUM) --- */
-    function salvarMetaConfig() {
-      appData.metas.mesInicio = document.getElementById('metaMesInicio').value;
-      salvar();
-      renderMetas();
-    }
-
-    function calcularTotalOrcadoBrl() {
-      return appData.budgetItems.reduce((acc, item) => acc + (item.amountBrl || 0), 0);
-    }
-
-    function renderMetas() {
-      if (!isPremium) return;
-
-      const metaValorTotalInput = document.getElementById('metaValorTotal');
-      const avisoSemData = document.getElementById('metaAvisoSemData');
-      const cardResumo = document.getElementById('cardResumoMetas');
-      const cardLista = document.getElementById('cardListaMetas');
-      const listaEl = document.getElementById('metasLista');
-
-      const totalOrcado = calcularTotalOrcadoBrl();
-      metaValorTotalInput.value = `R$ ${formatarBRL(totalOrcado)}`;
-
-      document.getElementById('metaMesInicio').value = appData.metas.mesInicio || '';
-
-      const startDateStr = appData.config.startDate;
-
-      if (!startDateStr) {
-        avisoSemData.style.display = 'block';
-        cardResumo.style.display = 'none';
-        cardLista.style.display = 'none';
-        return;
-      }
-      avisoSemData.style.display = 'none';
-
-      const mesInicioStr = appData.metas.mesInicio;
-      if (!mesInicioStr || totalOrcado <= 0) {
-        cardResumo.style.display = 'none';
-        cardLista.style.display = 'none';
-        return;
-      }
-
-      // Data da viagem: primeiro dia do mês da viagem
-      const dataViagem = new Date(startDateStr + 'T00:00:00');
-      const anoViagem = dataViagem.getFullYear();
-      const mesViagem = dataViagem.getMonth(); // 0-indexado
-
-      // Mês de início escolhido (formato "AAAA-MM")
-      const [anoInicioStr, mesInicioNumStr] = mesInicioStr.split('-');
-      const anoInicio = parseInt(anoInicioStr);
-      const mesInicio = parseInt(mesInicioNumStr) - 1; // 0-indexado
-
-      // Quantidade de meses entre o mês de início e o mês da viagem (inclusive)
-      let totalMeses = (anoViagem - anoInicio) * 12 + (mesViagem - mesInicio) + 1;
-
-      if (totalMeses <= 0) {
-        cardResumo.style.display = 'block';
-        cardLista.style.display = 'block';
-        document.getElementById('metaValorMensal').textContent = '--';
-        document.getElementById('metaMesesRestantes').textContent = '0';
-        document.getElementById('metaTotalDisplay').textContent = `R$ ${formatarBRL(totalOrcado)}`;
-        listaEl.innerHTML = `
-          <div style="text-align:center; padding:20px; color:var(--danger); font-size:13px;">
-            ⚠️ O mês de início selecionado é igual ou posterior ao mês da viagem. Escolha um mês anterior para calcular a reserva mensal.
-          </div>
-        `;
-        return;
-      }
-
-      const valorMensal = totalOrcado / totalMeses;
-
-      cardResumo.style.display = 'block';
-      cardLista.style.display = 'block';
-
-      document.getElementById('metaValorMensal').textContent = `R$ ${formatarBRL(valorMensal)}`;
-      document.getElementById('metaMesesRestantes').textContent = totalMeses;
-      document.getElementById('metaTotalDisplay').textContent = `R$ ${formatarBRL(totalOrcado)}`;
-
-      const nomesMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
-      listaEl.innerHTML = '';
-      let acumulado = 0;
-      for (let i = 0; i < totalMeses; i++) {
-        const mesIndex = (mesInicio + i) % 12;
-        const anoAtual = anoInicio + Math.floor((mesInicio + i) / 12);
-        acumulado += valorMensal;
-
-        const linha = document.createElement('div');
-        linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:11px 4px; border-bottom:1px solid var(--border-color); font-size:13px;';
-        linha.innerHTML = `
-          <div><strong>${nomesMeses[mesIndex]} / ${anoAtual}</strong></div>
-          <div style="text-align:right;">
-            <div style="font-weight:700; color:var(--brand-primary);">R$ ${formatarBRL(valorMensal)}</div>
-            <div style="font-size:11px; color:var(--text-muted);">Acumulado: R$ ${formatarBRL(acumulado)}</div>
-          </div>
-        `;
-        listaEl.appendChild(linha);
-      }
-    }
-
-    /* --- CRONOGRAMA DE TAREFAS (PREMIUM) --- */
-    function salvarTarefaCronograma() {
-      const editId = document.getElementById('croEditId').value;
-      const mes = document.getElementById('croMes').value;
-      const titulo = document.getElementById('croTitulo').value.trim();
-      const valor = parseFloat(document.getElementById('croValor').value) || 0;
-
-      if (!mes || !titulo) return alert('Informe o mês/ano e a tarefa.');
-
-      if (editId) {
-        const item = appData.cronograma.find(t => t.id == editId);
-        if (item) { item.mes = mes; item.titulo = titulo; item.valor = valor; }
-      } else {
-        appData.cronograma.push({ id: Date.now(), mes, titulo, valor, feito: false });
-      }
-
-      salvar();
-      renderCronograma();
-      renderAlertasPrazo();
-      cancelarEdicaoCronograma();
-    }
-
-    function editarTarefaCronograma(id) {
-      const item = appData.cronograma.find(t => t.id === id);
-      if (!item) return;
-
-      document.getElementById('croEditId').value = item.id;
-      document.getElementById('croMes').value = item.mes;
-      document.getElementById('croTitulo').value = item.titulo;
-      document.getElementById('croValor').value = item.valor || '';
-
-      document.getElementById('croFormTitle').textContent = 'Editar Tarefa do Cronograma';
-      document.getElementById('btnCroSubmit').textContent = 'Salvar Alterações';
-      document.getElementById('btnCroCancel').style.display = 'block';
-
-      window.scrollTo({ top: document.getElementById('tab-cronograma').offsetTop - 20, behavior: 'smooth' });
-    }
-
-    function cancelarEdicaoCronograma() {
-      document.getElementById('croEditId').value = '';
-      document.getElementById('croMes').value = '';
-      document.getElementById('croTitulo').value = '';
-      document.getElementById('croValor').value = '';
-
-      document.getElementById('croFormTitle').textContent = 'Adicionar Tarefa ao Cronograma';
-      document.getElementById('btnCroSubmit').textContent = 'Adicionar ao Cronograma';
-      document.getElementById('btnCroCancel').style.display = 'none';
-    }
-
-    function toggleTarefaCronograma(id) {
-      const item = appData.cronograma.find(t => t.id === id);
-      if (item) {
-        item.feito = !item.feito;
-        salvar();
-        renderCronograma();
-        renderAlertasPrazo();
-      }
-    }
-
-    function removerTarefaCronograma(id) {
-      if (confirm('Deseja excluir esta tarefa do cronograma?')) {
-        appData.cronograma = appData.cronograma.filter(t => t.id !== id);
-        salvar();
-        renderCronograma();
-        renderAlertasPrazo();
-      }
-    }
-
-    function toggleCategoriaMoeda(cardId, valorBrl, rate, valorUsdOriginal) {
-      const card = document.getElementById(cardId);
-      const valEl = document.getElementById(cardId + '_val');
-      const btn = card?.querySelector('button');
-      if (!card || !valEl) return;
-      const modo = card.dataset.modo || 'brl';
-      if (modo === 'brl') {
-        // Se tem valor USD original (ex: Transporte), usa ele direto; senão converte
-        const usd = valorUsdOriginal !== undefined ? valorUsdOriginal : (rate > 0 ? valorBrl / rate : 0);
-        valEl.textContent = `US$ ${formatarUSD(usd)}`;
-        if (btn) btn.textContent = '💱 ver em R$';
-        card.dataset.modo = 'usd';
-      } else {
-        valEl.textContent = `R$ ${formatarBRL(valorBrl)}`;
-        if (btn) btn.textContent = '💱 ver em US$';
-        card.dataset.modo = 'brl';
-      }
-    }
-
-    function renderCronograma() {
-      if (!isPremium) return;
-
-      const container = document.getElementById('cronogramaLista');
-      if (!container) return;
-      container.innerHTML = '';
-
-      if (appData.cronograma.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Nenhuma tarefa cadastrada. Adicione a primeira acima.</div>';
-        return;
-      }
-
-      const nomesMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
-      const ordenado = [...appData.cronograma].sort((a, b) => a.mes.localeCompare(b.mes));
-
-      const agrupado = {};
-      ordenado.forEach(item => {
-        if (!agrupado[item.mes]) agrupado[item.mes] = [];
-        agrupado[item.mes].push(item);
-      });
-
-      Object.keys(agrupado).sort().forEach(mesStr => {
-        const [anoStr, mesNumStr] = mesStr.split('-');
-        const mesNome = nomesMeses[parseInt(mesNumStr) - 1];
-
-        const grupo = document.createElement('div');
-        grupo.style.cssText = 'margin-bottom:18px;';
-        grupo.innerHTML = `<div style="font-weight:700; font-size:13px; color:var(--brand-primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border-color);">${mesNome} / ${anoStr}</div>`;
-
-        agrupado[mesStr].forEach(item => {
-          const linha = document.createElement('div');
-          linha.style.cssText = 'display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid #F1F5F9;';
-          linha.innerHTML = `
-            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggleTarefaCronograma(${item.id})" style="width:18px; height:18px; accent-color:var(--brand-primary); flex-shrink:0;">
-            <div style="flex:1; font-size:14px; ${item.feito ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${item.titulo}</div>
-            ${item.valor ? `<span style="font-size:12px;font-weight:600;color:var(--brand-primary);white-space:nowrap;">R$ ${formatarBRL(item.valor)}</span>` : ''}
-            <button class="btn-action-icon" onclick="editarTarefaCronograma(${item.id})">✏️</button>
-            <button class="btn-action-icon" style="color:var(--danger);" onclick="removerTarefaCronograma(${item.id})">🗑️</button>
-          `;
-          grupo.appendChild(linha);
-        });
-
-        container.appendChild(grupo);
-      });
-    }
-
-    /* --- CHECKLIST DE MALA (PREMIUM) --- */
-    function salvarItemMala() {
-      const editId = document.getElementById('malaEditId').value;
-      const categoria = document.getElementById('malaCategoria').value;
-      const item = document.getElementById('malaItem').value.trim();
-
-      if (!item) return alert('Informe o nome do item.');
-
-      if (editId) {
-        const existente = appData.mala.find(m => m.id == editId);
-        if (existente) { existente.categoria = categoria; existente.item = item; }
-      } else {
-        appData.mala.push({ id: Date.now(), categoria, item, feito: false });
-      }
-
-      salvar();
-      renderMala();
-      cancelarEdicaoMala();
-    }
-
-    function editarItemMala(id) {
-      const item = appData.mala.find(m => m.id === id);
-      if (!item) return;
-
-      document.getElementById('malaEditId').value = item.id;
-      document.getElementById('malaCategoria').value = item.categoria;
-      document.getElementById('malaItem').value = item.item;
-
-      document.getElementById('malaFormTitle').textContent = 'Editar Item da Mala';
-      document.getElementById('btnMalaSubmit').textContent = 'Salvar Alterações';
-      document.getElementById('btnMalaCancel').style.display = 'block';
-
-      window.scrollTo({ top: document.getElementById('tab-mala').offsetTop - 20, behavior: 'smooth' });
-    }
-
-    function cancelarEdicaoMala() {
-      document.getElementById('malaEditId').value = '';
-      document.getElementById('malaCategoria').value = 'Documentos';
-      document.getElementById('malaItem').value = '';
-
-      document.getElementById('malaFormTitle').textContent = 'Adicionar Item à Mala';
-      document.getElementById('btnMalaSubmit').textContent = 'Adicionar à Mala';
-      document.getElementById('btnMalaCancel').style.display = 'none';
-    }
-
-    function toggleItemMala(id) {
-      const item = appData.mala.find(m => m.id === id);
-      if (item) {
-        item.feito = !item.feito;
-        salvar();
-        renderMala();
-      }
-    }
-
-    function removerItemMala(id) {
-      if (confirm('Deseja excluir este item da mala?')) {
-        appData.mala = appData.mala.filter(m => m.id !== id);
-        salvar();
-        renderMala();
-      }
-    }
-
-    function renderMala() {
-      if (!isPremium) return;
-
-      const container = document.getElementById('malaLista');
-      if (!container) return;
-      container.innerHTML = '';
-
-      const totalItens = appData.mala.length;
-      const totalFeitos = appData.mala.filter(m => m.feito).length;
-      const pct = totalItens > 0 ? Math.round((totalFeitos / totalItens) * 100) : 0;
-
-      document.getElementById('malaProgressoTexto').textContent = `${pct}% embalado`;
-      document.getElementById('malaBarraFill').style.width = pct + '%';
-
-      if (totalItens === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Nenhum item adicionado ainda. Adicione o primeiro acima.</div>';
-        return;
-      }
-
-      const categoriasOrdem = ['Documentos', 'Roupas', 'Eletrônicos', 'Itens de Parque', 'Higiene e Saúde', 'Outros'];
-      const iconesCategoria = {
-        'Documentos': '📄', 'Roupas': '👕', 'Eletrônicos': '🔌',
-        'Itens de Parque': '🎢', 'Higiene e Saúde': '🧴', 'Outros': '📦'
-      };
-
-      const agrupado = {};
-      appData.mala.forEach(item => {
-        if (!agrupado[item.categoria]) agrupado[item.categoria] = [];
-        agrupado[item.categoria].push(item);
-      });
-
-      categoriasOrdem.forEach(cat => {
-        if (!agrupado[cat]) return;
-        const itensCategoria = agrupado[cat];
-        const feitosCategoria = itensCategoria.filter(i => i.feito).length;
-
-        const grupo = document.createElement('div');
-        grupo.style.cssText = 'margin-bottom:18px;';
-        grupo.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:13px; color:var(--brand-primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border-color);">
-            <span>${iconesCategoria[cat] || '📦'} ${cat}</span>
-            <span style="color:var(--text-muted); font-weight:600; text-transform:none; letter-spacing:0;">${feitosCategoria}/${itensCategoria.length}</span>
-          </div>
-        `;
-
-        itensCategoria.forEach(item => {
-          const linha = document.createElement('div');
-          linha.style.cssText = 'display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid #F1F5F9;';
-          linha.innerHTML = `
-            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggleItemMala(${item.id})" style="width:18px; height:18px; accent-color:var(--brand-primary); flex-shrink:0;">
-            <div style="flex:1; font-size:14px; ${item.feito ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${item.item}</div>
-            <button class="btn-action-icon" onclick="editarItemMala(${item.id})">✏️</button>
-            <button class="btn-action-icon" style="color:var(--danger);" onclick="removerItemMala(${item.id})">🗑️</button>
-          `;
-          grupo.appendChild(linha);
-        });
-
-        container.appendChild(grupo);
-      });
-    }
-
-    /* --- ALERTAS DE PRAZO (PREMIUM) --- */
-    function renderAlertasPrazo() {
-      const card = document.getElementById('cardAlertasPrazo');
-      const lista = document.getElementById('alertasPrazoLista');
-      if (!card || !lista) return;
-
-      if (!isPremium) {
-        card.style.display = 'none';
-        return;
-      }
-
-      const hoje = new Date();
-      const mesAtualStr = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
-
-      const nomesMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
-      // Tarefas do cronograma vencidas (mês já passou) e não concluídas
-      const atrasadas = appData.cronograma.filter(t => !t.feito && t.mes < mesAtualStr);
-
-      // Tarefas do mês atual, não concluídas
-      const desteMs = appData.cronograma.filter(t => !t.feito && t.mes === mesAtualStr);
-
-      const alertas = [];
-
-      if (atrasadas.length > 0) {
-        alertas.push({
-          tipo: 'atrasado',
-          texto: `${atrasadas.length} tarefa${atrasadas.length > 1 ? 's' : ''} do cronograma está${atrasadas.length > 1 ? 'ão' : ''} atrasada${atrasadas.length > 1 ? 's' : ''}: ${atrasadas.map(t => t.titulo).join(', ')}`
-        });
-      }
-
-      if (desteMs.length > 0) {
-        alertas.push({
-          tipo: 'atencao',
-          texto: `${desteMs.length} tarefa${desteMs.length > 1 ? 's' : ''} para concluir este mês: ${desteMs.map(t => t.titulo).join(', ')}`
-        });
-      }
-
-      // Contagem de dias até a viagem, se houver data configurada
-      if (appData.config.startDate) {
-        const dataViagem = new Date(appData.config.startDate + 'T00:00:00');
-        const diffDias = Math.ceil((dataViagem - hoje) / (1000 * 60 * 60 * 24));
-        if (diffDias >= 0 && diffDias <= 60) {
-          alertas.push({
-            tipo: 'info',
-            texto: `Faltam ${diffDias} dia${diffDias !== 1 ? 's' : ''} para a viagem — hora de revisar cronograma e checklist de mala.`
-          });
-        }
-      }
-
-      if (alertas.length === 0) {
-        card.style.display = 'none';
-        return;
-      }
-
-      card.style.display = 'block';
-      lista.innerHTML = '';
-
-      alertas.forEach(alerta => {
-        const cores = {
-          atrasado: { bg: '#FEF2F2', border: '#FECACA', color: '#991B1B', icone: '🔴' },
-          atencao: { bg: '#FFFBEB', border: '#FDE68A', color: '#92400E', icone: '🟡' },
-          info: { bg: '#EFF6FF', border: '#BFDBFE', color: '#1E40AF', icone: '🔵' }
-        };
-        const c = cores[alerta.tipo];
-        const div = document.createElement('div');
-        div.style.cssText = `background:${c.bg}; border:1px solid ${c.border}; color:${c.color}; padding:12px 14px; border-radius:8px; font-size:13px; margin-bottom:8px;`;
-        div.innerHTML = `${c.icone} ${alerta.texto}`;
-        lista.appendChild(div);
-      });
-    }
-
-    /* --- OUTRAS FUNÇÕES (ROTEIRO, TRANSPORTE, MODAIS) --- */
-    function salvarAtividade() {
-      const editId = document.getElementById('actEditId').value;
-      const date = document.getElementById('actDate').value;
-      const time = document.getElementById('actTime').value;
-      const title = document.getElementById('actTitle').value;
-      const desc = document.getElementById('actDesc').value;
-
-      if (!date || !title) return alert('Informe a data e o título.');
-
-      if (editId) {
-        const item = appData.activities.find(a => a.id == editId);
-        if (item) { item.date = date; item.time = time; item.title = title; item.desc = desc; }
-        _diaExpandidoId = date; // Mantém o dia expandido após salvar edição
-      } else {
-        appData.activities.push({ id: Date.now(), date, time, title, desc, compras: [] });
-        _diaExpandidoId = date;
-      }
-
-      salvar();
-      renderRoteiroCronologico();
-      cancelarEdicaoAtividade();
-      toggleFormRoteiro(false);
-    }
-
-    function editarAtividade(id) {
-      const item = appData.activities.find(a => a.id === id);
-      if (!item) return;
-
-      document.getElementById('actEditId').value = item.id;
-      document.getElementById('actDate').value = item.date;
-      document.getElementById('actTime').value = item.time;
-      document.getElementById('actTitle').value = item.title;
-      document.getElementById('actDesc').value = item.desc || '';
-
-      const cancelBtn = document.getElementById('btnActCancel');
-      const submitBtn = document.getElementById('btnActSubmit');
-      if (cancelBtn) cancelBtn.style.display = 'inline-block';
-      if (submitBtn) submitBtn.textContent = 'Salvar Alterações';
-      atualizarDiaSemanaForm();
-      _diaExpandidoId = item.date; // Expande só o dia desta atividade
-      toggleFormRoteiro(true);
-      window.scrollTo({ top: document.getElementById('tab-roteiro').offsetTop - 20, behavior: 'smooth' });
-    }
-
-    function cancelarEdicaoAtividade() {
-      document.getElementById('actEditId').value = '';
-      document.getElementById('actDate').value = '';
-      document.getElementById('actTime').value = '09:00';
-      document.getElementById('actTitle').value = '';
-      document.getElementById('actDesc').value = '';
-      const cancelBtn = document.getElementById('btnActCancel');
-      const submitBtn = document.getElementById('btnActSubmit');
-      if (cancelBtn) cancelBtn.style.display = 'none';
-      if (submitBtn) submitBtn.textContent = 'Salvar';
-      atualizarDiaSemanaForm();
-      toggleFormRoteiro(false);
-    }
-
-    function removerAtividade(id) {
-      appData.activities = appData.activities.filter(a => a.id !== id);
-      salvar();
-      renderRoteiroCronologico();
-    }
-
-    function toggleAccordion(headerElem) {
-  headerElem.closest('.day-accordion').classList.toggle('open');
-}
-
-    function renderRoteiroCronologico() {
-      const container = document.getElementById('cronogramaContainer');
-      container.innerHTML = '';
-
-      if (appData.activities.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Nenhuma atividade cadastrada. Adicione itens acima para montar seu roteiro.</div>';
-        return;
-      }
-
-      const atividadesOrdenadas = [...appData.activities].sort((a, b) => {
-        const datetimeA = (a.date || '') + ' ' + (a.time || '00:00');
-        const datetimeB = (b.date || '') + ' ' + (b.time || '00:00');
-        return datetimeA.localeCompare(datetimeB);
-      });
-
-      if (!isPremium) {
-        atividadesOrdenadas.forEach(item => {
-          const card = document.createElement('div');
-          card.style.cssText = 'background:#FFF; border:1px solid var(--border-color); border-radius:8px; padding:12px 16px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; font-size:13px;';
-          card.innerHTML = `
-            <div style="display:flex; align-items:center;">
-              <div style="font-weight:700; color:var(--text-muted); font-size:12px; margin-right:12px; width:85px; flex-shrink:0;">${formatarDataBR(item.date)}</div>
-              <div class="activity-time">${item.time || '--:--'}</div>
-              <div class="activity-info">
-                <strong>${item.title}</strong>
-                ${item.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-top:2px; white-space:pre-wrap;">${item.desc}</div>` : ''}
-            </div>
-          `;
-          container.appendChild(card);
-        });
-        return;
-      }
-
-      const agrupado = {};
-      atividadesOrdenadas.forEach(act => {
-        if (!agrupado[act.date]) agrupado[act.date] = [];
-        agrupado[act.date].push(act);
-      });
-
-      const datasOrdenadas = Object.keys(agrupado).sort();
-      const startDateStr = appData.config.startDate;
-      const startDateTime = startDateStr ? new Date(startDateStr + 'T00:00:00').getTime() : null;
-
-      datasOrdenadas.forEach(dataStr => {
-        const atividades = agrupado[dataStr];
-
-        let diaTag = 'Dia';
-        if (startDateTime) {
-          const currentDateTime = new Date(dataStr + 'T00:00:00').getTime();
-          const diffDays = Math.floor((currentDateTime - startDateTime) / (1000 * 60 * 60 * 24)) + 1;
-          diaTag = diffDays > 0 ? `D${diffDays}` : `Pré-Viagem`;
-        }
-
-        // Dia expande só se for o _diaExpandidoId
-        const esteAberto = dataStr === _diaExpandidoId;
-        const accordion = document.createElement('div');
-        accordion.className = `day-accordion${esteAberto ? ' open' : ''}`;
-
-        // Resumo por tipo de todos os itens do dia
-        const tiposEmoji = { compras:'🛍️', mercado:'🛒', alimentacao:'🍽️', transporte:'🚗' };
-        const resumoDia = {};
-        atividades.forEach(at => (at.compras || []).forEach(c => {
-          const t = c.tipo || 'compras';
-          if (!resumoDia[t]) resumoDia[t] = { teto: 0, qtd: 0 };
-          resumoDia[t].teto += (c.teto || 0);
-          resumoDia[t].qtd += 1;
-        }));
-        const resumoDiaHtml = Object.entries(resumoDia).map(([t, v]) =>
-          `<span style="font-size:11px;color:var(--text-muted);">${tiposEmoji[t]||'📋'} US$ ${formatarUSD(v.teto)}</span>`
-        ).join(' · ');
-
-        let html = `
-         <div class="day-header" onclick="toggleAccordion(this.parentElement)">
-            <div class="day-title-box">
-              <span class="day-badge">${diaTag}</span>
-              <span class="day-date-str">${formatarDataBR(dataStr)} · ${obterDiaSemana(dataStr)}</span>
-              <span class="day-count-tag">(${atividades.length} atividade${atividades.length > 1 ? 's' : ''})</span>
-              ${resumoDiaHtml ? `<span style="margin-left:8px;">${resumoDiaHtml}</span>` : ''}
-            </div>
-            <span class="day-arrow">${esteAberto ? '▲' : '▼'}</span>
-          </div>
-          <div class="day-content">
-        `;
-
-        atividades.forEach(item => {
-          const itens = item.compras || [];
-          const nItens = itens.length;
-          // Resumo por tipo na atividade
-          const tiposAt = {};
-          itens.forEach(c => {
-            const t = c.tipo || 'compras';
-            if (!tiposAt[t]) tiposAt[t] = { teto: 0, qtd: 0 };
-            tiposAt[t].teto += (c.teto || 0);
-            tiposAt[t].qtd += 1;
-          });
-          const resumoAtHtml = Object.entries(tiposAt).map(([t, v]) =>
-            `${tiposEmoji[t]||'📋'} ${v.qtd} · US$ ${formatarUSD(v.teto)}`
-          ).join(' &nbsp; ');
-
-          html += `
-            <div class="activity-item">
-              <div class="activity-time">${item.time || '--:--'}</div>
-              <div class="activity-info">
-                <strong>${item.title}</strong>
-                ${item.desc ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:pre-wrap;">${item.desc}</div>` : ''}
-                ${nItens > 0 ? `<div style="font-size:11px;color:var(--brand-primary);margin-top:4px;cursor:pointer;" onclick="abrirModalComprasAtividade(${item.id})">${resumoAtHtml} ▾</div>` : ''}
-              </div>
-              <div style="display:flex;flex-direction:row;gap:4px;align-items:center;">
-                ${isPremium ? `<button class="btn-action-icon" title="Lista da atividade" onclick="abrirModalComprasAtividade(${item.id})">📋</button>` : ''}
-                <button class="btn-action-icon" onclick="editarAtividade(${item.id})">✏️</button>
-                <button class="btn-action-icon" style="color:var(--danger);" onclick="removerAtividade(${item.id})">🗑️</button>
-              </div>
-            </div>
-          `;
-        });
-        html += `</div>`;
-        accordion.innerHTML = html;
-        container.appendChild(accordion);
-      });
-    }
-
-    // ===== TRANSPORTE REFORMULADO =====
-    let _atividadeComprasId = null; // ID da atividade cujo modal de compras está aberto
-
-    function alternarModoTransporte() {
-      const modo = document.querySelector('input[name="modoTransporte"]:checked')?.value;
-      document.getElementById('campusCarro').style.display = modo === 'carro' ? 'block' : 'none';
-      document.getElementById('campusApp').style.display = modo === 'app' ? 'block' : 'none';
-      if (!appData.transporte) appData.transporte = { modo: 'carro', trajetos: [] };
-      appData.transporte.modo = modo || 'carro';
-      calcularTransporte();
-      salvar();
-    }
-
-    function adicionarTrajeto() {
-      const origem = document.getElementById('trajOrigem').value.trim();
-      const destino = document.getElementById('trajDestino').value.trim();
-      const app = document.getElementById('trajApp').value.trim();
-      const valor = parseFloat(document.getElementById('trajValor').value) || 0;
-      if (!origem && !destino) return;
-      if (!appData.transporte) appData.transporte = { modo: 'app', trajetos: [] };
-      appData.transporte.trajetos.push({ id: Date.now(), origem, destino, app, valor });
-      document.getElementById('trajOrigem').value = '';
-      document.getElementById('trajDestino').value = '';
-      document.getElementById('trajApp').value = '';
-      document.getElementById('trajValor').value = '';
-      salvar();
-      renderTransporte();
-    }
-
-    function removerTrajeto(id) {
-      if (!confirm('Remover este trajeto?')) return;
-      appData.transporte.trajetos = appData.transporte.trajetos.filter(t => t.id !== id);
-      salvar();
-      renderTransporte();
-    }
-
-    function calcularTransporte() { renderTransporte(); }
-
-    function renderTransporte() {
-      if (!isPremium) return;
-      if (!appData.transporte) appData.transporte = { modo: 'carro', trajetos: [] };
-      const rate = appData.config?.dollarRate || 5.20;
-      const modo = appData.transporte.modo || 'carro';
-
-      const radioEl = document.getElementById(modo === 'carro' ? 'modoCarro' : 'modoApp');
-      if (radioEl) radioEl.checked = true;
-      document.getElementById('campusCarro').style.display = modo === 'carro' ? 'block' : 'none';
-      document.getElementById('campusApp').style.display = modo === 'app' ? 'block' : 'none';
-
-      // Trajetos do roteiro (itens tipo 'transporte' nas atividades)
-      const trajetosRoteiro = [];
-      (appData.activities || []).forEach(at => {
-        (at.compras || []).filter(c => c.tipo === 'transporte').forEach(c => {
-          trajetosRoteiro.push({ desc: c.produto, detalhe: c.marca, teto: c.teto || 0, data: at.date, hora: at.time });
-        });
-      });
-      const totalRoteiro = trajetosRoteiro.reduce((a, t) => a + t.teto, 0);
-      const cardRoteiro = document.getElementById('cardTransporteRoteiro');
-      const listaRoteiro = document.getElementById('trajetosRoteiro');
-      if (cardRoteiro) cardRoteiro.style.display = trajetosRoteiro.length > 0 ? 'block' : 'none';
-      if (listaRoteiro) {
-        listaRoteiro.innerHTML = trajetosRoteiro.map(t =>
-          `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
-            <div>
-              <span style="font-weight:500;">${t.desc}</span>
-              ${t.detalhe ? `<span style="color:var(--text-muted);font-size:12px;"> · ${t.detalhe}</span>` : ''}
-              ${t.data ? `<div style="font-size:11px;color:var(--text-muted);">${t.hora || ''} · ${t.data.split('-').reverse().join('/')}</div>` : ''}
-            </div>
-            <span style="font-weight:600;">US$ ${formatarUSD(t.teto)}</span>
-          </div>`
-        ).join('');
-      }
-
-      let totalUsd = 0;
-      if (modo === 'carro') {
-        const days = parseInt(document.getElementById('carDays')?.value) || 0;
-        const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
-        const park = parseFloat(document.getElementById('carPark')?.value) || 0;
-        const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
-        totalUsd = days * (daily + park) + fuel;
-        document.getElementById('trajetosLista').innerHTML = '';
-      } else {
-        const lista = appData.transporte.trajetos || [];
-        totalUsd = lista.reduce((a, t) => a + (t.valor || 0), 0);
-        let html = lista.length === 0 ? '<p style="font-size:13px;color:var(--text-muted)">Nenhum trajeto adicionado.</p>' : '';
-        lista.forEach(t => {
-          html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
-            <div>
-              <strong>${t.origem || '?'} → ${t.destino || '?'}</strong>
-              ${t.app ? `<div style="font-size:11px;color:var(--text-muted)">${t.app}</div>` : ''}
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-weight:600;">US$ ${formatarUSD(t.valor)}</span>
-              <button class="btn-action-icon" style="color:var(--danger)" onclick="removerTrajeto(${t.id})">🗑️</button>
-            </div>
-          </div>`;
-        });
-        document.getElementById('trajetosLista').innerHTML = html;
-      }
-
-      // Total inclui manual + roteiro
-      const totalComRoteiro = totalUsd + totalRoteiro;
-
-      document.getElementById('kpiTransporteTotal').textContent = `US$ ${formatarUSD(totalComRoteiro)}`;
-      document.getElementById('kpiTransporteTotalBrl').textContent = `R$ ${formatarBRL(totalComRoteiro * rate)}`;
-      document.getElementById('kpiTransporteModo').textContent = modo === 'carro' ? '🚗 Carro Alugado' : '🚌 App / Transporte';
-      if (totalRoteiro > 0) {
-        const nota = document.getElementById('kpiTransporteModo');
-        if (nota) nota.innerHTML = (modo === 'carro' ? '🚗 Carro Alugado' : '🚌 App / Transporte') +
-          `<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Inclui US$ ${formatarUSD(totalUsd)} manual + US$ ${formatarUSD(totalRoteiro)} do roteiro</div>`;
-      }
-
-      // Comparativo Carro vs App (só mostra se tiver dados em ambos os modos)
-      const compCard = document.getElementById('cardTransporteComparativo');
-      const compTexto = document.getElementById('transporteComparativoTexto');
-      const days = parseFloat(document.getElementById('carDays')?.value) || 0;
-      const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
-      const park = parseFloat(document.getElementById('carPark')?.value) || 0;
-      const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
-      const totalCarro = days * (daily + park) + fuel;
-      const totalApp = (appData.transporte.trajetos || []).reduce((a, t) => a + (t.valor || 0), 0);
-
-      if (totalCarro > 0 && totalApp > 0 && compCard && compTexto) {
-        compCard.style.display = 'block';
-        const diff = Math.abs(totalCarro - totalApp);
-        if (totalApp < totalCarro) {
-          compTexto.innerHTML = `✅ <strong>App/transporte é mais vantajoso</strong> neste cenário — você economiza aproximadamente <strong>US$ ${formatarUSD(diff)}</strong> em relação ao carro alugado.`;
-          compTexto.style.color = '#16A34A';
-        } else if (totalCarro < totalApp) {
-          compTexto.innerHTML = `✅ <strong>Carro alugado é mais vantajoso</strong> neste cenário — você economiza aproximadamente <strong>US$ ${formatarUSD(diff)}</strong> em relação ao app/transporte.`;
-          compTexto.style.color = '#2563EB';
-        } else {
-          compTexto.innerHTML = `🤝 Os dois modos ficam com o mesmo custo estimado — escolha pela conveniência!`;
-          compTexto.style.color = 'var(--text-muted)';
-        }
-      } else if (compCard) {
-        compCard.style.display = 'none';
-      }
-    }
-
-    // ===== MINI-LISTA DE COMPRAS POR ATIVIDADE =====
-    function abrirModalComprasAtividade(atividadeId) {
-      _atividadeComprasId = atividadeId;
-      const atividade = appData.activities?.find(a => a.id === atividadeId);
-      if (!atividade) return;
-      if (!atividade.compras) atividade.compras = [];
-      document.getElementById('modalComprasTitulo').textContent = `🛍️ ${atividade.title || 'Lista de Compras'}`;
-      const dataFmt = atividade.date ? atividade.date.split('-').reverse().join('/') : '';
-      document.getElementById('modalComprasSubtitulo').textContent = [atividade.time, dataFmt].filter(Boolean).join(' · ');
-      renderListaItensCompra();
-      document.getElementById('modalComprasAtividade').classList.add('active');
-    }
-
-    function fecharModalComprasAtividade() {
-      document.getElementById('modalComprasAtividade').classList.remove('active');
-      _atividadeComprasId = null;
-      renderRoteiroCronologico();
-      renderCompras();
-    }
-
-    function adicionarItemCompra() {
-      const produto = document.getElementById('cmpProduto').value.trim();
-      if (!produto) return;
-      const tipo = document.getElementById('cmpTipo')?.value || 'compras';
-      const marca = document.getElementById('cmpMarca').value.trim();
-      const teto = parseFloat(document.getElementById('cmpTeto').value) || 0;
-      const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
-      if (!atividade) return;
-      if (!atividade.compras) atividade.compras = [];
-      atividade.compras.push({ id: Date.now(), tipo, produto, marca, teto, comprado: false });
-      document.getElementById('cmpProduto').value = '';
-      document.getElementById('cmpMarca').value = '';
-      document.getElementById('cmpTeto').value = '';
-      salvar();
-      renderListaItensCompra();
-    }
-
-    function toggleItemComprado(atividadeId, itemId) {
-      const atividade = appData.activities?.find(a => a.id === atividadeId);
-      const item = atividade?.compras?.find(c => c.id === itemId);
-      if (item) { item.comprado = !item.comprado; salvar(); renderListaItensCompra(); renderCompras(); }
-    }
-
-    function removerItemCompra(itemId) {
-      if (!confirm('Remover item?')) return;
-      const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
-      if (atividade) {
-        atividade.compras = atividade.compras.filter(c => c.id !== itemId);
-        salvar();
-        renderListaItensCompra();
-      }
-    }
-
-    let _itemCompraEditandoId = null;
-
-    function editarItemCompra(itemId) {
-      const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
-      const it = atividade?.compras?.find(c => c.id === itemId);
-      if (!it) return;
-      _itemCompraEditandoId = itemId;
-      document.getElementById('cmpProduto').value = it.produto || '';
-      document.getElementById('cmpMarca').value = it.marca || '';
-      document.getElementById('cmpQtd').value = it.qtd || 1;
-      document.getElementById('cmpTeto').value = it.teto || '';
-      const btn = document.querySelector('#modalComprasAtividade .btn-submit');
-      if (btn) { btn.textContent = '💾 Salvar Edição'; btn.onclick = salvarEdicaoItemCompra; }
-      document.getElementById('cmpProduto').focus();
-    }
-
-    function salvarEdicaoItemCompra() {
-      const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
-      const it = atividade?.compras?.find(c => c.id === _itemCompraEditandoId);
-      if (!it) return;
-      it.produto = document.getElementById('cmpProduto').value.trim();
-      it.marca = document.getElementById('cmpMarca').value.trim();
-      it.qtd = parseInt(document.getElementById('cmpQtd').value) || 1;
-      it.teto = parseFloat(document.getElementById('cmpTeto').value) || 0;
-      _itemCompraEditandoId = null;
-      document.getElementById('cmpProduto').value = '';
-      document.getElementById('cmpMarca').value = '';
-      document.getElementById('cmpQtd').value = '1';
-      document.getElementById('cmpTeto').value = '';
-      const btn = document.querySelector('#modalComprasAtividade .btn-submit');
-      if (btn) { btn.textContent = '+ Adicionar Item'; btn.onclick = adicionarItemCompra; }
-      salvar();
-      renderListaItensCompra();
-    }
-
-    function renderListaItensCompra() {
-      const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
-      const lista = document.getElementById('listaItensCompra');
-      const totalEl = document.getElementById('totalTetoAtividade');
-      const tiposEl = document.getElementById('totalTetoTipos');
-      if (!atividade || !lista) return;
-      const itens = atividade.compras || [];
-      const tiposEmoji = { compras:'🛍️', mercado:'🛒', alimentacao:'🍽️', transporte:'🚗' };
-      let total = 0;
-      const porTipo = {};
-      let html = itens.length === 0 ? '<p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Nenhum item ainda.</p>' : '';
-      itens.forEach(it => {
-        total += it.teto || 0;
-        const t = it.tipo || 'compras';
-        porTipo[t] = (porTipo[t] || 0) + (it.teto || 0);
-        html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-color);font-size:13px;${it.comprado ? 'opacity:0.5;text-decoration:line-through;' : ''}">
-          <input type="checkbox" ${it.comprado ? 'checked' : ''} onchange="toggleItemComprado(${atividade.id},${it.id})" style="width:16px;height:16px;cursor:pointer;flex-shrink:0;">
-          <span style="font-size:15px;">${tiposEmoji[t]||'📋'}</span>
-          <div style="flex:1;">
-            <span style="font-weight:500;">${it.produto}</span>${it.marca ? ` <span style="color:var(--text-muted);font-size:12px;">(${it.marca})</span>` : ''}
-          </div>
-          <span style="font-weight:600;white-space:nowrap;">US$ ${formatarUSD(it.teto || 0)}</span>
-          <button class="btn-action-icon" onclick="editarItemCompra(${it.id})">✏️</button>
-          <button class="btn-action-icon" style="color:var(--danger)" onclick="removerItemCompra(${it.id})">🗑️</button>
-        </div>`;
-      });
-      lista.innerHTML = html;
-      if (totalEl) totalEl.textContent = `US$ ${formatarUSD(total)}`;
-      if (tiposEl) {
-        tiposEl.innerHTML = Object.entries(porTipo)
-          .map(([t, v]) => `<span>${tiposEmoji[t]||'📋'} US$ ${formatarUSD(v)}</span>`)
-          .join(' · ');
-      }
-    }
-
-    // ===== ABA COMPRAS CONSOLIDADA (só 🛍️ e 🛒) =====
-    function renderCompras() {
-      if (!isPremium) return;
-      const container = document.getElementById('comprasConsolidada');
-      if (!container) return;
-      const roteiro = appData.activities || [];
-      const tiposEmoji = { compras:'🛍️', mercado:'🛒' };
-      const porDia = {};
-      roteiro.forEach(at => {
-        // Filtra só itens de compras e mercado
-        const itens = (at.compras || []).filter(c => c.tipo === 'compras' || c.tipo === 'mercado' || !c.tipo);
-        if (!itens.length) return;
-        const dia = at.date || 'Sem data';
-        if (!porDia[dia]) porDia[dia] = [];
-        porDia[dia].push({ ...at, compras: itens });
-      });
-      const dias = Object.keys(porDia).sort();
-      if (dias.length === 0) {
-        container.innerHTML = '<p style="font-size:13px;color:var(--text-muted);text-align:center;padding:24px;">Nenhum item de compras ou mercado adicionado ainda.<br>Abra uma atividade no Roteiro e use 📋 para adicionar itens do tipo 🛍️ ou 🛒.</p>';
-        return;
-      }
-
-      const dataIda = appData.config?.startDate;
-      const dataInicioMs = dataIda ? new Date(dataIda + 'T00:00:00').getTime() : null;
-
-      function getDiaViagem(dataIso) {
-        if (!dataInicioMs || !dataIso || dataIso === 'Sem data') return null;
-        const d = new Date(dataIso + 'T00:00:00').getTime();
-        const diff = Math.round((d - dataInicioMs) / 86400000);
-        return diff >= 0 ? `D${diff + 1}` : null;
-      }
-      function fmtDia(d) {
-        if (!d || d === 'Sem data') return d;
-        const p = d.split('-');
-        return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
-      }
-
-      let html = '';
-      let totalGeral = 0;
-      dias.forEach((dia, idx) => {
-        const atividades = porDia[dia];
-        const acordId = `comprasDia_${idx}`;
-        let totalDia = 0;
-        let htmlAt = '';
-        const atOrdenadas = [...atividades].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
-        atOrdenadas.forEach(at => {
-          const itens = [...(at.compras || [])].sort((a, b) => (a.produto || '').localeCompare(b.produto || '', 'pt'));
-          const totalAt = itens.reduce((a, i) => a + (i.teto || 0), 0);
-          totalDia += totalAt;
-          totalGeral += totalAt;
-          const comprados = itens.filter(i => i.comprado).length;
-          htmlAt += `<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:12px 14px;margin-bottom:8px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <strong style="font-size:13px;">${at.time ? at.time + ' · ' : ''}${at.title}</strong>
-              <span style="font-size:12px;color:var(--text-muted)">${comprados}/${itens.length} · <strong>US$ ${formatarUSD(totalAt)}</strong></span>
-            </div>`;
-          itens.forEach(it => {
-            htmlAt += `<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border-color);${it.comprado ? 'opacity:0.5;text-decoration:line-through;' : ''}">
-              <input type="checkbox" ${it.comprado ? 'checked' : ''} onchange="toggleItemCompradoConsolidado(${at.id},${it.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
-              <span>${tiposEmoji[it.tipo]||'📋'}</span>
-              <span style="flex:1;">${it.produto}${it.marca ? ' ('+it.marca+')' : ''}</span>
-              <span style="font-weight:600;">US$ ${formatarUSD(it.teto || 0)}</span>
-            </div>`;
-          });
-          htmlAt += '</div>';
-        });
-        html += `
-          <div style="border:1px solid var(--border-color);border-radius:10px;margin-bottom:10px;overflow:hidden;">
-            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.caret').style.transform=this.nextElementSibling.style.display==='none'?'rotate(0deg)':'rotate(180deg)'"
-              style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;background:var(--bg-card);">
-              <span style="font-weight:700;font-size:13px;color:var(--brand-primary);">${getDiaViagem(dia) ? getDiaViagem(dia) + ' · ' : ''}${fmtDia(dia)}${dia !== 'Sem data' ? ' · ' + obterDiaSemana(dia) : ''}</span>
-              <div style="display:flex;align-items:center;gap:10px;">
-                <span style="font-size:12px;color:var(--text-muted)">US$ ${formatarUSD(totalDia)}</span>
-                <span class="caret" style="font-size:12px;transition:transform .2s;">▼</span>
-              </div>
-            </div>
-            <div style="padding:10px 14px;display:block;">${htmlAt}</div>
-          </div>`;
-      });
-      html += `<div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-        <span style="font-weight:700;color:#166534;">Total geral 🛍️+🛒 (teto)</span>
-        <span style="font-size:18px;font-weight:700;color:#16A34A;">US$ ${formatarUSD(totalGeral)}</span>
-      </div>`;
+      html += `</tbody></table>`;
       container.innerHTML = html;
     }
 
-    function toggleItemCompradoConsolidado(atividadeId, itemId) {
-      const atividade = appData.activities?.find(a => a.id === atividadeId);
-      const item = atividade?.compras?.find(c => c.id === itemId);
-      if (item) { item.comprado = !item.comprado; salvar(); renderCompras(); }
+    function calcularTransporte() {
+      const dias = parseFloat(document.getElementById('carDays').value) || 0;
+      const diaria = parseFloat(document.getElementById('carDaily').value) || 0;
+      const estac = parseFloat(document.getElementById('carPark').value) || 0;
+      const comb = parseFloat(document.getElementById('carFuel').value) || 0;
+
+      const totalUSD = (dias * diaria) + (dias * estac) + comb;
+      appData.transporte = { modo: 'carro', totalUsd: totalUSD };
+      salvar();
     }
 
-    function renderAllData() {
-      renderDashboardCalculos();
-      renderRoteiroCronologico();
-      renderOrcamento();
-      renderMetas();
-      renderCronograma();
-      renderMala();
-      renderCompras();
-      renderTransporte();
-      renderAlertasPrazo();
-    }
+    /* --- CÁLCULO MESTRE DO RESUMO DO ORÇAMENTO E KPIS --- */
+    function renderDashboardCalculos() {
+      const cotacao = parseFloat(appData.config.dollarRate) || 5.20;
+      const viajantes = parseInt(appData.config.travelers) || 1;
+      
+      const currencyOpt = document.querySelector('input[name="viewCurrency"]:checked');
+      const verEmDolar = currencyOpt ? currencyOpt.value === 'USD' : false;
 
-    function baixarArquivoOffline() {
-      const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'flowi-viagem-disney-offline.html';
-      a.click();
-    }
+      // 1. CÁLCULO DO TRANSPORTE (Converte USD -> BRL)
+      const transporteTotalUsd = appData.transporte?.totalUsd || 0;
+      const transporteTotalBrl = transporteTotalUsd * cotacao;
 
-    function toggleMenu() {
-      document.getElementById('drawer').classList.toggle('active');
-      document.getElementById('drawerOverlay').classList.toggle('active');
-      atualizarMenuPrincipal();
-    }
+      // 2. CONSOLIDAÇÃO DOS ITENS DO ORÇAMENTO
+      let orcadoBrl = 0;
+      let pagoBrl = 0;
+      let pendenteBrl = 0;
 
-    function atualizarMenuPrincipal() {
-      const link = document.getElementById('drawerMenuPrincipal');
-      if (!link) return;
-      const emailSalvo = localStorage.getItem('flowi_hub_email');
-      if (emailSalvo) {
-        link.textContent = '⚡ Minha Central Flowi';
-        link.href = 'https://tryflowi.github.io/hub.html';
-        link.onclick = null;
-      } else {
-        link.textContent = '🔑 Já sou Premium? Entrar';
-        link.href = '#';
-        link.onclick = function() { abrirLoginModal(); toggleMenu(); return false; };
-      }
-    }
+      let categorias = {
+        'Passagens': 0,
+        'Hospedagem': 0,
+        'Parques e Ingressos': 0,
+        'Alimentação': 0,
+        'Compras': 0,
+        'Transporte': transporteTotalBrl, // Inclui o transporte automaticamente
+        'Outros': 0
+      };
 
-    function abrirPaywall() { document.getElementById('paywallModal').classList.add('active'); }
-    function fecharPaywall() { document.getElementById('paywallModal').classList.remove('active'); }
+      appData.budgetItems.forEach(item => {
+        const valOrcado = parseFloat(item.amountBrl) || 0;
+        const valPago = parseFloat(item.paidBrl) || 0;
+        const isPago = item.status === 'Pago';
 
-    function abrirLoginModal() {
-      document.getElementById('loginModal').classList.add('active');
-      document.getElementById('loginStatus').textContent = '';
-      document.getElementById('loginStatus').style.color = '';
-    }
-    function fecharLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+        orcadoBrl += valOrcado;
 
-    async function verificarLicencaPremium() {
-      const emailInput = document.getElementById('loginEmail');
-      const statusEl = document.getElementById('loginStatus');
-      const btn = document.getElementById('btnAtivarPremium');
-
-      const email = emailInput.value.trim().toLowerCase();
-
-      if (!email || !email.includes('@')) {
-        statusEl.textContent = 'Digite um e-mail válido.';
-        statusEl.style.color = 'var(--danger)';
-        return;
-      }
-
-      if (!supabaseClient) {
-        statusEl.textContent = 'Serviço de verificação indisponível no momento.';
-        statusEl.style.color = 'var(--danger)';
-        return;
-      }
-
-      btn.disabled = true;
-      const textoOriginalBtn = btn.textContent;
-      btn.textContent = 'Verificando...';
-      statusEl.textContent = '';
-
-      try {
-        const { data, error } = await supabaseClient
-          .from('licencas_flowi')
-          .select('ativo')
-          .eq('email', email)
-          .eq('produto', PRODUTO_ID)
-          .eq('ativo', true)
-          .maybeSingle();
-
-        if (error) throw error;
-
-        if (data) {
-          localStorage.setItem('flowi_is_premium', 'true');
-          localStorage.setItem('flowi_hub_email', email);
-          statusEl.textContent = 'Licença encontrada! Liberando...';
-          statusEl.style.color = 'var(--success)';
-          setTimeout(() => location.reload(), 800);
+        if (isPago) {
+          pagoBrl += (valPago > 0 ? valPago : valOrcado);
         } else {
-          statusEl.textContent = 'Não encontramos uma compra aprovada com este e-mail para este produto.';
-          statusEl.style.color = 'var(--danger)';
+          pendenteBrl += valOrcado;
         }
-      } catch (e) {
-        console.error('Erro ao verificar licença:', e);
-        statusEl.textContent = 'Erro ao verificar. Tente novamente em instantes.';
-        statusEl.style.color = 'var(--danger)';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = textoOriginalBtn;
+
+        if (categorias.hasOwnProperty(item.category)) {
+          categorias[item.category] += valOrcado;
+        } else {
+          categorias['Outros'] += valOrcado;
+        }
+      });
+
+      // Total acumulado em BRL incluindo o valor da aba transporte
+      const gastoTotalBrl = orcadoBrl + transporteTotalBrl;
+      const economiaRealizadaBrl = pagoBrl > 0 ? (orcadoBrl - pagoBrl) : 0;
+
+      // 3. EXIBIÇÃO NOS KPIS (TRATAMENTO BRL OU USD)
+      const fnFormatar = verEmDolar ? (val) => formatarUSD(val / cotacao) : formatarBRL;
+
+      document.getElementById('lblMoedaResumo').textContent = verEmDolar ? '(valores em US$)' : '(valores em R$)';
+      document.getElementById('lblKpiTotal').textContent = verEmDolar ? 'Gasto Total em Dólares (USD)' : 'Gasto Total em Reais (BRL)';
+
+      document.getElementById('kpiTotalBrl').textContent = fnFormatar(gastoTotalBrl);
+      document.getElementById('kpiPerPerson').textContent = fnFormatar(gastoTotalBrl / viajantes);
+      document.getElementById('kpiTotalPaid').textContent = fnFormatar(pagoBrl);
+      document.getElementById('kpiTotalPending').textContent = fnFormatar(pendenteBrl + transporteTotalBrl); // Transporte entra como pendente até contratação
+      
+      const elEconomia = document.getElementById('kpiEconomia');
+      elEconomia.textContent = fnFormatar(economiaRealizadaBrl);
+      elEconomia.className = `kpi-value ${economiaRealizadaBrl >= 0 ? 'green' : 'red'}`;
+
+      // 4. PREENCHIMENTO DA DIVISÃO POR CATEGORIA
+      const catWrapper = document.getElementById('categoriesWrapper');
+      catWrapper.innerHTML = '';
+
+      Object.keys(categorias).forEach(cat => {
+        const valCat = categorias[cat];
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.innerHTML = `
+          <div class="category-name">${cat}</div>
+          <div class="category-amount">${fnFormatar(valCat)}</div>
+        `;
+        catWrapper.appendChild(card);
+      });
+    }
+
+    function confirmarReset() {
+      if (confirm("Deseja apagar os dados cadastrados e redefinir o simulador?")) {
+        localStorage.removeItem('flowi_disney_user_data');
+        location.reload();
       }
     }
   </script>
