@@ -529,58 +529,70 @@
 
     <!-- TAB 3: ORÇAMENTO -->
     <div id="tab-orcamento" class="tab-content">
-      <div class="card no-print">
-        <div class="card-title" id="budFormTitle">Adicionar Custo ao Orçamento</div>
-        <input type="hidden" id="budEditId" value="">
 
-        <div class="grid-2">
-          <div class="form-group"><label>Descrição do Gasto</label><input type="text" id="budDesc" class="form-control" placeholder="Ex: Passagens aéreas, Hospedagem..."></div>
+      <!-- Campos hidden para compatibilidade -->
+      <input type="hidden" id="budEditId" value="">
+      <input type="hidden" id="budAmountUsd" value="0">
+      <input type="hidden" id="budRate" value="0">
+
+      <!-- Accordion: formulário minimizado por padrão -->
+      <div class="card no-print" style="margin-bottom:12px;">
+        <button id="budFormToggle" onclick="toggleFormOrcamento()" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--brand-primary);padding:0;font-family:inherit;display:flex;justify-content:space-between;align-items:center;">
+          <span>+ Adicionar item ao orçamento</span>
+          <span id="budFormToggleIcon" style="font-size:12px;color:var(--text-muted);">▼</span>
+        </button>
+
+        <div id="budFormBody" style="display:none;margin-top:16px;">
+
+          <!-- CAMPOS FREE -->
           <div class="form-group">
-            <label>Categoria</label>
-            <select id="budCategory" class="form-control">
-              <option value="Passagens">✈️ Passagens</option>
-              <option value="Hospedagem">🏨 Hospedagem</option>
-              <option value="Parques e Ingressos">🏰 Parques & Ingressos</option>
-              <option value="Alimentação">🍕 Alimentação</option>
-              <option value="Compras">🛍️ Compras</option>
-              <option value="Outros">📌 Outros (exceto transporte — use a aba Transporte)</option>
-            </select>
+            <label>Descrição do Gasto</label>
+            <input type="text" id="budDesc" class="form-control" placeholder="Ex: Passagens aéreas, Hospedagem...">
           </div>
-        </div>
-
-        <div class="grid-2">
           <div class="form-group">
             <label>Valor Estimado (R$)</label>
             <input type="number" id="budAmountBrl" class="form-control" placeholder="0.00" step="0.01">
           </div>
-          <div class="form-group">
-            <label>Valor Pago Real (R$)</label>
-            <input type="number" id="budPaidBrl" class="form-control" placeholder="0.00 (opcional)">
+
+          <!-- CAMPOS PREMIUM -->
+          <div id="budCamposPremium" style="display:none;">
+            <div class="form-group">
+              <label>Categoria</label>
+              <select id="budCategory" class="form-control">
+                <option value="Passagens">✈️ Passagens</option>
+                <option value="Hospedagem">🏨 Hospedagem</option>
+                <option value="Parques e Ingressos">🏰 Parques & Ingressos</option>
+                <option value="Alimentação">🍕 Alimentação</option>
+                <option value="Compras">🛍️ Compras</option>
+                <option value="Outros">📌 Outros (exceto transporte — use a aba Transporte)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Valor Pago Real (R$) <span style="font-weight:400;font-size:11px;color:var(--text-muted);">opcional</span></label>
+              <input type="number" id="budPaidBrl" class="form-control" placeholder="0.00">
+            </div>
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
+              <span style="font-weight:500;font-size:13px;">Status:</span>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
+                <input type="radio" name="budStatus" value="Pendente" checked> 🟡 Pendente
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
+                <input type="radio" name="budStatus" value="Pago"> 🟢 Pago
+              </label>
+            </div>
+          </div>
+
+          <!-- AVISO FREE -->
+          <div id="promoOrcamentoFree" style="display:none;background:#F8FAFC;border:1px solid var(--border-color);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--text-muted);">
+            🔒 <strong>Modo Free:</strong> Categoria, valor pago e status são exclusivos da <a href="#" onclick="abrirPaywall();return false;" style="color:var(--brand-primary);font-weight:700;">versão Premium</a>.
+          </div>
+
+          <div style="display:flex;gap:8px;">
+            <button class="btn-submit" id="btnBudSubmit" onclick="salvarOrcamento()" style="flex:1;">Salvar</button>
+            <button class="btn-cancel" id="btnBudCancel" style="display:none;" onclick="cancelarEdicaoOrcamento()">Cancelar</button>
           </div>
         </div>
-
-        <div class="form-group" style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-          <label style="margin:0;font-weight:500;">Status:</label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
-            <input type="radio" name="budStatus" value="Pendente" checked> 🟡 Pendente
-          </label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
-            <input type="radio" name="budStatus" value="Pago"> 🟢 Pago
-          </label>
-        </div>
-
-        <div id="promoOrcamentoFree" style="display:none; background:#F8FAFC; border:1px solid var(--border-color); border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:12px; color:var(--text-muted);">
-          🔒 <strong>Modo Free:</strong> Categorização e controle de status estão disponíveis na <a href="#" onclick="abrirPaywall(); return false;" style="color:var(--brand-primary); font-weight:700;">versão Premium</a>.
-        </div>
-
-        <button class="btn-submit" id="btnBudSubmit" onclick="salvarOrcamento()">Adicionar Item ao Orçamento</button>
-        <button class="btn-cancel" id="btnBudCancel" style="display:none;" onclick="cancelarEdicaoOrcamento()">Cancelar Edição</button>
       </div>
-
-      <!-- Campos hidden necessários para compatibilidade com código existente -->
-      <input type="hidden" id="budAmountUsd" value="0">
-      <input type="hidden" id="budRate" value="0">
-      <select id="budStatus" style="display:none"><option value="Pendente">Pendente</option><option value="Pago">Pago</option></select>
 
       <div class="card">
         <div class="card-title">Itens Registrados no Orçamento</div>
@@ -1443,77 +1455,65 @@
 
     function salvarOrcamento() {
       const editId = document.getElementById('budEditId').value;
-      const desc = document.getElementById('budDesc').value;
+      const desc = document.getElementById('budDesc').value.trim();
       const amountBrl = parseFloat(document.getElementById('budAmountBrl').value) || 0;
 
       if (!desc || amountBrl <= 0) return alert('Informe a descrição e o valor em Reais (BRL).');
 
-      const amountUsd = 0;
-      const rate = appData.config?.dollarRate || 5.20;
       let category = 'Outros';
       let paidBrl = 0;
       let status = 'Pendente';
 
       if (isPremium) {
-        category = document.getElementById('budCategory').value;
-        paidBrl = parseFloat(document.getElementById('budPaidBrl').value) || 0;
+        category = document.getElementById('budCategory')?.value || 'Outros';
+        paidBrl = parseFloat(document.getElementById('budPaidBrl')?.value) || 0;
         const statusRadio = document.querySelector('input[name="budStatus"]:checked');
         status = statusRadio ? statusRadio.value : 'Pendente';
       }
 
       if (editId) {
-        const item = appData.budgetItems.find(i => i.id == editId);
+        const item = appData.budgetItems.find(i => String(i.id) === String(editId));
         if (item) {
           item.desc = desc;
-          item.isEstrangeiro = isEstrangeiro;
           item.amountBrl = amountBrl;
-          item.rate = rate;
-          item.amountUsd = amountUsd;
-          if (isPremium) {
-            item.category = category;
-            item.paidBrl = paidBrl;
-            item.status = status;
-          }
+          item.category = category;
+          item.paidBrl = paidBrl;
+          item.status = status;
         }
       } else {
-        appData.budgetItems.push({
-          id: Date.now(),
-          desc,
-          category,
-          isEstrangeiro,
-          amountBrl,
-          rate,
-          amountUsd,
-          paidBrl,
-          status
-        });
+        appData.budgetItems.push({ id: Date.now(), desc, category, amountBrl, paidBrl, status });
       }
 
       salvar();
       renderOrcamento();
       renderMetas();
       cancelarEdicaoOrcamento();
+      // Fecha o formulário após salvar
+      const formBody = document.getElementById('budFormBody');
+      if (formBody) formBody.style.display = 'none';
+      const toggleBtn = document.getElementById('budFormToggle');
+      if (toggleBtn) toggleBtn.textContent = '+ Adicionar item ao orçamento';
     }
 
     function editarOrcamento(id) {
-      const item = appData.budgetItems.find(i => i.id === id);
+      const item = appData.budgetItems.find(i => String(i.id) === String(id));
       if (!item) return;
-
       document.getElementById('budEditId').value = item.id;
       document.getElementById('budDesc').value = item.desc;
       document.getElementById('budAmountBrl').value = item.amountBrl || 0;
-
       if (isPremium) {
-        document.getElementById('budCategory').value = item.category || 'Outros';
-        document.getElementById('budPaidBrl').value = item.paidBrl || '';
-        // Popular radio buttons de status
+        const catEl = document.getElementById('budCategory');
+        if (catEl) catEl.value = item.category || 'Outros';
+        const paidEl = document.getElementById('budPaidBrl');
+        if (paidEl) paidEl.value = item.paidBrl || '';
         const radios = document.querySelectorAll('input[name="budStatus"]');
         radios.forEach(r => { r.checked = r.value === (item.status || 'Pendente'); });
       }
-
-      document.getElementById('budFormTitle').textContent = 'Editar Item do Orçamento';
-      document.getElementById('btnBudSubmit').textContent = 'Salvar Alterações';
-      document.getElementById('btnBudCancel').style.display = 'block';
+      const cancelBtn = document.getElementById('btnBudCancel');
+      const submitBtn = document.getElementById('btnBudSubmit');
+      if (cancelBtn) cancelBtn.style.display = 'inline-block';
+      if (submitBtn) submitBtn.textContent = 'Salvar Alterações';
+      toggleFormOrcamento(true);
       window.scrollTo({ top: document.getElementById('tab-orcamento').offsetTop - 20, behavior: 'smooth' });
     }
 
@@ -1521,15 +1521,17 @@
       document.getElementById('budEditId').value = '';
       document.getElementById('budDesc').value = '';
       document.getElementById('budAmountBrl').value = '';
-      document.getElementById('budPaidBrl').value = '';
-      const radiosPendente = document.querySelectorAll('input[name="budStatus"]');
-      if (radiosPendente.length) radiosPendente[0].checked = true;
-      if (isPremium) {
-        document.getElementById('budCategory').value = 'Passagens';
-      }
-      document.getElementById('budFormTitle').textContent = 'Adicionar Custo ao Orçamento';
-      document.getElementById('btnBudSubmit').textContent = 'Adicionar Item ao Orçamento';
-      document.getElementById('btnBudCancel').style.display = 'none';
+      const paidEl = document.getElementById('budPaidBrl');
+      if (paidEl) paidEl.value = '';
+      const catEl = document.getElementById('budCategory');
+      if (catEl) catEl.value = 'Passagens';
+      const radios = document.querySelectorAll('input[name="budStatus"]');
+      if (radios.length) radios[0].checked = true;
+      const cancelBtn = document.getElementById('btnBudCancel');
+      const submitBtn = document.getElementById('btnBudSubmit');
+      if (cancelBtn) cancelBtn.style.display = 'none';
+      if (submitBtn) submitBtn.textContent = 'Salvar';
+      toggleFormOrcamento(false);
     }
 
     function toggleStatusOrcamento(id) {
@@ -1552,62 +1554,119 @@
       renderMetas();
     }
 
+    function toggleFormOrcamento(forcarAbrir) {
+      const body = document.getElementById('budFormBody');
+      const icon = document.getElementById('budFormToggleIcon');
+      const toggle = document.getElementById('budFormToggle');
+      if (!body) return;
+      const abrir = forcarAbrir !== undefined ? forcarAbrir : body.style.display === 'none';
+      body.style.display = abrir ? 'block' : 'none';
+      if (icon) icon.textContent = abrir ? '▲' : '▼';
+      if (toggle) toggle.querySelector('span').textContent = abrir ? '− Fechar formulário' : '+ Adicionar item ao orçamento';
+      // Mostra campos premium ou free
+      const campoPremium = document.getElementById('budCamposPremium');
+      const promoFree = document.getElementById('promoOrcamentoFree');
+      if (campoPremium) campoPremium.style.display = isPremium ? 'block' : 'none';
+      if (promoFree) promoFree.style.display = isPremium ? 'none' : 'block';
+    }
+
     function renderOrcamento() {
       const container = document.getElementById('orcamentoLista');
       container.innerHTML = '';
 
-      if(appData.budgetItems.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:13px;">Nenhum item orçado ainda.</div>';
+      if (appData.budgetItems.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">Nenhum item orçado ainda. Clique em "+ Adicionar" acima para começar.</div>';
         return;
       }
 
+      if (!isPremium) {
+        // Free: lista simples, sem agrupamento
+        const itens = [...appData.budgetItems].sort((a, b) => (a.desc || '').localeCompare(b.desc || '', 'pt'));
+        itens.forEach(item => {
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border-color);font-size:13px;gap:8px;';
+          row.innerHTML = `
+            <strong style="flex:1;">${item.desc}</strong>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-weight:700;color:var(--brand-primary);">R$ ${formatarBRL(item.amountBrl)}</span>
+              <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
+              <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
+            </div>
+          `;
+          container.appendChild(row);
+        });
+        return;
+      }
+
+      // Premium: agrupa por categoria em accordion, minimizado, alfabético
+      const ordemCats = ['Passagens','Hospedagem','Parques e Ingressos','Alimentação','Compras','Outros'];
+      const porCat = {};
       appData.budgetItems.forEach(item => {
-        const row = document.createElement('div');
-        row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid var(--border-color); font-size:13px; gap:8px; flex-wrap:wrap;';
-        
-        const subtag = item.isEstrangeiro 
-          ? `<span style="font-size:11px; color:#1E40AF; background:#EFF6FF; padding:2px 6px; border-radius:4px;">Estrangeiro · USD ${formatarUSD(item.amountUsd)}</span>`
-          : `<span style="font-size:11px; color:#065F46; background:#D1FAE5; padding:2px 6px; border-radius:4px;">Nacional</span>`;
+        const cat = item.category || 'Outros';
+        if (!porCat[cat]) porCat[cat] = [];
+        porCat[cat].push(item);
+      });
 
-        if (!isPremium) {
-          row.innerHTML = `
-            <div>
-              <strong>${item.desc}</strong>
-              <div style="margin-top:2px;">${subtag}</div>
-            </div>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="font-weight:700; color:var(--brand-primary);">R$ ${formatarBRL(item.amountBrl)}</div>
-              <div>
-                <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
-                <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
-              </div>
-            </div>
-          `;
-        } else {
+      // Ordena categorias pela ordem padrão, colocando as demais no final
+      const cats = [...new Set([...ordemCats, ...Object.keys(porCat)])].filter(c => porCat[c]);
+
+      cats.forEach((cat, idx) => {
+        const itens = [...porCat[cat]].sort((a, b) => (a.desc || '').localeCompare(b.desc || '', 'pt'));
+        const totalCat = itens.reduce((s, i) => s + (i.amountBrl || 0), 0);
+        const pagosCat = itens.filter(i => i.status === 'Pago').reduce((s, i) => s + (i.paidBrl || i.amountBrl || 0), 0);
+        const acordId = `catAccord_${idx}`;
+
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = 'border:1px solid var(--border-color);border-radius:10px;margin-bottom:8px;overflow:hidden;';
+
+        // Header do accordion
+        const header = document.createElement('div');
+        header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;background:var(--bg-card);';
+        header.innerHTML = `
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-weight:700;font-size:13px;">${cat}</span>
+            <span style="font-size:11px;color:var(--text-muted);">${itens.length} ite${itens.length > 1 ? 'ns' : 'm'}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:12px;font-weight:600;">R$ ${formatarBRL(totalCat)}</span>
+            ${pagosCat > 0 ? `<span style="font-size:11px;color:var(--success);">Pago: R$ ${formatarBRL(pagosCat)}</span>` : ''}
+            <span class="caret-cat" style="font-size:11px;color:var(--text-muted);transition:transform .2s;">▼</span>
+          </div>
+        `;
+
+        // Body do accordion (minimizado por padrão)
+        const body = document.createElement('div');
+        body.id = acordId;
+        body.style.display = 'none';
+
+        header.onclick = () => {
+          const aberto = body.style.display !== 'none';
+          body.style.display = aberto ? 'none' : 'block';
+          header.querySelector('.caret-cat').style.transform = aberto ? 'rotate(0deg)' : 'rotate(180deg)';
+        };
+
+        itens.forEach(item => {
           const status = item.status || 'Pendente';
-          const paidBrl = item.paidBrl || 0;
-
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid var(--border-color);font-size:13px;gap:8px;';
           row.innerHTML = `
-            <div>
+            <div style="flex:1;">
               <strong>${item.desc}</strong>
-              <div style="margin-top:2px; font-size:11px; color:var(--text-muted);">${item.category || 'Outros'} · ${subtag}</div>
+              ${status === 'Pago' ? `<div style="font-size:11px;color:var(--success);">Pago: R$ ${formatarBRL(item.paidBrl || item.amountBrl)}</div>` : ''}
             </div>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="text-align:right;">
-                <div>Est: R$ ${formatarBRL(item.amountBrl)}</div>
-                ${status === 'Pago' ? `<div style="font-size:11px; color:var(--success);">Pago: R$ ${formatarBRL(item.paidBrl || item.amountBrl)}</div>` : ''}
-              </div>
-              <button class="badge-status ${status === 'Pago' ? 'status-pago' : 'status-pendente'}" onclick="toggleStatusOrcamento(${item.id})">
-                ${status}
-              </button>
-              <div>
-                <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
-                <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
-              </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-weight:600;white-space:nowrap;">R$ ${formatarBRL(item.amountBrl)}</span>
+              <button class="badge-status ${status === 'Pago' ? 'status-pago' : 'status-pendente'}" onclick="toggleStatusOrcamento(${item.id})">${status}</button>
+              <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
+              <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
             </div>
           `;
-        }
-        container.appendChild(row);
+          body.appendChild(row);
+        });
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(body);
+        container.appendChild(wrapper);
       });
     }
 
