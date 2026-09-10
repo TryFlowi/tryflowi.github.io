@@ -1740,17 +1740,16 @@
       renderDashboardCalculos();
     }
 
-    /* --- CÁLCULO DAS DASHBOARDS E RESUMOS CONSOLIDADOS (CORRIGIDO) --- */
 function renderDashboardCalculos() {
-  // Salva estado dos botões 💱 antes de re-renderizar os cards de categoria
+  // Salva estado dos botões 💱 antes de re-renderizar
   const estadosBotoes = {};
   document.querySelectorAll('.category-card[id]').forEach(card => {
     estadosBotoes[card.id] = card.dataset.modo || 'brl';
   });
 
-  // Pega o valor estimado da aba Transporte (já convertido em BRL)
-  const valorAbaTransporte = (typeof calcularTransporte === 'function') ? calcularTransporte() : 0;
-  
+  // 1. Obtém o valor numérico puro do transporte
+  const valorAbaTransporte = (typeof calcularTransporte === 'function') ? (parseFloat(calcularTransporte()) || 0) : 0;
+
   let totalBrl = 0;
   let totalNationalBrl = 0;
   let totalForeignBrl = 0;
@@ -1761,19 +1760,20 @@ function renderDashboardCalculos() {
 
   const catTotalsBrl = {};
 
-  // Varre os itens lançados na aba Orçamento
+  // 2. Soma e conversão forçada de cada item do orçamento
   (appData.budgetItems || []).forEach(item => {
-    const brl = item.amountBrl || 0;
+    // Garante que o valor seja tratado como número puro (evita contaminação por string ou NaN)
+    const brl = Number(item.amountBrl) || 0;
     totalBrl += brl;
 
     if (item.isEstrangeiro) {
       totalForeignBrl += brl;
-      totalUsdEstimated += (item.amountUsd || 0);
+      totalUsdEstimated += (Number(item.amountUsd) || 0);
     } else {
       totalNationalBrl += brl;
     }
 
-    const paid = item.paidBrl || 0;
+    const paid = Number(item.paidBrl) || 0;
     if (item.status === 'Pago') {
       totalPaidBrl += (paid > 0 ? paid : brl);
     } else {
@@ -1784,7 +1784,7 @@ function renderDashboardCalculos() {
     catTotalsBrl[cat] = (catTotalsBrl[cat] || 0) + brl;
   });
 
-  // CONSOLIDAÇÃO DO TRANSPORTE NO TOTAL GERAL
+  // 3. Consolidação do transporte
   totalBrl += valorAbaTransporte;
   totalNationalBrl += valorAbaTransporte;
 
@@ -1792,57 +1792,59 @@ function renderDashboardCalculos() {
     catTotalsBrl['Transporte'] = valorAbaTransporte;
   }
 
-  const travelers = appData.config?.travelers || 1;
-  const rate = appData.config?.dollarRate || 5.20;
+  // 4. Parâmetros da viagem
+  const travelers = Math.max(1, parseInt(document.getElementById('cfgTravelers')?.value || appData.config?.travelers) || 1);
+  const rate = parseFloat(document.getElementById('cfgDollarRate')?.value || appData.config?.dollarRate) || 5.10;
+  
   const viewCurrencyEl = document.querySelector('input[name="viewCurrency"]:checked');
-  const viewCurrency = (isPremium && viewCurrencyEl) ? viewCurrencyEl.value : 'BRL';
+  const viewCurrency = (typeof isPremium !== 'undefined' && isPremium && viewCurrencyEl) ? viewCurrencyEl.value : 'BRL';
 
-  // 1. GASTO TOTAL E GASTO POR PESSOA
+  // 5. Injeção direta nos KPIs (Gasto Total e Por Pessoa)
+  const elTotal = document.getElementById('kpiTotalBrl');
+  const elPerPerson = document.getElementById('kpiPerPerson');
+
   if (viewCurrency === 'USD') {
     const totalUsdConsolidado = rate > 0 ? (totalBrl / rate) : 0;
-    const perPersonUsd = rate > 0 ? (totalUsdConsolidado / travelers) : 0;
-    document.getElementById('kpiTotalBrl').textContent = `US$ ${formatarUSD(totalUsdConsolidado)}`;
-    document.getElementById('kpiPerPerson').textContent = `US$ ${formatarUSD(perPersonUsd)}`;
+    const perPersonUsd = totalUsdConsolidado / travelers;
+    if (elTotal) elTotal.textContent = `US$ ${formatarUSD(totalUsdConsolidado)}`;
+    if (elPerPerson) elPerPerson.textContent = `US$ ${formatarUSD(perPersonUsd)}`;
   } else {
-    document.getElementById('kpiTotalBrl').textContent = `R$ ${formatarBRL(totalBrl)}`;
-    document.getElementById('kpiPerPerson').textContent = `R$ ${formatarBRL(totalBrl / travelers)}`;
+    if (elTotal) elTotal.textContent = `R$ ${formatarBRL(totalBrl)}`;
+    if (elPerPerson) elPerPerson.textContent = `R$ ${formatarBRL(totalBrl / travelers)}`;
   }
 
+  // 6. Injeção Pago, Pendente e Economia
   const paidBox = document.getElementById('kpiTotalPaidContainer');
   const pendingBox = document.getElementById('kpiTotalPendingContainer');
   const economiaBox = document.getElementById('kpiEconomiaContainer');
 
-  // 2. TOTAIS PAGO, PENDENTE E ECONOMIA
-  if (!isPremium) {
-    if (paidBox) paidBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
-    if (pendingBox) pendingBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
-    if (economiaBox) economiaBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
-  } else {
-    // Transporte: calcula o que já foi pago e o que está pendente
-    const transpPago = (typeof calcularTransportePago === 'function') ? calcularTransportePago() : 0;
-    const transpPendente = Math.max(0, valorAbaTransporte - transpPago);
+  const transpPago = (typeof calcularTransportePago === 'function') ? (parseFloat(calcularTransportePago()) || 0) : 0;
+  const transpPendente = Math.max(0, valorAbaTransporte - transpPago);
 
-    const totalPagoFinal = totalPaidBrl + transpPago;
-    const totalPendenteFinal = totalPendingBrl + transpPendente;
+  const totalPagoFinal = totalPaidBrl + transpPago;
+  const totalPendenteFinal = totalPendingBrl + transpPendente;
 
-    if (paidBox) paidBox.innerHTML = `<div class="kpi-value green">R$ ${formatarBRL(totalPagoFinal)}</div>`;
-    if (pendingBox) pendingBox.innerHTML = `<div class="kpi-value red">R$ ${formatarBRL(totalPendenteFinal)}</div>`;
+  if (paidBox) paidBox.innerHTML = `<div class="kpi-value green">R$ ${formatarBRL(totalPagoFinal)}</div>`;
+  if (pendingBox) pendingBox.innerHTML = `<div class="kpi-value red">R$ ${formatarBRL(totalPendenteFinal)}</div>`;
 
-    // Economia Realizada
-    let totalOrcadoPago = 0;
-    let totalEfetivamentePago = 0;
-    (appData.budgetItems || []).forEach(item => {
-      if (item.status === 'Pago') {
-        totalOrcadoPago += item.amountBrl || 0;
-        totalEfetivamentePago += item.paidBrl || item.amountBrl || 0;
-      }
-    });
-    const economia = Math.max(0, totalOrcadoPago - totalEfetivamentePago);
-    if (economiaBox) {
-      economiaBox.style.color = economia > 0 ? '#16A34A' : '#64748B';
-      economiaBox.textContent = `R$ ${formatarBRL(economia)}`;
+  // Economia Realizada
+  let totalOrcadoPago = 0;
+  let totalEfetivamentePago = 0;
+  (appData.budgetItems || []).forEach(item => {
+    if (item.status === 'Pago') {
+      const valOrc = Number(item.amountBrl) || 0;
+      const valPag = Number(item.paidBrl) || valOrc;
+      totalOrcadoPago += valOrc;
+      totalEfetivamentePago += valPag;
     }
+  });
+  
+  const economia = Math.max(0, totalOrcadoPago - totalEfetivamentePago);
+  if (economiaBox) {
+    economiaBox.style.color = economia > 0 ? '#16A34A' : '#64748B';
+    economiaBox.textContent = `R$ ${formatarBRL(economia)}`;
   }
+}
 
   // 3. DIVISÃO POR CATEGORIA
   const tituloCategoria = document.getElementById('tituloDivisaoCategoria');
