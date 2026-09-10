@@ -504,25 +504,32 @@
 
     <!-- TAB 2: PLANEJADOR DIA A DIA -->
     <div id="tab-roteiro" class="tab-content">
-      <div class="card no-print">
-        <div class="card-title" id="actFormTitle">Adicionar Atividade ao Roteiro</div>
+      <div class="card no-print" style="margin-bottom:12px;">
         <input type="hidden" id="actEditId" value="">
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Data da Atividade</label>
-            <input type="date" id="actDate" class="form-control" onchange="atualizarDiaSemanaForm()">
-            <div id="actDiaSemana" style="display:none; font-size:12px; color:var(--brand-primary); font-weight:600; margin-top:4px;"></div>
+        <button id="actFormToggle" onclick="toggleFormRoteiro()" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--brand-primary);padding:0;font-family:inherit;display:flex;justify-content:space-between;align-items:center;">
+          <span>+ Adicionar atividade ao roteiro</span>
+          <span id="actFormToggleIcon" style="font-size:12px;color:var(--text-muted);">▼</span>
+        </button>
+        <div id="actFormBody" style="display:none;margin-top:16px;">
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Data da Atividade</label>
+              <input type="date" id="actDate" class="form-control" onchange="atualizarDiaSemanaForm()">
+              <div id="actDiaSemana" style="display:none;font-size:12px;color:var(--brand-primary);font-weight:600;margin-top:4px;"></div>
+            </div>
+            <div class="form-group"><label>Horário</label><input type="time" id="actTime" class="form-control" value="09:00"></div>
           </div>
-          <div class="form-group"><label>Horário</label><input type="time" id="actTime" class="form-control" value="09:00"></div>
+          <div class="form-group"><label>Título da Atividade / Local</label><input type="text" id="actTitle" class="form-control" placeholder="Ex: Magic Kingdom - Parque"></div>
+          <div class="form-group"><label>Observações</label><textarea id="actDesc" class="form-control" placeholder="Ex: Chegar para o Rope Drop" rows="3" style="resize:vertical;line-height:1.5;"></textarea></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-submit" id="btnActSubmit" onclick="salvarAtividade()">Salvar</button>
+            <button class="btn-cancel" id="btnActCancel" style="display:none;" onclick="cancelarEdicaoAtividade()">Cancelar</button>
+          </div>
         </div>
-        <div class="form-group"><label>Título da Atividade / Local</label><input type="text" id="actTitle" class="form-control" placeholder="Ex: Magic Kingdom - Parque"></div>
-        <div class="form-group"><label>Observações</label><textarea id="actDesc" class="form-control" placeholder="Ex: Chegar para o Rope Drop" rows="3" style="resize:vertical;line-height:1.5;"></textarea></div>
-        <button class="btn-submit" id="btnActSubmit" onclick="salvarAtividade()">Adicionar ao Roteiro</button>
-        <button class="btn-cancel" id="btnActCancel" style="display:none;" onclick="cancelarEdicaoAtividade()">Cancelar Edição</button>
       </div>
-      
-      <div id="promoRoteiroD1" style="display:none; background:#EFF6FF; border:1px dashed #2563EB; border-radius:8px; padding:12px 16px; margin-bottom:16px; font-size:13px; color:#1E40AF;">
-        🔒 <strong>Recurso Premium:</strong> Desbloqueie a organização dinâmica por dias de viagem (D1, D2, D3...) agrupada cronologicamente. <a href="#" onclick="abrirPaywall(); return false;" style="color:#2563EB; font-weight:700; text-decoration:underline;">Saber mais</a>
+
+      <div id="promoRoteiroD1" style="display:none;background:#EFF6FF;border:1px dashed #2563EB;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#1E40AF;">
+        🔒 <strong>Recurso Premium:</strong> Desbloqueie a organização dinâmica por dias de viagem (D1, D2, D3...) agrupada cronologicamente. <a href="#" onclick="abrirPaywall();return false;" style="color:#2563EB;font-weight:700;text-decoration:underline;">Saber mais</a>
       </div>
 
       <div id="cronogramaContainer"></div>
@@ -649,6 +656,12 @@
         <div id="transporteComparativoTexto" style="font-size:13px;color:var(--text-muted);"></div>
       </div>
 
+      <div class="card" id="cardTransporteRoteiro" style="display:none;">
+        <div class="card-title">🗺️ Trajetos do Roteiro</div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Itens marcados como 🚗 Transporte nas atividades do roteiro. Somente leitura — edite pelo Roteiro da Viagem.</p>
+        <div id="trajetosRoteiro"></div>
+      </div>
+
       <div class="card" id="cardTransporteResultado">
         <div class="card-title">Estimativa Total de Transporte</div>
         <div class="kpi-grid">
@@ -724,24 +737,35 @@
     <div class="modal-termos-overlay" id="modalComprasAtividade">
       <div class="modal-termos-card" style="max-width:500px;">
         <button class="modal-termos-close" onclick="fecharModalComprasAtividade()">✕</button>
-        <div class="modal-termos-titulo" id="modalComprasTitulo">🛍️ Lista de Compras</div>
+        <div class="modal-termos-titulo" id="modalComprasTitulo">📋 Lista da Atividade</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;" id="modalComprasSubtitulo"></div>
 
         <div class="grid-2" style="margin-bottom:8px;">
-          <div class="form-group"><label>Produto</label><input type="text" id="cmpProduto" class="form-control" placeholder="Ex: Tênis Nike"></div>
-          <div class="form-group"><label>Marca (opcional)</label><input type="text" id="cmpMarca" class="form-control" placeholder="Ex: Nike Air Max"></div>
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="cmpTipo" class="form-control">
+              <option value="compras">🛍️ Compras</option>
+              <option value="mercado">🛒 Mercado</option>
+              <option value="alimentacao">🍽️ Alimentação</option>
+              <option value="transporte">🚗 Transporte</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Descrição</label><input type="text" id="cmpProduto" class="form-control" placeholder="Ex: Tênis Nike, Jantar..."></div>
         </div>
         <div class="grid-2" style="margin-bottom:8px;">
-          <div class="form-group"><label>Qtd</label><input type="number" id="cmpQtd" class="form-control" value="1" min="1"></div>
-          <div class="form-group"><label>Teto de gasto (US$)</label><input type="number" id="cmpTeto" class="form-control" placeholder="0.00" step="0.01"></div>
+          <div class="form-group"><label>Marca / Detalhe <span style="font-weight:400;font-size:11px;color:var(--text-muted);">opcional</span></label><input type="text" id="cmpMarca" class="form-control" placeholder="Ex: Nike, Texas Roadhouse..."></div>
+          <div class="form-group"><label>Teto (US$)</label><input type="number" id="cmpTeto" class="form-control" placeholder="0.00" step="0.01"></div>
         </div>
-        <button class="btn-submit" onclick="adicionarItemCompra()" style="margin-bottom:16px;">+ Adicionar Item</button>
+        <button class="btn-submit" onclick="adicionarItemCompra()" style="margin-bottom:16px;">+ Adicionar</button>
 
         <div id="listaItensCompra" style="margin-bottom:12px;"></div>
 
-        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:13px;color:#166534;font-weight:600;">Teto total desta parada:</span>
-          <span style="font-size:16px;font-weight:700;color:#16A34A;" id="totalTetoAtividade">US$ 0,00</span>
+        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px 14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:13px;color:#166534;font-weight:600;">Teto total desta parada:</span>
+            <span style="font-size:16px;font-weight:700;color:#16A34A;" id="totalTetoAtividade">US$ 0,00</span>
+          </div>
+          <div id="totalTetoTipos" style="font-size:11px;color:#166534;display:flex;gap:12px;flex-wrap:wrap;"></div>
         </div>
       </div>
     </div>
@@ -1597,6 +1621,20 @@
       if (promoFree) promoFree.style.display = isPremium ? 'none' : 'block';
     }
 
+    function toggleFormRoteiro(forcarAbrir) {
+      const body = document.getElementById('actFormBody');
+      const icon = document.getElementById('actFormToggleIcon');
+      const toggle = document.getElementById('actFormToggle');
+      if (!body) return;
+      const abrir = forcarAbrir !== undefined ? forcarAbrir : body.style.display === 'none';
+      body.style.display = abrir ? 'block' : 'none';
+      if (icon) icon.textContent = abrir ? '▲' : '▼';
+      if (toggle) toggle.querySelector('span').textContent = abrir ? '− Fechar formulário' : '+ Adicionar atividade ao roteiro';
+    }
+
+    // ID do dia expandido no roteiro (para expandir só o dia certo ao editar)
+    let _diaExpandidoId = null;
+
     function renderOrcamento() {
       const container = document.getElementById('orcamentoLista');
       container.innerHTML = '';
@@ -1833,15 +1871,20 @@
         transpCard.className = 'category-card';
         transpCard.id = 'cat_Transporte';
         const transpUsd = (() => {
+          let manual = 0;
           if (!appData.transporte) return 0;
           if (appData.transporte.modo === 'app') {
-            return (appData.transporte.trajetos || []).reduce((a, t) => a + (t.valor || 0), 0);
+            manual = (appData.transporte.trajetos || []).reduce((a, t) => a + (t.valor || 0), 0);
+          } else {
+            const days = parseFloat(document.getElementById('carDays')?.value) || 0;
+            const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
+            const park = parseFloat(document.getElementById('carPark')?.value) || 0;
+            const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
+            manual = days * (daily + park) + fuel;
           }
-          const days = parseFloat(document.getElementById('carDays')?.value) || 0;
-          const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
-          const park = parseFloat(document.getElementById('carPark')?.value) || 0;
-          const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
-          return days * (daily + park) + fuel;
+          const doRoteiro = (appData.activities || []).reduce((s, at) =>
+            s + (at.compras || []).filter(c => c.tipo === 'transporte').reduce((a, c) => a + (c.teto || 0), 0), 0);
+          return manual + doRoteiro;
         })();
         const transpBrl = transpUsd * rate;
         transpCard.dataset.modo = 'brl';
@@ -2321,13 +2364,16 @@
       if (editId) {
         const item = appData.activities.find(a => a.id == editId);
         if (item) { item.date = date; item.time = time; item.title = title; item.desc = desc; }
+        _diaExpandidoId = date; // Mantém o dia expandido após salvar edição
       } else {
-        appData.activities.push({ id: Date.now(), date, time, title, desc });
+        appData.activities.push({ id: Date.now(), date, time, title, desc, compras: [] });
+        _diaExpandidoId = date;
       }
 
       salvar();
       renderRoteiroCronologico();
       cancelarEdicaoAtividade();
+      toggleFormRoteiro(false);
     }
 
     function editarAtividade(id) {
@@ -2340,11 +2386,13 @@
       document.getElementById('actTitle').value = item.title;
       document.getElementById('actDesc').value = item.desc || '';
 
-      document.getElementById('actFormTitle').textContent = 'Editar Atividade';
-      document.getElementById('btnActSubmit').textContent = 'Salvar Alterações';
-      document.getElementById('btnActCancel').style.display = 'block';
+      const cancelBtn = document.getElementById('btnActCancel');
+      const submitBtn = document.getElementById('btnActSubmit');
+      if (cancelBtn) cancelBtn.style.display = 'inline-block';
+      if (submitBtn) submitBtn.textContent = 'Salvar Alterações';
       atualizarDiaSemanaForm();
-
+      _diaExpandidoId = item.date; // Expande só o dia desta atividade
+      toggleFormRoteiro(true);
       window.scrollTo({ top: document.getElementById('tab-roteiro').offsetTop - 20, behavior: 'smooth' });
     }
 
@@ -2354,11 +2402,12 @@
       document.getElementById('actTime').value = '09:00';
       document.getElementById('actTitle').value = '';
       document.getElementById('actDesc').value = '';
-
-      document.getElementById('actFormTitle').textContent = 'Adicionar Atividade ao Roteiro';
-      document.getElementById('btnActSubmit').textContent = 'Adicionar ao Roteiro';
-      document.getElementById('btnActCancel').style.display = 'none';
+      const cancelBtn = document.getElementById('btnActCancel');
+      const submitBtn = document.getElementById('btnActSubmit');
+      if (cancelBtn) cancelBtn.style.display = 'none';
+      if (submitBtn) submitBtn.textContent = 'Salvar';
       atualizarDiaSemanaForm();
+      toggleFormRoteiro(false);
     }
 
     function removerAtividade(id) {
@@ -2422,8 +2471,23 @@
           diaTag = diffDays > 0 ? `D${diffDays}` : `Pré-Viagem`;
         }
 
+        // Dia expande só se for o _diaExpandidoId
+        const esteAberto = dataStr === _diaExpandidoId;
         const accordion = document.createElement('div');
-        accordion.className = 'day-accordion open';
+        accordion.className = `day-accordion${esteAberto ? ' open' : ''}`;
+
+        // Resumo por tipo de todos os itens do dia
+        const tiposEmoji = { compras:'🛍️', mercado:'🛒', alimentacao:'🍽️', transporte:'🚗' };
+        const resumoDia = {};
+        atividades.forEach(at => (at.compras || []).forEach(c => {
+          const t = c.tipo || 'compras';
+          if (!resumoDia[t]) resumoDia[t] = { teto: 0, qtd: 0 };
+          resumoDia[t].teto += (c.teto || 0);
+          resumoDia[t].qtd += 1;
+        }));
+        const resumoDiaHtml = Object.entries(resumoDia).map(([t, v]) =>
+          `<span style="font-size:11px;color:var(--text-muted);">${tiposEmoji[t]||'📋'} US$ ${formatarUSD(v.teto)}</span>`
+        ).join(' · ');
 
         let html = `
           <div class="day-header" onclick="toggleAccordion(this)">
@@ -2431,26 +2495,38 @@
               <span class="day-badge">${diaTag}</span>
               <span class="day-date-str">${formatarDataBR(dataStr)} · ${obterDiaSemana(dataStr)}</span>
               <span class="day-count-tag">(${atividades.length} atividade${atividades.length > 1 ? 's' : ''})</span>
+              ${resumoDiaHtml ? `<span style="margin-left:8px;">${resumoDiaHtml}</span>` : ''}
             </div>
-            <span class="day-arrow">▼</span>
+            <span class="day-arrow">${esteAberto ? '▲' : '▼'}</span>
           </div>
-          <div class="day-content">
+          <div class="day-content" style="${esteAberto ? '' : 'display:none;'}">
         `;
-        
+
         atividades.forEach(item => {
-          const nItens = item.compras?.length || 0;
-          const tetoAt = (item.compras || []).reduce((a, c) => a + c.teto * c.qtd, 0);
-          const compradosAt = (item.compras || []).filter(c => c.comprado).length;
+          const itens = item.compras || [];
+          const nItens = itens.length;
+          // Resumo por tipo na atividade
+          const tiposAt = {};
+          itens.forEach(c => {
+            const t = c.tipo || 'compras';
+            if (!tiposAt[t]) tiposAt[t] = { teto: 0, qtd: 0 };
+            tiposAt[t].teto += (c.teto || 0);
+            tiposAt[t].qtd += 1;
+          });
+          const resumoAtHtml = Object.entries(tiposAt).map(([t, v]) =>
+            `${tiposEmoji[t]||'📋'} ${v.qtd} · US$ ${formatarUSD(v.teto)}`
+          ).join(' &nbsp; ');
+
           html += `
             <div class="activity-item">
               <div class="activity-time">${item.time || '--:--'}</div>
               <div class="activity-info">
                 <strong>${item.title}</strong>
-                ${item.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-top:2px; white-space:pre-wrap;">${item.desc}</div>` : ''}
-                ${nItens > 0 ? `<div style="font-size:11px;color:var(--brand-primary);margin-top:4px;font-weight:600;cursor:pointer;" onclick="abrirModalComprasAtividade(${item.id})">🛍️ ${nItens} ite${nItens > 1 ? 'ns' : 'm'} · Teto: US$ ${formatarUSD(tetoAt)} ▾</div>` : ''}
+                ${item.desc ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:pre-wrap;">${item.desc}</div>` : ''}
+                ${nItens > 0 ? `<div style="font-size:11px;color:var(--brand-primary);margin-top:4px;cursor:pointer;" onclick="abrirModalComprasAtividade(${item.id})">${resumoAtHtml} ▾</div>` : ''}
               </div>
               <div style="display:flex;flex-direction:row;gap:4px;align-items:center;">
-                ${isPremium ? `<button class="btn-action-icon" title="Lista de compras" onclick="abrirModalComprasAtividade(${item.id})">🛍️</button>` : ''}
+                ${isPremium ? `<button class="btn-action-icon" title="Lista da atividade" onclick="abrirModalComprasAtividade(${item.id})">📋</button>` : ''}
                 <button class="btn-action-icon" onclick="editarAtividade(${item.id})">✏️</button>
                 <button class="btn-action-icon" style="color:var(--danger);" onclick="removerAtividade(${item.id})">🗑️</button>
               </div>
@@ -2507,11 +2583,34 @@
       const rate = appData.config?.dollarRate || 5.20;
       const modo = appData.transporte.modo || 'carro';
 
-      // Restaurar seleção do radio
       const radioEl = document.getElementById(modo === 'carro' ? 'modoCarro' : 'modoApp');
       if (radioEl) radioEl.checked = true;
       document.getElementById('campusCarro').style.display = modo === 'carro' ? 'block' : 'none';
       document.getElementById('campusApp').style.display = modo === 'app' ? 'block' : 'none';
+
+      // Trajetos do roteiro (itens tipo 'transporte' nas atividades)
+      const trajetosRoteiro = [];
+      (appData.activities || []).forEach(at => {
+        (at.compras || []).filter(c => c.tipo === 'transporte').forEach(c => {
+          trajetosRoteiro.push({ desc: c.produto, detalhe: c.marca, teto: c.teto || 0, data: at.date, hora: at.time });
+        });
+      });
+      const totalRoteiro = trajetosRoteiro.reduce((a, t) => a + t.teto, 0);
+      const cardRoteiro = document.getElementById('cardTransporteRoteiro');
+      const listaRoteiro = document.getElementById('trajetosRoteiro');
+      if (cardRoteiro) cardRoteiro.style.display = trajetosRoteiro.length > 0 ? 'block' : 'none';
+      if (listaRoteiro) {
+        listaRoteiro.innerHTML = trajetosRoteiro.map(t =>
+          `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
+            <div>
+              <span style="font-weight:500;">${t.desc}</span>
+              ${t.detalhe ? `<span style="color:var(--text-muted);font-size:12px;"> · ${t.detalhe}</span>` : ''}
+              ${t.data ? `<div style="font-size:11px;color:var(--text-muted);">${t.hora || ''} · ${t.data.split('-').reverse().join('/')}</div>` : ''}
+            </div>
+            <span style="font-weight:600;">US$ ${formatarUSD(t.teto)}</span>
+          </div>`
+        ).join('');
+      }
 
       let totalUsd = 0;
       if (modo === 'carro') {
@@ -2540,9 +2639,17 @@
         document.getElementById('trajetosLista').innerHTML = html;
       }
 
-      document.getElementById('kpiTransporteTotal').textContent = `US$ ${formatarUSD(totalUsd)}`;
-      document.getElementById('kpiTransporteTotalBrl').textContent = `R$ ${formatarBRL(totalUsd * rate)}`;
+      // Total inclui manual + roteiro
+      const totalComRoteiro = totalUsd + totalRoteiro;
+
+      document.getElementById('kpiTransporteTotal').textContent = `US$ ${formatarUSD(totalComRoteiro)}`;
+      document.getElementById('kpiTransporteTotalBrl').textContent = `R$ ${formatarBRL(totalComRoteiro * rate)}`;
       document.getElementById('kpiTransporteModo').textContent = modo === 'carro' ? '🚗 Carro Alugado' : '🚌 App / Transporte';
+      if (totalRoteiro > 0) {
+        const nota = document.getElementById('kpiTransporteModo');
+        if (nota) nota.innerHTML = (modo === 'carro' ? '🚗 Carro Alugado' : '🚌 App / Transporte') +
+          `<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Inclui US$ ${formatarUSD(totalUsd)} manual + US$ ${formatarUSD(totalRoteiro)} do roteiro</div>`;
+      }
 
       // Comparativo Carro vs App (só mostra se tiver dados em ambos os modos)
       const compCard = document.getElementById('cardTransporteComparativo');
@@ -2595,16 +2702,15 @@
     function adicionarItemCompra() {
       const produto = document.getElementById('cmpProduto').value.trim();
       if (!produto) return;
+      const tipo = document.getElementById('cmpTipo')?.value || 'compras';
       const marca = document.getElementById('cmpMarca').value.trim();
-      const qtd = parseInt(document.getElementById('cmpQtd').value) || 1;
       const teto = parseFloat(document.getElementById('cmpTeto').value) || 0;
       const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
       if (!atividade) return;
       if (!atividade.compras) atividade.compras = [];
-      atividade.compras.push({ id: Date.now(), produto, marca, qtd, teto, comprado: false });
+      atividade.compras.push({ id: Date.now(), tipo, produto, marca, teto, comprado: false });
       document.getElementById('cmpProduto').value = '';
       document.getElementById('cmpMarca').value = '';
-      document.getElementById('cmpQtd').value = '1';
       document.getElementById('cmpTeto').value = '';
       salvar();
       renderListaItensCompra();
@@ -2665,48 +2771,60 @@
       const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
       const lista = document.getElementById('listaItensCompra');
       const totalEl = document.getElementById('totalTetoAtividade');
+      const tiposEl = document.getElementById('totalTetoTipos');
       if (!atividade || !lista) return;
       const itens = atividade.compras || [];
+      const tiposEmoji = { compras:'🛍️', mercado:'🛒', alimentacao:'🍽️', transporte:'🚗' };
       let total = 0;
+      const porTipo = {};
       let html = itens.length === 0 ? '<p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Nenhum item ainda.</p>' : '';
       itens.forEach(it => {
-        total += it.teto * it.qtd;
+        total += it.teto || 0;
+        const t = it.tipo || 'compras';
+        porTipo[t] = (porTipo[t] || 0) + (it.teto || 0);
         html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-color);font-size:13px;${it.comprado ? 'opacity:0.5;text-decoration:line-through;' : ''}">
           <input type="checkbox" ${it.comprado ? 'checked' : ''} onchange="toggleItemComprado(${atividade.id},${it.id})" style="width:16px;height:16px;cursor:pointer;flex-shrink:0;">
+          <span style="font-size:15px;">${tiposEmoji[t]||'📋'}</span>
           <div style="flex:1;">
-            <strong>${it.produto}</strong>${it.marca ? ` <span style="color:var(--text-muted)">(${it.marca})</span>` : ''}
-            <span style="color:var(--text-muted)"> × ${it.qtd}</span>
+            <span style="font-weight:500;">${it.produto}</span>${it.marca ? ` <span style="color:var(--text-muted);font-size:12px;">(${it.marca})</span>` : ''}
           </div>
-          <span style="font-weight:600;white-space:nowrap;">US$ ${formatarUSD(it.teto * it.qtd)}</span>
+          <span style="font-weight:600;white-space:nowrap;">US$ ${formatarUSD(it.teto || 0)}</span>
           <button class="btn-action-icon" onclick="editarItemCompra(${it.id})">✏️</button>
           <button class="btn-action-icon" style="color:var(--danger)" onclick="removerItemCompra(${it.id})">🗑️</button>
         </div>`;
       });
       lista.innerHTML = html;
       if (totalEl) totalEl.textContent = `US$ ${formatarUSD(total)}`;
+      if (tiposEl) {
+        tiposEl.innerHTML = Object.entries(porTipo)
+          .map(([t, v]) => `<span>${tiposEmoji[t]||'📋'} US$ ${formatarUSD(v)}</span>`)
+          .join(' · ');
+      }
     }
 
-    // ===== ABA COMPRAS CONSOLIDADA =====
+    // ===== ABA COMPRAS CONSOLIDADA (só 🛍️ e 🛒) =====
     function renderCompras() {
       if (!isPremium) return;
       const container = document.getElementById('comprasConsolidada');
       if (!container) return;
       const roteiro = appData.activities || [];
+      const tiposEmoji = { compras:'🛍️', mercado:'🛒' };
       const porDia = {};
       roteiro.forEach(at => {
-        if (!at.compras || at.compras.length === 0) return;
+        // Filtra só itens de compras e mercado
+        const itens = (at.compras || []).filter(c => c.tipo === 'compras' || c.tipo === 'mercado' || !c.tipo);
+        if (!itens.length) return;
         const dia = at.date || 'Sem data';
         if (!porDia[dia]) porDia[dia] = [];
-        porDia[dia].push(at);
+        porDia[dia].push({ ...at, compras: itens });
       });
       const dias = Object.keys(porDia).sort();
       if (dias.length === 0) {
-        container.innerHTML = '<p style="font-size:13px;color:var(--text-muted);text-align:center;padding:24px;">Nenhum item de compra adicionado ainda. Abra uma atividade no Roteiro e clique em 🛍️ para adicionar.</p>';
+        container.innerHTML = '<p style="font-size:13px;color:var(--text-muted);text-align:center;padding:24px;">Nenhum item de compras ou mercado adicionado ainda.<br>Abra uma atividade no Roteiro e use 📋 para adicionar itens do tipo 🛍️ ou 🛒.</p>';
         return;
       }
 
-      // Calcular D1 baseado na data de ida da viagem
-      const dataIda = appData.config?.travelDate;
+      const dataIda = appData.config?.startDate;
       const dataInicioMs = dataIda ? new Date(dataIda + 'T00:00:00').getTime() : null;
 
       function getDiaViagem(dataIso) {
@@ -2715,12 +2833,12 @@
         const diff = Math.round((d - dataInicioMs) / 86400000);
         return diff >= 0 ? `D${diff + 1}` : null;
       }
-
       function fmtDia(d) {
         if (!d || d === 'Sem data') return d;
         const p = d.split('-');
         return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
       }
+
       let html = '';
       let totalGeral = 0;
       dias.forEach((dia, idx) => {
@@ -2728,11 +2846,10 @@
         const acordId = `comprasDia_${idx}`;
         let totalDia = 0;
         let htmlAt = '';
-        // Ordenar atividades alfabeticamente pelo título
         const atOrdenadas = [...atividades].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
         atOrdenadas.forEach(at => {
           const itens = [...(at.compras || [])].sort((a, b) => (a.produto || '').localeCompare(b.produto || '', 'pt'));
-          const totalAt = itens.reduce((a, i) => a + i.teto * i.qtd, 0);
+          const totalAt = itens.reduce((a, i) => a + (i.teto || 0), 0);
           totalDia += totalAt;
           totalGeral += totalAt;
           const comprados = itens.filter(i => i.comprado).length;
@@ -2744,8 +2861,9 @@
           itens.forEach(it => {
             htmlAt += `<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border-color);${it.comprado ? 'opacity:0.5;text-decoration:line-through;' : ''}">
               <input type="checkbox" ${it.comprado ? 'checked' : ''} onchange="toggleItemCompradoConsolidado(${at.id},${it.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
-              <span style="flex:1;">${it.produto}${it.marca ? ' ('+it.marca+')' : ''} × ${it.qtd}</span>
-              <span style="font-weight:600;">US$ ${formatarUSD(it.teto * it.qtd)}</span>
+              <span>${tiposEmoji[it.tipo]||'📋'}</span>
+              <span style="flex:1;">${it.produto}${it.marca ? ' ('+it.marca+')' : ''}</span>
+              <span style="font-weight:600;">US$ ${formatarUSD(it.teto || 0)}</span>
             </div>`;
           });
           htmlAt += '</div>';
@@ -2764,7 +2882,7 @@
           </div>`;
       });
       html += `<div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-        <span style="font-weight:700;color:#166534;">Total geral de compras (teto)</span>
+        <span style="font-weight:700;color:#166534;">Total geral 🛍️+🛒 (teto)</span>
         <span style="font-size:18px;font-weight:700;color:#16A34A;">US$ ${formatarUSD(totalGeral)}</span>
       </div>`;
       container.innerHTML = html;
