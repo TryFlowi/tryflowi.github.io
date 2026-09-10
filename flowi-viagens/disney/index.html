@@ -1780,9 +1780,15 @@ const valorAbaTransporte = (typeof calcularTransporte === 'function') ? calcular
         const cat = item.category || 'Outros';
         catTotalsBrl[cat] = (catTotalsBrl[cat] || 0) + brl;
       });
-totalBrl += valorAbaTransporte;
+// 1. Obtém o valor do transporte em BRL para somar nos totais gerais
+  totalBrl += valorAbaTransporte;
   totalNationalBrl += valorAbaTransporte;
-  catTotalsBrl['Transporte'] = valorAbaTransporte;
+
+  // 2. Garante que o totalizador geral em BRL receba a soma correta
+  // (NÃO sobrescreve catTotalsBrl['Transporte'] para preservar o valor original em USD do card)
+  if (!catTotalsBrl['Transporte']) {
+    catTotalsBrl['Transporte'] = valorAbaTransporte;
+  }
       const travelers = appData.config.travelers || 1;
       const rate = appData.config.dollarRate || 5.20;
       const viewCurrencyEl = document.querySelector('input[name="viewCurrency"]:checked');
