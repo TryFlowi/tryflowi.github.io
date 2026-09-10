@@ -1636,104 +1636,110 @@
     let _diaExpandidoId = null;
 
     function renderOrcamento() {
-      const container = document.getElementById('orcamentoLista');
-      container.innerHTML = '';
+  const container = document.getElementById('orcamentoLista');
+  const items = appData.budgetItems || [];
+  const rate = appData.config?.dollarRate || 5.20;
 
-      if (appData.budgetItems.length === 0) {
-        container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">Nenhum item orçado ainda. Clique em "+ Adicionar" acima para começar.</div>';
-        return;
-      }
+  // 1. Soma todos os itens do orçamento em R$
+  let totalGeral = items.reduce((acc, item) => acc + (parseFloat(item.amountBrl) || 0), 0);
 
-      if (!isPremium) {
-        // Free: lista simples, sem agrupamento
-        const itens = [...appData.budgetItems].sort((a, b) => (a.desc || '').localeCompare(b.desc || '', 'pt'));
-        itens.forEach(item => {
-          const row = document.createElement('div');
-          row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border-color);font-size:13px;gap:8px;';
-          row.innerHTML = `
-            <strong style="flex:1;">${item.desc}</strong>
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-weight:700;color:var(--brand-primary);">R$ ${formatarBRL(item.amountBrl)}</span>
-              <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
-              <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
-            </div>
-          `;
-          container.appendChild(row);
-        });
-        return;
-      }
-
-      // Premium: agrupa por categoria em accordion, minimizado, alfabético
-      const ordemCats = ['Passagens','Hospedagem','Parques e Ingressos','Alimentação','Compras','Outros'];
-      const porCat = {};
-      appData.budgetItems.forEach(item => {
-        const cat = item.category || 'Outros';
-        if (!porCat[cat]) porCat[cat] = [];
-        porCat[cat].push(item);
-      });
-
-      // Ordena categorias pela ordem padrão, colocando as demais no final
-      const cats = [...new Set([...ordemCats, ...Object.keys(porCat)])].filter(c => porCat[c]);
-
-      cats.forEach((cat, idx) => {
-        const itens = [...porCat[cat]].sort((a, b) => (a.desc || '').localeCompare(b.desc || '', 'pt'));
-        const totalCat = itens.reduce((s, i) => s + (i.amountBrl || 0), 0);
-        const pagosCat = itens.filter(i => i.status === 'Pago').reduce((s, i) => s + (i.paidBrl || i.amountBrl || 0), 0);
-        const acordId = `catAccord_${idx}`;
-
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = 'border:1px solid var(--border-color);border-radius:10px;margin-bottom:8px;overflow:hidden;';
-
-        // Header do accordion
-        const header = document.createElement('div');
-        header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;background:var(--bg-card);';
-        header.innerHTML = `
-          <div style="display:flex;align-items:center;gap:10px;">
-            <strong style="font-size:14px;font-weight:700;">${cat}</strong>
-            <span style="font-size:11px;color:var(--text-muted);font-weight:400;">${itens.length} ite${itens.length > 1 ? 'ns' : 'm'}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <span style="font-size:12px;font-weight:600;">R$ ${formatarBRL(totalCat)}</span>
-            ${pagosCat > 0 ? `<span style="font-size:11px;color:var(--success);">Pago: R$ ${formatarBRL(pagosCat)}</span>` : ''}
-            <span class="caret-cat" style="font-size:11px;color:var(--text-muted);transition:transform .2s;">▼</span>
-          </div>
-        `;
-
-        // Body do accordion (minimizado por padrão)
-        const body = document.createElement('div');
-        body.id = acordId;
-        body.style.display = 'none';
-
-        header.onclick = () => {
-          const aberto = body.style.display !== 'none';
-          body.style.display = aberto ? 'none' : 'block';
-          header.querySelector('.caret-cat').style.transform = aberto ? 'rotate(0deg)' : 'rotate(180deg)';
-        };
-
-        itens.forEach(item => {
-          const status = item.status || 'Pendente';
-          const row = document.createElement('div');
-          row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid var(--border-color);font-size:13px;gap:8px;';
-          row.innerHTML = `
-            <div style="flex:1;">
-              <span style="font-weight:500;color:var(--text-main);">${item.desc}</span>
-              ${status === 'Pago' ? `<div style="font-size:11px;color:var(--success);">Pago: R$ ${formatarBRL(item.paidBrl || item.amountBrl)}</div>` : ''}
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-weight:600;white-space:nowrap;">R$ ${formatarBRL(item.amountBrl)}</span>
-              <button class="badge-status ${status === 'Pago' ? 'status-pago' : 'status-pendente'}" onclick="toggleStatusOrcamento(${item.id})">${status}</button>
-              <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
-              <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
-            </div>
-          `;
-          body.appendChild(row);
-        });
-
-        wrapper.appendChild(header);
-        wrapper.appendChild(body);
-        container.appendChild(wrapper);
-      });
+  // Soma também o valor de transporte se estiver configurado
+  if (appData.transporte) {
+    if (appData.transporte.modo === 'carro') {
+      const days = parseFloat(document.getElementById('carDays')?.value) || 0;
+      const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
+      const park = parseFloat(document.getElementById('carPark')?.value) || 0;
+      const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
+      totalGeral += (days * (daily + park) + fuel) * rate;
+    } else {
+      totalGeral += (appData.transporte.trajetos || []).reduce((acc, t) => acc + (t.valor || 0), 0) * rate;
     }
+  }
+
+  // 2. Calcula Gasto Por Pessoa e Total Pendente
+  const pessoas = parseInt(appData.config?.peopleCount || appData.config?.passengers) || 1;
+  const totalPago = parseFloat(appData.orcamento?.totalPago) || 5000;
+  const totalPendente = Math.max(0, totalGeral - totalPago);
+  const gastoPorPessoa = pessoas > 0 ? (totalGeral / pessoas) : totalGeral;
+
+  // 3. Atualiza os cards de KPI no topo da página
+  const elGastoTotal = document.getElementById('kpiGastoTotal') || document.querySelector('[data-kpi="gasto-total"]');
+  const elGastoPessoa = document.getElementById('kpiGastoPessoa') || document.querySelector('[data-kpi="gasto-pessoa"]');
+  const elTotalPendente = document.getElementById('kpiTotalPendente') || document.querySelector('[data-kpi="total-pendente"]');
+
+  if (elGastoTotal) elGastoTotal.textContent = `R$ ${formatarBRL(totalGeral)}`;
+  if (elGastoPessoa) elGastoPessoa.textContent = `R$ ${formatarBRL(gastoPorPessoa)}`;
+  if (elTotalPendente) elTotalPendente.textContent = `R$ ${formatarBRL(totalPendente)}`;
+
+  // 4. Renderiza a lista de itens na tela
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (items.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">Nenhum item orçado ainda. Clique em "+ Adicionar" acima para começar.</div>';
+    return;
+  }
+
+  if (!isPremium) {
+    const ordenados = [...items].sort((a, b) => (a.desc || '').localeCompare(b.desc || '', 'pt'));
+    ordenados.forEach(item => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border-color);font-size:13px;gap:8px;';
+      row.innerHTML = `
+        <strong style="flex:1;">${item.desc}</strong>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-weight:700;color:var(--brand-primary);">R$ ${formatarBRL(item.amountBrl || 0)}</span>
+          <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
+          <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
+        </div>
+      `;
+      container.appendChild(row);
+    });
+    return;
+  }
+
+  // Agrupamento por Categoria (Versão Premium)
+  const ordemCats = ['Passagens', 'Hospedagem', 'Parques e Ingressos', 'Alimentação', 'Compras', 'Outros'];
+  const porCat = {};
+  items.forEach(item => {
+    const c = item.cat || 'Outros';
+    if (!porCat[c]) porCat[c] = [];
+    porCat[c].push(item);
+  });
+
+  ordemCats.forEach(cat => {
+    if (!porCat[cat] || porCat[cat].length === 0) return;
+    const catItems = porCat[cat];
+    const totalCat = catItems.reduce((a, i) => a + (parseFloat(i.amountBrl) || 0), 0);
+
+    const catDiv = document.createElement('div');
+    catDiv.style.cssText = 'border:1px solid var(--border-color);border-radius:8px;margin-bottom:8px;overflow:hidden;';
+    
+    let htmlItens = '';
+    catItems.forEach(it => {
+      htmlItens += `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border-color);font-size:12px;">
+          <span>${it.desc}</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-weight:600;">R$ ${formatarBRL(it.amountBrl || 0)}</span>
+            <button class="btn-action-icon" onclick="editarOrcamento(${it.id})">✏️</button>
+            <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${it.id})">🗑️</button>
+          </div>
+        </div>
+      `;
+    });
+
+    catDiv.innerHTML = `
+      <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" 
+           style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg-card);cursor:pointer;font-weight:600;font-size:13px;">
+        <span>${cat}</span>
+        <span style="color:var(--brand-primary);">R$ ${formatarBRL(totalCat)}</span>
+      </div>
+      <div style="display:block;background:#FFF;">${htmlItens}</div>
+    `;
+    container.appendChild(catDiv);
+  });
+}
 
     function atualizarMoedaVisualizacao() {
       if (!isPremium) return;
