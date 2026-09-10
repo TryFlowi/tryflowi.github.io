@@ -404,7 +404,7 @@
 
       <!-- 3 botões de acesso rápido -->
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-        <button onclick="abrirModalTermos('modalDicas')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
+        <button onclick="abrirModalPremium('modalDicas')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
           💡 Dicas da Viagem
         </button>
         <button onclick="abrirModalPremium('modalMetas')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
@@ -1618,6 +1618,12 @@
 
     /* --- CÁLCULO DAS DASHBOARDS E RESUMOS CONSOLIDADOS --- */
     function renderDashboardCalculos() {
+      // Salva estado dos botões 💱 antes de re-renderizar os cards de categoria
+      const estadosBotoes = {};
+      document.querySelectorAll('.category-card[id]').forEach(card => {
+        estadosBotoes[card.id] = card.dataset.modo || 'brl';
+      });
+
       let totalBrl = 0;
       let totalNationalBrl = 0;
       let totalForeignBrl = 0;
@@ -1729,7 +1735,7 @@
             <div class="category-name">${cat}</div>
             <div class="category-amount" id="${cardId}_val">R$ ${formatarBRL(valorBrl)}</div>
             ${podeConverter && isPremium ? `
-              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Lançado em R$ na aba Orçamento · cotação R$ ${rate}/US$</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Lançado em R$ · cotação R$ ${rate}/US$</div>
               <button onclick="toggleCategoriaMoeda('${cardId}',${valorBrl},${rate})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>
             ` : ''}
           `;
@@ -1753,6 +1759,7 @@
         })();
         const transpBrl = transpUsd * rate;
         transpCard.dataset.modo = 'brl';
+        transpCard.dataset.usdOriginal = transpUsd;
         transpCard.innerHTML = `
           <div class="category-name">🚗 Transporte</div>
           <div class="category-amount" id="cat_Transporte_val">R$ ${formatarBRL(transpBrl)}</div>
@@ -1761,6 +1768,28 @@
         `;
         grid.appendChild(transpCard);
         wrapper.appendChild(grid);
+
+        // Restaura estado dos botões 💱 que estavam ativos antes do re-render
+        Object.entries(estadosBotoes).forEach(([id, modo]) => {
+          if (modo === 'usd') {
+            const card = document.getElementById(id);
+            if (!card) return;
+            const valEl = document.getElementById(id + '_val');
+            const btn = card.querySelector('button');
+            if (!valEl || !btn) return;
+            const brl = parseFloat(card.dataset.brl) || 0;
+            // Transporte: usa USD original; outros: divide BRL pela cotação
+            if (id === 'cat_Transporte') {
+              const usdOriginal = parseFloat(card.dataset.usdOriginal) || 0;
+              valEl.textContent = `US$ ${formatarUSD(usdOriginal)}`;
+            } else {
+              const r = appData.config?.dollarRate || 5.20;
+              valEl.textContent = `US$ ${formatarUSD(r > 0 ? brl / r : 0)}`;
+            }
+            btn.textContent = '💱 ver em R$';
+            card.dataset.modo = 'usd';
+          }
+        });
       }
     }
 
