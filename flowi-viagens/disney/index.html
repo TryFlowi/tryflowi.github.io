@@ -401,6 +401,20 @@
 
     <!-- TAB 1: INÍCIO -->
     <div id="tab-inicio" class="tab-content active">
+
+      <!-- 3 botões de acesso rápido -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button onclick="abrirModalTermos('modalDicas')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
+          💡 Dicas da Viagem
+        </button>
+        <button onclick="abrirModalPremium('modalMetas')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
+          🎯 Metas de Economia
+        </button>
+        <button onclick="abrirModalPremium('modalMala')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
+          🧳 Checklist de Mala
+        </button>
+      </div>
+
       <div class="card no-print">
         <div class="card-title">
           <span>Configuração da Viagem</span>
@@ -440,7 +454,7 @@
 
       <!-- PAINEL DE RESUMO E INDICADORES CONSOLIDADOS -->
       <div class="card">
-        <div class="card-title">Resumo do Orçamento</div>
+        <div class="card-title">Resumo do Orçamento <span style="font-weight:400;font-size:11px;color:var(--text-muted);text-transform:none;letter-spacing:0;">(valores em R$)</span></div>
         
         <div class="info-box" id="infoBoxResumo">
           ℹ️ <strong>Aviso:</strong> No modo Free, todos os lançamentos e o resumo do orçamento são exibidos apenas em Reais (BRL).
@@ -478,6 +492,7 @@
           <div class="kpi-card"><div class="kpi-label">Gasto Por Pessoa</div><div class="kpi-value" id="kpiPerPerson">R$ 0,00</div></div>
           <div class="kpi-card"><div class="kpi-label">Total Pago</div><div id="kpiTotalPaidContainer"></div></div>
           <div class="kpi-card"><div class="kpi-label">Total Pendente</div><div id="kpiTotalPendingContainer"></div></div>
+          <div class="kpi-card"><div class="kpi-label">💰 Economia Realizada</div><div id="kpiEconomiaContainer" style="font-size:18px;font-weight:700;color:#16A34A;">R$ 0,00</div></div>
         </div>
       </div>
 
@@ -520,7 +535,7 @@
           <div class="form-group"><label>Horário</label><input type="time" id="actTime" class="form-control" value="09:00"></div>
         </div>
         <div class="form-group"><label>Título da Atividade / Local</label><input type="text" id="actTitle" class="form-control" placeholder="Ex: Magic Kingdom - Parque"></div>
-        <div class="form-group"><label>Observações</label><input type="text" id="actDesc" class="form-control" placeholder="Ex: Chegar para o Rope Drop"></div>
+        <div class="form-group"><label>Observações</label><textarea id="actDesc" class="form-control" placeholder="Ex: Chegar para o Rope Drop" rows="3" style="resize:vertical;line-height:1.5;"></textarea></div>
         <button class="btn-submit" id="btnActSubmit" onclick="salvarAtividade()">Adicionar ao Roteiro</button>
         <button class="btn-cancel" id="btnActCancel" style="display:none;" onclick="cancelarEdicaoAtividade()">Cancelar Edição</button>
       </div>
@@ -532,92 +547,60 @@
       <div id="cronogramaContainer"></div>
     </div>
 
-    <!-- TAB 3: ORÇAMENTO (COM ENTRADA EM USD E CONVERSÃO AUTO EM BRL) -->
+    <!-- TAB 3: ORÇAMENTO -->
     <div id="tab-orcamento" class="tab-content">
       <div class="card no-print">
         <div class="card-title" id="budFormTitle">Adicionar Custo ao Orçamento</div>
         <input type="hidden" id="budEditId" value="">
-        
+
         <div class="grid-2">
-          <div class="form-group"><label>Descrição do Gasto</label><input type="text" id="budDesc" class="form-control" placeholder="Ex: Alimentação nos Parques, Passagens..."></div>
-          <div class="form-group" id="groupBudCategory">
+          <div class="form-group"><label>Descrição do Gasto</label><input type="text" id="budDesc" class="form-control" placeholder="Ex: Passagens aéreas, Hospedagem..."></div>
+          <div class="form-group">
             <label>Categoria</label>
             <select id="budCategory" class="form-control">
               <option value="Passagens">✈️ Passagens</option>
               <option value="Hospedagem">🏨 Hospedagem</option>
               <option value="Parques e Ingressos">🏰 Parques & Ingressos</option>
               <option value="Alimentação">🍕 Alimentação</option>
-              <option value="Transporte">🚗 Transporte</option>
               <option value="Compras">🛍️ Compras</option>
-              <option value="Outros">📌 Outros</option>
+              <option value="Outros">📌 Outros (exceto transporte — use a aba Transporte)</option>
             </select>
           </div>
         </div>
 
-        <!-- TIPO DE GASTO (exclusivo Premium) -->
-        <div class="form-group" id="groupBudType" style="display:none;">
-          <label>Tipo de Gasto</label>
-          <div class="radio-group">
-            <label class="radio-label">
-              <input type="radio" name="budType" value="nacional" checked onchange="toggleFormularioEstrangeiro()"> Nacional (BRL)
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="budType" value="estrangeiro" onchange="toggleFormularioEstrangeiro()"> Estrangeiro (USD)
-            </label>
-          </div>
-        </div>
-
-        <div id="promoMoedaFree" style="display:none; background:#F8FAFC; border:1px solid var(--border-color); border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:12px; color:var(--text-muted);">
-          🔒 <strong>Modo Free:</strong> lançamentos apenas em Reais (BRL). A conversão automática Real ↔ Dólar é exclusiva da <a href="#" onclick="abrirPaywall(); return false;" style="color:var(--brand-primary); font-weight:700;">versão Premium</a>.
-        </div>
-
         <div class="grid-2">
-          <!-- CAMPO NACIONAL (BRL) -->
-          <div class="form-group" id="groupBudBrl">
-            <label>Valor em Reais (R$)</label>
+          <div class="form-group">
+            <label>Valor Estimado (R$)</label>
             <input type="number" id="budAmountBrl" class="form-control" placeholder="0.00" step="0.01">
           </div>
-          
-          <!-- CAMPO ESTRANGEIRO (USD) — exclusivo Premium -->
-          <div class="form-group" id="groupBudUsd" style="display:none;">
-            <label>Valor em Dólares (US$)</label>
-            <input type="number" id="budAmountUsd" class="form-control" placeholder="0.00" step="0.01" oninput="calcularPreviewBRL()">
-          </div>
-
-          <!-- COTAÇÃO ESTIMADA — exclusivo Premium -->
-          <div class="form-group" id="groupBudRate" style="display:none;">
-            <label>Cotação / Taxa de Câmbio (R$ por Dólar)</label>
-            <input type="number" id="budRate" class="form-control" step="0.01" placeholder="5.20" oninput="calcularPreviewBRL()">
+          <div class="form-group">
+            <label>Valor Pago Real (R$)</label>
+            <input type="number" id="budPaidBrl" class="form-control" placeholder="0.00 (opcional)">
           </div>
         </div>
 
-        <!-- PREVIEW DO CÁLCULO EM BRL -->
-        <div id="brlPreviewBox" style="display:none; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:6px; padding:10px 12px; margin-bottom:12px; font-size:13px; color:#166534;">
-          💵 <strong>Valor convertido a pagar:</strong> <span id="brlPreviewValue">R$ 0,00</span>
-        </div>
-
-        <div class="grid-2">
-          <div class="form-group" id="groupBudPaid">
-            <label>Valor Pago Real (em R$)</label>
-            <input type="number" id="budPaidBrl" class="form-control" placeholder="0.00" step="0.01">
-          </div>
-
-          <div class="form-group" id="groupBudStatus">
-            <label>Status do Pagamento</label>
-            <select id="budStatus" class="form-control">
-              <option value="Pendente">🟡 Pendente</option>
-              <option value="Pago">🟢 Pago</option>
-            </select>
-          </div>
+        <div class="form-group" style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <label style="margin:0;font-weight:500;">Status:</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
+            <input type="radio" name="budStatus" value="Pendente" checked> 🟡 Pendente
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
+            <input type="radio" name="budStatus" value="Pago"> 🟢 Pago
+          </label>
         </div>
 
         <div id="promoOrcamentoFree" style="display:none; background:#F8FAFC; border:1px solid var(--border-color); border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:12px; color:var(--text-muted);">
-          🔒 <strong>Modo Free:</strong> Categorização, comparador e controle de status estão disponíveis na <a href="#" onclick="abrirPaywall(); return false;" style="color:var(--brand-primary); font-weight:700;">versão Premium</a>.
+          🔒 <strong>Modo Free:</strong> Categorização e controle de status estão disponíveis na <a href="#" onclick="abrirPaywall(); return false;" style="color:var(--brand-primary); font-weight:700;">versão Premium</a>.
         </div>
 
         <button class="btn-submit" id="btnBudSubmit" onclick="salvarOrcamento()">Adicionar Item ao Orçamento</button>
         <button class="btn-cancel" id="btnBudCancel" style="display:none;" onclick="cancelarEdicaoOrcamento()">Cancelar Edição</button>
       </div>
+
+      <!-- Campos hidden necessários para compatibilidade com código existente -->
+      <input type="hidden" id="budAmountUsd" value="0">
+      <input type="hidden" id="budRate" value="0">
+      <select id="budStatus" style="display:none"><option value="Pendente">Pendente</option><option value="Pago">Pago</option></select>
 
       <div class="card">
         <div class="card-title">Itens Registrados no Orçamento</div>
@@ -625,138 +608,191 @@
       </div>
     </div>
 
-    <!-- TAB 4: CALCULADORA UBER VS CARRO -->
+    <!-- TAB 4: TRANSPORTE (reformulada) -->
     <div id="tab-transporte" class="tab-content">
       <div class="card no-print">
-        <div class="card-title">🚗 Calculadora: Uber vs. Aluguel de Carro</div>
-        <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Descubra qual opção fica mais barata para o número de dias da sua viagem.</p>
-        <div class="grid-2">
-          <div class="form-group"><label>Dias de Aluguel</label><input type="number" id="carDays" class="form-control" value="7" oninput="calcularTransporte()"></div>
-          <div class="form-group"><label>Valor da Diária do Carro (US$)</label><input type="number" id="carDaily" class="form-control" value="45" oninput="calcularTransporte()"></div>
+        <div class="card-title">🚗 Como vai se deslocar?</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;">
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;border:2px solid var(--border-color);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;" id="lblModoCarro">
+            <input type="radio" name="modoTransporte" value="carro" id="modoCarro" onchange="alternarModoTransporte()"> 🚗 Carro Alugado
+          </label>
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;border:2px solid var(--border-color);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;" id="lblModoApp">
+            <input type="radio" name="modoTransporte" value="app" id="modoApp" onchange="alternarModoTransporte()"> 🚌 Uber / App / Transporte
+          </label>
         </div>
-        <div class="grid-2">
-          <div class="form-group"><label>Estacionamento/Dia (Parque+Hotel US$)</label><input type="number" id="carPark" class="form-control" value="35" oninput="calcularTransporte()"></div>
-          <div class="form-group"><label>Média Est. de Uber/Dia (US$)</label><input type="number" id="uberDaily" class="form-control" value="65" oninput="calcularTransporte()"></div>
+
+        <!-- Campos modo Carro -->
+        <div id="campusCarro" style="display:none;">
+          <div class="grid-2">
+            <div class="form-group"><label>Dias de aluguel</label><input type="number" id="carDays" class="form-control" value="7" oninput="calcularTransporte()"></div>
+            <div class="form-group"><label>Diária do carro (US$)</label><input type="number" id="carDaily" class="form-control" value="45" oninput="calcularTransporte()"></div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group"><label>Estacionamento/dia nos parques (US$)</label><input type="number" id="carPark" class="form-control" value="35" oninput="calcularTransporte()"></div>
+            <div class="form-group"><label>Combustível estimado total (US$)</label><input type="number" id="carFuel" class="form-control" value="80" oninput="calcularTransporte()"></div>
+          </div>
         </div>
+
+        <!-- Campos modo App/Uber -->
+        <div id="campusApp" style="display:none;">
+          <div class="grid-2">
+            <div class="form-group"><label>Origem</label><input type="text" id="trajOrigem" class="form-control" placeholder="Ex: Hotel Rosen Inn"></div>
+            <div class="form-group"><label>Destino</label><input type="text" id="trajDestino" class="form-control" placeholder="Ex: Magic Kingdom"></div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group"><label>App / Meio</label><input type="text" id="trajApp" class="form-control" placeholder="Ex: Uber, Lyft, Ônibus I-Ride..."></div>
+            <div class="form-group"><label>Valor estimado (US$)</label><input type="number" id="trajValor" class="form-control" placeholder="0.00" step="0.01"></div>
+          </div>
+          <button class="btn-submit" onclick="adicionarTrajeto()">+ Adicionar Trajeto</button>
+        </div>
+      </div>
+
+      <div class="card" id="cardTransporteComparativo" style="display:none;">
+        <div class="card-title">💡 Vale mais a pena Carro ou App?</div>
+        <div id="transporteComparativoTexto" style="font-size:13px;color:var(--text-muted);"></div>
+      </div>
+
+      <div class="card" id="cardTransporteResultado">
+        <div class="card-title">Estimativa Total de Transporte</div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Total Estimado (US$)</div><div class="kpi-value blue" id="kpiTransporteTotal">US$ 0,00</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total Estimado (R$)</div><div class="kpi-value" id="kpiTransporteTotalBrl">R$ 0,00</div></div>
+          <div class="kpi-card"><div class="kpi-label">Modo Escolhido</div><div class="kpi-value" id="kpiTransporteModo" style="font-size:13px;">—</div></div>
+        </div>
+        <div id="trajetosLista" style="margin-top:16px;"></div>
+      </div>
+    </div>
+
+    <!-- TAB 5: LISTA DE COMPRAS (consolidada por dia) -->
+    <div id="tab-compras" class="tab-content">
+      <div class="card">
+        <div class="card-title">🛍️ Lista de Compras por Dia</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Itens adicionados nas atividades do roteiro, agrupados por dia.</p>
+        <div id="comprasConsolidada"></div>
+      </div>
+    </div>
+
+    <!-- MODAL: DICAS (substituiu a aba) -->
+    <div class="modal-termos-overlay" id="modalDicas">
+      <div class="modal-termos-card" style="max-width:720px;">
+        <button class="modal-termos-close" onclick="fecharModalTermos('modalDicas')">✕</button>
+        <div class="modal-termos-titulo">💡 Dicas para sua Viagem Disney</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;" id="dicasGrid">
+          <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px;">
+            <div style="font-size:15px;font-weight:700;color:#1E40AF;margin-bottom:8px;">📲 Apps Essenciais</div>
+            <ul style="font-size:12px;color:#1E3A5F;line-height:1.7;margin:0;padding-left:16px;">
+              <li>Baixe o <strong>My Disney Experience</strong> antes de viajar</li>
+              <li>Vincule seus ingressos assim que chegar</li>
+              <li>Use o Mobile Order para pular fila de comida</li>
+            </ul>
+          </div>
+          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:14px;">
+            <div style="font-size:15px;font-weight:700;color:#166534;margin-bottom:8px;">🎢 Nos Parques</div>
+            <ul style="font-size:12px;color:#14532D;line-height:1.7;margin:0;padding-left:16px;">
+              <li>Chegue 45-60 min antes da abertura (Rope Drop)</li>
+              <li>Atração mais concorrida primeiro</li>
+              <li>Intercale dias de parque com descanso</li>
+            </ul>
+          </div>
+          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px;">
+            <div style="font-size:15px;font-weight:700;color:#9A3412;margin-bottom:8px;">⏰ Genie+ & Lightning Lane</div>
+            <ul style="font-size:12px;color:#7C2D12;line-height:1.7;margin:0;padding-left:16px;">
+              <li>Agende o 1º Lightning Lane às 07:00 no app</li>
+              <li>Priorize: Rise of the Resistance, Tron, TSMM</li>
+              <li>Avatar (AK) e Guardians (EPCOT) têm fila individual paga</li>
+            </ul>
+          </div>
+          <div style="background:#FDF4FF;border:1px solid #E9D5FF;border-radius:10px;padding:14px;">
+            <div style="font-size:15px;font-weight:700;color:#6B21A8;margin-bottom:8px;">🛡️ Seguro & Chip</div>
+            <ul style="font-size:12px;color:#581C87;line-height:1.7;margin:0;padding-left:16px;">
+              <li>Seguro com cobertura médica mínima US$60k</li>
+              <li>eSIM: ative antes de embarcar</li>
+              <li>Mínimo 10GB para 7 dias de uso normal</li>
+            </ul>
+          </div>
+          <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:10px;padding:14px;grid-column:1/-1;">
+            <div style="font-size:15px;font-weight:700;color:#0C4A6E;margin-bottom:8px;">📋 Ordem de Contratações</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;color:#0C4A6E;">
+              <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">✈️</div><strong>12-6 meses</strong><br>Passagens e passaporte</div>
+              <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">🏨</div><strong>6 meses</strong><br>Hotel e ingressos</div>
+              <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">🍽️</div><strong>60 dias</strong><br>Restaurantes (6h da manhã)</div>
+              <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">🎢</div><strong>7-3 dias</strong><br>Lightning Lane Individual</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: LISTA DE COMPRAS POR ATIVIDADE -->
+    <div class="modal-termos-overlay" id="modalComprasAtividade">
+      <div class="modal-termos-card" style="max-width:500px;">
+        <button class="modal-termos-close" onclick="fecharModalComprasAtividade()">✕</button>
+        <div class="modal-termos-titulo" id="modalComprasTitulo">🛍️ Lista de Compras</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;" id="modalComprasSubtitulo"></div>
+
+        <div class="grid-2" style="margin-bottom:8px;">
+          <div class="form-group"><label>Produto</label><input type="text" id="cmpProduto" class="form-control" placeholder="Ex: Tênis Nike"></div>
+          <div class="form-group"><label>Marca (opcional)</label><input type="text" id="cmpMarca" class="form-control" placeholder="Ex: Nike Air Max"></div>
+        </div>
+        <div class="grid-2" style="margin-bottom:8px;">
+          <div class="form-group"><label>Qtd</label><input type="number" id="cmpQtd" class="form-control" value="1" min="1"></div>
+          <div class="form-group"><label>Teto de gasto (US$)</label><input type="number" id="cmpTeto" class="form-control" placeholder="0.00" step="0.01"></div>
+        </div>
+        <button class="btn-submit" onclick="adicionarItemCompra()" style="margin-bottom:16px;">+ Adicionar Item</button>
+
+        <div id="listaItensCompra" style="margin-bottom:12px;"></div>
+
+        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#166534;font-weight:600;">Teto total desta parada:</span>
+          <span style="font-size:16px;font-weight:700;color:#16A34A;" id="totalTetoAtividade">US$ 0,00</span>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- TAB 8: CRONOGRAMA DE TAREFAS -->
+    <div id="tab-cronograma" class="tab-content">
+      <div class="card no-print">
+        <div class="card-title" id="croFormTitle">Adicionar Tarefa ao Cronograma</div>
+        <input type="hidden" id="croEditId" value="">
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Mês/Ano da tarefa</label>
+            <input type="month" id="croMes" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Tarefa</label>
+            <input type="text" id="croTitulo" class="form-control" placeholder="Ex: Pagar passaporte, Comprar passagens...">
+          </div>
+        </div>
+        <div class="form-group" style="max-width:200px;">
+          <label>Valor (R$) <span style="font-weight:400;color:var(--text-muted);font-size:11px;">opcional</span></label>
+          <input type="number" id="croValor" class="form-control" placeholder="0.00" step="0.01">
+        </div>
+        <button class="btn-submit" id="btnCroSubmit" onclick="salvarTarefaCronograma()">Adicionar ao Cronograma</button>
+        <button class="btn-cancel" id="btnCroCancel" style="display:none;" onclick="cancelarEdicaoCronograma()">Cancelar Edição</button>
       </div>
 
       <div class="card">
-        <div class="card-title">Comparativo Total Estimado</div>
-        <div class="grid-2">
-          <div class="kpi-card"><div class="kpi-label">Custo Total de Carro</div><div class="kpi-value" id="resCarTotal">US$ 0,00</div></div>
-          <div class="kpi-card"><div class="kpi-label">Custo Total de Uber</div><div class="kpi-value blue" id="resUberTotal">US$ 0,00</div></div>
-        </div>
-        <div id="transporteVerdict" style="margin-top:16px; font-weight:600; font-size:14px; text-align:center;"></div>
+        <div class="card-title">Tarefas Organizadas por Mês</div>
+        <div id="cronogramaLista"></div>
       </div>
     </div>
 
-    <!-- TAB 5: DICAS (GUIA DE ESTRATÉGIAS + SEQUÊNCIA DE AÇÃO) -->
-    <div id="tab-dicas" class="tab-content">
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-title">📱 Planejamento e Aplicativo</div>
-          <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>📲 Baixe o My Disney Experience:</strong> Use o app para ver os tempos de fila, conferir horários de shows, fazer pedidos de comida (Mobile Order) e gerenciar as filas rápidas (Lightning Lane).
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>🎟️ Compre ingressos antes:</strong> Garanta os bilhetes com antecedência e vincule-os imediatamente na sua conta da Disney.
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>🍽️ Faça reservas de restaurantes:</strong> Lugares concorridos ou refeições com personagens devem ser reservados com meses de antecedência pelo aplicativo.
-            </div>
-          </div>
-        </div>
+  </main>
 
-        <div class="card">
-          <div class="card-title">🏰 Nos Parques</div>
-          <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>⏰ Chegue cedo:</strong> Vá aos parques cerca de uma hora antes da abertura oficial para aproveitar as atrações mais concorridas com filas menores.
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>👟 Use calçados confortáveis:</strong> Você vai caminhar quilômetros por dia; vá de tênis amaciado e evite estrear sapatos novos na viagem.
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>🔄 Alterne os dias:</strong> Não faça dois dias seguidos de parque para não esgotar as energias, intercalando os passeios com dias de descanso ou compras.
-            </div>
-          </div>
-        </div>
 
-        <div class="card">
-          <div class="card-title">🛡️ Seguro Viagem</div>
-          <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>🏥 Cobertura médica mínima:</strong> Para os EUA, procure apólices com cobertura médica de pelo menos US$ 60.000 a US$ 100.000, já que o custo de saúde no país é muito alto.
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>🧳 Bagagem e cancelamento:</strong> Verifique se a apólice cobre extravio ou atraso de bagagem e reembolso em caso de cancelamento ou interrupção da viagem.
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>🎢 Atividades de risco:</strong> Se pretende alugar carro ou praticar esportes, confirme se o seguro cobre esses itens (nem toda apólice inclui automaticamente).
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>📞 Assistência 24h em português:</strong> Priorize seguradoras com atendimento em português e acionamento simples pelo app, essencial em caso de emergência.
-            </div>
-          </div>
-        </div>
 
-        <div class="card">
-          <div class="card-title">📶 Internet e Chip</div>
-          <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>📊 Quantos GB para 7 dias:</strong> Para uso normal (mapas, redes sociais, mensagens e algumas fotos), o mínimo recomendado é de 5 GB a 10 GB por pessoa em uma viagem de 7 dias.
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>🎥 Se for postar muito conteúdo:</strong> Quem pretende compartilhar vídeos e stories com frequência deve considerar planos de 15 GB a 20 GB ou ilimitados.
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>💳 eSIM vs. chip físico:</strong> Um eSIM internacional costuma ser mais prático (ativa antes de viajar, sem precisar trocar o chip físico no aeroporto).
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>📱 Mantenha o app do parque sempre online:</strong> O My Disney Experience consome dados o dia todo (filas, Mobile Order, mapa), então garanta uma internet estável já no primeiro dia.
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">🎯 Guia de Apps, Genie+ & Lightning Lane</div>
-          <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>⏰ Regra das 07:00 AM:</strong> Agende sua 1ª Lightning Lane Multi Pass pontualmente às 07:00 no My Disney Experience.
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>🏰 Rope Drop Magic Kingdom:</strong> Chegue ao parque 45 minutos antes da abertura oficial e vá direto para a Space Mountain ou Peter Pan.
-            </div>
-            <div style="background:#F8FAFC; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-              <strong>🎢 Melhores Horários para Atração:</strong> Agende brinquedos com fila alta (Avatar, Rise of the Resistance) para o fim da tarde/noite ou agende Single Rider.
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">📋 Sequência de Contratações Recomendada</div>
-          <div style="display:flex; flex-direction:column; gap:10px; font-size:13px;">
-            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border-color);">
-              <span>1. Passagens & Passaporte</span><strong style="color:var(--brand-primary);">12 a 6 meses antes</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border-color);">
-              <span>2. Hotel e Ingressos Disney</span><strong style="color:var(--brand-primary);">6 meses antes</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border-color);">
-              <span>3. Reservas de Restaurantes</span><strong style="color:var(--brand-primary);">60 dias antes (6:00 AM)</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid var(--border-color);">
-              <span>4. Agendamento Lightning Lane</span><strong style="color:var(--brand-primary);">7 ou 3 dias antes</strong>
-            </div>
-          </div>
-        </div>
+  <!-- MODAL METAS DE ECONOMIA -->
+  <div class="modal-termos-overlay" id="modalMetas">
+    <div class="modal-termos-card" style="max-width:600px;">
+      <button class="modal-termos-close" onclick="fecharModalTermos('modalMetas')">✕</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="modal-termos-titulo" style="margin-bottom:0;">🎯 Metas de Economia</div>
+        <button onclick="exportarPDF('metas')" style="background:none;border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;">📄 Exportar PDF</button>
       </div>
-    </div>
-
-
-    <!-- TAB 7: METAS DE ECONOMIA -->
-    <div id="tab-metas" class="tab-content">
+      <div id="tab-metas">
       <div class="card no-print">
         <div class="card-title">🎯 Meta de Economia Mensal</div>
         <div class="info-box">
@@ -802,34 +838,18 @@
         <div id="metasLista"></div>
       </div>
     </div>
-
-    <!-- TAB 8: CRONOGRAMA DE TAREFAS -->
-    <div id="tab-cronograma" class="tab-content">
-      <div class="card no-print">
-        <div class="card-title" id="croFormTitle">Adicionar Tarefa ao Cronograma</div>
-        <input type="hidden" id="croEditId" value="">
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Mês/Ano da tarefa</label>
-            <input type="month" id="croMes" class="form-control">
-          </div>
-          <div class="form-group">
-            <label>Tarefa</label>
-            <input type="text" id="croTitulo" class="form-control" placeholder="Ex: Pagar passaporte, Comprar passagens...">
-          </div>
-        </div>
-        <button class="btn-submit" id="btnCroSubmit" onclick="salvarTarefaCronograma()">Adicionar ao Cronograma</button>
-        <button class="btn-cancel" id="btnCroCancel" style="display:none;" onclick="cancelarEdicaoCronograma()">Cancelar Edição</button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Tarefas Organizadas por Mês</div>
-        <div id="cronogramaLista"></div>
-      </div>
     </div>
+  </div>
 
-    <!-- TAB 9: CHECKLIST DE MALA -->
-    <div id="tab-mala" class="tab-content">
+  <!-- MODAL CHECKLIST DE MALA -->
+  <div class="modal-termos-overlay" id="modalMala">
+    <div class="modal-termos-card" style="max-width:600px;">
+      <button class="modal-termos-close" onclick="fecharModalTermos('modalMala')">✕</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="modal-termos-titulo" style="margin-bottom:0;">🧳 Checklist de Mala</div>
+        <button onclick="exportarPDF('mala')" style="background:none;border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;">📄 Exportar PDF</button>
+      </div>
+      <div id="tab-mala">
       <div class="card no-print">
         <div class="card-title" id="malaFormTitle">Adicionar Item à Mala</div>
         <input type="hidden" id="malaEditId" value="">
@@ -865,8 +885,8 @@
         <div id="malaLista"></div>
       </div>
     </div>
-  </main>
-
+    </div>
+  </div>
 
   <!-- MODAL PAYWALL PREMIUM -->
   <div class="modal-overlay" id="paywallModal">
@@ -962,13 +982,11 @@
 
     const TABS_CONFIG = [
       { id: 'inicio', label: 'Início', premium: false },
-      { id: 'roteiro', label: 'Roteiro da Viagem', premium: false },
       { id: 'orcamento', label: 'Orçamento', premium: false },
-      { id: 'metas', label: '🎯 Metas de Economia', premium: true },
+      { id: 'roteiro', label: 'Roteiro da Viagem', premium: false },
       { id: 'cronograma', label: '🗓️ Cronograma', premium: true },
-      { id: 'mala', label: '🧳 Checklist de Mala', premium: true },
-      { id: 'transporte', label: '🚗 Uber vs Carro', premium: true },
-      { id: 'dicas', label: '💡 Dicas', premium: true }
+      { id: 'compras', label: '🛍️ Lista de Compras', premium: true },
+      { id: 'transporte', label: '🚗 Transporte', premium: true }
     ];
 
     /* --- FUNÇÕES AUXILIARES DE FORMATAÇÃO DE MOEDA (CONTÁBIL) --- */
@@ -1082,8 +1100,17 @@
     }
 
     function abrirModalTermos(id) {
-      toggleMenu();
+      const drawer = document.getElementById('drawer');
+      if (drawer && drawer.classList.contains('active')) toggleMenu();
       document.getElementById(id || 'modalTermos').classList.add('active');
+    }
+
+    function abrirModalPremium(id) {
+      if (!isPremium) { abrirPaywall(); return; }
+      abrirModalTermos(id);
+      // Renderiza o conteúdo do modal após abrir
+      if (id === 'modalMetas') renderMetas();
+      if (id === 'modalMala') renderMala();
     }
 
     function fecharModalTermos(id) {
@@ -1115,6 +1142,8 @@
       if (!appData.metas) appData.metas = { mesInicio: '' };
       if (!appData.cronograma) appData.cronograma = [];
       if (!appData.mala) appData.mala = [];
+      if (!appData.compras) appData.compras = [];
+      if (!appData.transporte) appData.transporte = { modo: 'carro', trajetos: [] };
 
       isPremium = localStorage.getItem('flowi_is_premium') === 'true';
 
@@ -1337,7 +1366,7 @@
         if (kpiUsdCard) kpiUsdCard.style.display = 'block';
         if (kpiUsdLockedCard) kpiUsdLockedCard.style.display = 'none';
         if (kpiNationalCard) kpiNationalCard.style.display = 'block';
-        if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'block';
+        if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none'; // Removido — divisão por categoria sempre em BRL
         if (infoBoxResumo) infoBoxResumo.innerHTML = 'ℹ️ <strong>Aviso:</strong> Escolha abaixo em qual moeda deseja visualizar o saldo consolidado da sua viagem.';
         const btnPDF = document.getElementById('btnExportarPDF');
         if (btnPDF) btnPDF.style.display = 'inline-flex';
@@ -1472,23 +1501,12 @@
     function salvarOrcamento() {
       const editId = document.getElementById('budEditId').value;
       const desc = document.getElementById('budDesc').value;
-      const isEstrangeiro = isPremium && document.querySelector('input[name="budType"]:checked').value === 'estrangeiro';
+      const amountBrl = parseFloat(document.getElementById('budAmountBrl').value) || 0;
 
-      let amountBrl = 0;
-      let amountUsd = 0;
-      let rate = 1;
+      if (!desc || amountBrl <= 0) return alert('Informe a descrição e o valor em Reais (BRL).');
 
-      if (isEstrangeiro) {
-        amountUsd = parseFloat(document.getElementById('budAmountUsd').value) || 0;
-        rate = parseFloat(document.getElementById('budRate').value) || appData.config.dollarRate || 5.20;
-        amountBrl = amountUsd * rate;
-        
-        if (!desc || amountUsd <= 0) return alert('Informe a descrição e o valor em Dólares (USD).');
-      } else {
-        amountBrl = parseFloat(document.getElementById('budAmountBrl').value) || 0;
-        if (!desc || amountBrl <= 0) return alert('Informe a descrição e o valor em Reais (BRL).');
-      }
-
+      const amountUsd = 0;
+      const rate = appData.config?.dollarRate || 5.20;
       let category = 'Outros';
       let paidBrl = 0;
       let status = 'Pendente';
@@ -1496,7 +1514,8 @@
       if (isPremium) {
         category = document.getElementById('budCategory').value;
         paidBrl = parseFloat(document.getElementById('budPaidBrl').value) || 0;
-        status = document.getElementById('budStatus').value;
+        const statusRadio = document.querySelector('input[name="budStatus"]:checked');
+        status = statusRadio ? statusRadio.value : 'Pendente';
       }
 
       if (editId) {
@@ -1539,47 +1558,32 @@
 
       document.getElementById('budEditId').value = item.id;
       document.getElementById('budDesc').value = item.desc;
-      
-      const radioType = document.querySelectorAll('input[name="budType"]');
-      if (item.isEstrangeiro && isPremium) {
-        radioType[1].checked = true;
-        document.getElementById('budAmountUsd').value = item.amountUsd;
-        document.getElementById('budRate').value = item.rate || appData.config.dollarRate || 5.20;
-      } else {
-        radioType[0].checked = true;
-        document.getElementById('budAmountBrl').value = item.isEstrangeiro ? item.amountBrl : item.amountBrl;
-      }
-      toggleFormularioEstrangeiro();
+      document.getElementById('budAmountBrl').value = item.amountBrl || 0;
 
       if (isPremium) {
         document.getElementById('budCategory').value = item.category || 'Outros';
-        document.getElementById('budPaidBrl').value = item.paidBrl || 0;
-        document.getElementById('budStatus').value = item.status || 'Pendente';
+        document.getElementById('budPaidBrl').value = item.paidBrl || '';
+        // Popular radio buttons de status
+        const radios = document.querySelectorAll('input[name="budStatus"]');
+        radios.forEach(r => { r.checked = r.value === (item.status || 'Pendente'); });
       }
 
       document.getElementById('budFormTitle').textContent = 'Editar Item do Orçamento';
       document.getElementById('btnBudSubmit').textContent = 'Salvar Alterações';
       document.getElementById('btnBudCancel').style.display = 'block';
-
       window.scrollTo({ top: document.getElementById('tab-orcamento').offsetTop - 20, behavior: 'smooth' });
     }
 
     function cancelarEdicaoOrcamento() {
       document.getElementById('budEditId').value = '';
       document.getElementById('budDesc').value = '';
-      document.querySelectorAll('input[name="budType"]')[0].checked = true;
-      toggleFormularioEstrangeiro();
-
       document.getElementById('budAmountBrl').value = '';
-      document.getElementById('budAmountUsd').value = '';
-      document.getElementById('budRate').value = appData.config.dollarRate || 5.20;
-
+      document.getElementById('budPaidBrl').value = '';
+      const radiosPendente = document.querySelectorAll('input[name="budStatus"]');
+      if (radiosPendente.length) radiosPendente[0].checked = true;
       if (isPremium) {
         document.getElementById('budCategory').value = 'Passagens';
-        document.getElementById('budPaidBrl').value = '';
-        document.getElementById('budStatus').value = 'Pendente';
       }
-
       document.getElementById('budFormTitle').textContent = 'Adicionar Custo ao Orçamento';
       document.getElementById('btnBudSubmit').textContent = 'Adicionar Item ao Orçamento';
       document.getElementById('btnBudCancel').style.display = 'none';
@@ -1648,9 +1652,7 @@
             <div style="display:flex; align-items:center; gap:12px;">
               <div style="text-align:right;">
                 <div>Est: R$ ${formatarBRL(item.amountBrl)}</div>
-                <div style="font-size:11px; color:${paidBrl > 0 ? 'var(--success)' : 'var(--text-muted)'};">
-                  Pago: R$ ${formatarBRL(paidBrl)}
-                </div>
+                ${status === 'Pago' ? `<div style="font-size:11px; color:var(--success);">Pago: R$ ${formatarBRL(item.paidBrl || item.amountBrl)}</div>` : ''}
               </div>
               <button class="badge-status ${status === 'Pago' ? 'status-pago' : 'status-pendente'}" onclick="toggleStatusOrcamento(${item.id})">
                 ${status}
@@ -1698,8 +1700,8 @@
         if (item.status === 'Pago') {
           totalPaidBrl += paid || brl;
         } else {
-          totalPaidBrl += paid;
-          totalPendingBrl += Math.max(0, brl - paid);
+          // Status Pendente: não soma nada no total pago, independente de ter valor pago preenchido
+          totalPendingBrl += brl;
         }
 
         const cat = item.category || 'Outros';
@@ -1727,13 +1729,29 @@
 
       const paidBox = document.getElementById('kpiTotalPaidContainer');
       const pendingBox = document.getElementById('kpiTotalPendingContainer');
+      const economiaBox = document.getElementById('kpiEconomiaContainer');
 
       if (!isPremium) {
         paidBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
         pendingBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
+        if (economiaBox) economiaBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
       } else {
         paidBox.innerHTML = `<div class="kpi-value green">R$ ${formatarBRL(totalPaidBrl)}</div>`;
         pendingBox.innerHTML = `<div class="kpi-value red">R$ ${formatarBRL(totalPendingBrl)}</div>`;
+        // Economia = diferença entre o valor orçado e o valor efetivamente pago nos itens já pagos
+        let totalOrcadoPago = 0;
+        let totalEfetivamentePago = 0;
+        appData.budgetItems.forEach(item => {
+          if (item.status === 'Pago') {
+            totalOrcadoPago += item.amountBrl || 0;
+            totalEfetivamentePago += item.paidBrl || item.amountBrl || 0;
+          }
+        });
+        const economia = Math.max(0, totalOrcadoPago - totalEfetivamentePago);
+        if (economiaBox) {
+          economiaBox.style.color = economia > 0 ? '#16A34A' : '#64748B';
+          economiaBox.textContent = `R$ ${formatarBRL(economia)}`;
+        }
       }
 
       const tituloCategoria = document.getElementById('tituloDivisaoCategoria');
@@ -1757,21 +1775,46 @@
       } else {
         const grid = document.createElement('div');
         grid.className = 'grid-3';
-        const categoriasPadrao = ['Passagens', 'Hospedagem', 'Parques e Ingressos', 'Alimentação', 'Transporte', 'Compras', 'Outros'];
-        
+        const categoriasPadrao = ['Passagens', 'Hospedagem', 'Parques e Ingressos', 'Alimentação', 'Compras', 'Outros'];
+
         categoriasPadrao.forEach(cat => {
           const valorBrl = catTotalsBrl[cat] || 0;
           const card = document.createElement('div');
           card.className = 'category-card';
-          const valorFormatado = viewCurrency === 'USD'
-            ? `US$ ${formatarUSD(rate > 0 ? valorBrl / rate : 0)}`
-            : `R$ ${formatarBRL(valorBrl)}`;
+          const cardId = `cat_${cat.replace(/\s+/g,'_')}`;
+          card.id = cardId;
+          card.dataset.brl = valorBrl;
+          card.dataset.modo = 'brl';
+          const podeConverter = ['Alimentação', 'Compras', 'Outros'].includes(cat);
           card.innerHTML = `
             <div class="category-name">${cat}</div>
-            <div class="category-amount">${valorFormatado}</div>
+            <div class="category-amount" id="${cardId}_val">R$ ${formatarBRL(valorBrl)}</div>
+            ${podeConverter && isPremium ? `<button onclick="toggleCategoriaMoeda('${cardId}',${valorBrl},${rate})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>` : ''}
           `;
           grid.appendChild(card);
         });
+
+        // Transporte: vem exclusivamente da aba Transporte (não do orçamento manual)
+        const transpCard = document.createElement('div');
+        transpCard.className = 'category-card';
+        const transpUsd = (() => {
+          if (!appData.transporte) return 0;
+          if (appData.transporte.modo === 'app') {
+            return (appData.transporte.trajetos || []).reduce((a, t) => a + (t.valor || 0), 0);
+          }
+          const days = parseFloat(document.getElementById('carDays')?.value) || 0;
+          const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
+          const park = parseFloat(document.getElementById('carPark')?.value) || 0;
+          const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
+          return days * (daily + park) + fuel;
+        })();
+        const transpBrl = transpUsd * rate;
+        transpCard.innerHTML = `
+          <div class="category-name">🚗 Transporte</div>
+          <div class="category-amount">US$ ${formatarUSD(transpUsd)}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">≈ R$ ${formatarBRL(transpBrl)} · calculado na aba Transporte</div>
+        `;
+        grid.appendChild(transpCard);
         wrapper.appendChild(grid);
       }
     }
@@ -1881,14 +1924,15 @@
       const editId = document.getElementById('croEditId').value;
       const mes = document.getElementById('croMes').value;
       const titulo = document.getElementById('croTitulo').value.trim();
+      const valor = parseFloat(document.getElementById('croValor').value) || 0;
 
       if (!mes || !titulo) return alert('Informe o mês/ano e a tarefa.');
 
       if (editId) {
         const item = appData.cronograma.find(t => t.id == editId);
-        if (item) { item.mes = mes; item.titulo = titulo; }
+        if (item) { item.mes = mes; item.titulo = titulo; item.valor = valor; }
       } else {
-        appData.cronograma.push({ id: Date.now(), mes, titulo, feito: false });
+        appData.cronograma.push({ id: Date.now(), mes, titulo, valor, feito: false });
       }
 
       salvar();
@@ -1904,6 +1948,7 @@
       document.getElementById('croEditId').value = item.id;
       document.getElementById('croMes').value = item.mes;
       document.getElementById('croTitulo').value = item.titulo;
+      document.getElementById('croValor').value = item.valor || '';
 
       document.getElementById('croFormTitle').textContent = 'Editar Tarefa do Cronograma';
       document.getElementById('btnCroSubmit').textContent = 'Salvar Alterações';
@@ -1916,6 +1961,7 @@
       document.getElementById('croEditId').value = '';
       document.getElementById('croMes').value = '';
       document.getElementById('croTitulo').value = '';
+      document.getElementById('croValor').value = '';
 
       document.getElementById('croFormTitle').textContent = 'Adicionar Tarefa ao Cronograma';
       document.getElementById('btnCroSubmit').textContent = 'Adicionar ao Cronograma';
@@ -1938,6 +1984,24 @@
         salvar();
         renderCronograma();
         renderAlertasPrazo();
+      }
+    }
+
+    function toggleCategoriaMoeda(cardId, valorBrl, rate) {
+      const card = document.getElementById(cardId);
+      const valEl = document.getElementById(cardId + '_val');
+      const btn = card?.querySelector('button');
+      if (!card || !valEl) return;
+      const modo = card.dataset.modo || 'brl';
+      if (modo === 'brl') {
+        const usd = rate > 0 ? valorBrl / rate : 0;
+        valEl.textContent = `US$ ${formatarUSD(usd)}`;
+        if (btn) btn.textContent = '💱 ver em R$';
+        card.dataset.modo = 'usd';
+      } else {
+        valEl.textContent = `R$ ${formatarBRL(valorBrl)}`;
+        if (btn) btn.textContent = '💱 ver em US$';
+        card.dataset.modo = 'brl';
       }
     }
 
@@ -1977,6 +2041,7 @@
           linha.innerHTML = `
             <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggleTarefaCronograma(${item.id})" style="width:18px; height:18px; accent-color:var(--brand-primary); flex-shrink:0;">
             <div style="flex:1; font-size:14px; ${item.feito ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${item.titulo}</div>
+            ${item.valor ? `<span style="font-size:12px;font-weight:600;color:var(--brand-primary);white-space:nowrap;">R$ ${formatarBRL(item.valor)}</span>` : ''}
             <button class="btn-action-icon" onclick="editarTarefaCronograma(${item.id})">✏️</button>
             <button class="btn-action-icon" style="color:var(--danger);" onclick="removerTarefaCronograma(${item.id})">🗑️</button>
           `;
@@ -2268,12 +2333,7 @@
               <div class="activity-time">${item.time || '--:--'}</div>
               <div class="activity-info">
                 <strong>${item.title}</strong>
-                ${item.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${item.desc}</div>` : ''}
-              </div>
-            </div>
-            <div>
-              <button class="btn-action-icon" onclick="editarAtividade(${item.id})">✏️</button>
-              <button class="btn-action-icon" style="color:var(--danger);" onclick="removerAtividade(${item.id})">🗑️</button>
+                ${item.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-top:2px; white-space:pre-wrap;">${item.desc}</div>` : ''}
             </div>
           `;
           container.appendChild(card);
@@ -2317,14 +2377,19 @@
         `;
         
         atividades.forEach(item => {
+          const nItens = item.compras?.length || 0;
+          const tetoAt = (item.compras || []).reduce((a, c) => a + c.teto * c.qtd, 0);
+          const compradosAt = (item.compras || []).filter(c => c.comprado).length;
           html += `
             <div class="activity-item">
               <div class="activity-time">${item.time || '--:--'}</div>
               <div class="activity-info">
                 <strong>${item.title}</strong>
-                ${item.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${item.desc}</div>` : ''}
+                ${item.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-top:2px; white-space:pre-wrap;">${item.desc}</div>` : ''}
+                ${nItens > 0 ? `<div style="font-size:11px;color:var(--brand-primary);margin-top:4px;font-weight:600;cursor:pointer;" onclick="abrirModalComprasAtividade(${item.id})">🛍️ ${nItens} ite${nItens > 1 ? 'ns' : 'm'} · Teto: US$ ${formatarUSD(tetoAt)} ▾</div>` : ''}
               </div>
-              <div>
+              <div style="display:flex;flex-direction:row;gap:4px;align-items:center;">
+                ${isPremium ? `<button class="btn-action-icon" title="Lista de compras" onclick="abrirModalComprasAtividade(${item.id})">🛍️</button>` : ''}
                 <button class="btn-action-icon" onclick="editarAtividade(${item.id})">✏️</button>
                 <button class="btn-action-icon" style="color:var(--danger);" onclick="removerAtividade(${item.id})">🗑️</button>
               </div>
@@ -2337,26 +2402,317 @@
       });
     }
 
-    function calcularTransporte() {
-      const days = parseInt(document.getElementById('carDays').value) || 0;
-      const daily = parseFloat(document.getElementById('carDaily').value) || 0;
-      const park = parseFloat(document.getElementById('carPark').value) || 0;
-      const uber = parseFloat(document.getElementById('uberDaily').value) || 0;
+    // ===== TRANSPORTE REFORMULADO =====
+    let _atividadeComprasId = null; // ID da atividade cujo modal de compras está aberto
 
-      const totalCar = days * (daily + park);
-      const totalUber = days * uber;
+    function alternarModoTransporte() {
+      const modo = document.querySelector('input[name="modoTransporte"]:checked')?.value;
+      document.getElementById('campusCarro').style.display = modo === 'carro' ? 'block' : 'none';
+      document.getElementById('campusApp').style.display = modo === 'app' ? 'block' : 'none';
+      if (!appData.transporte) appData.transporte = { modo: 'carro', trajetos: [] };
+      appData.transporte.modo = modo || 'carro';
+      calcularTransporte();
+      salvar();
+    }
 
-      document.getElementById('resCarTotal').textContent = `US$ ${formatarUSD(totalCar)}`;
-      document.getElementById('resUberTotal').textContent = `US$ ${formatarUSD(totalUber)}`;
+    function adicionarTrajeto() {
+      const origem = document.getElementById('trajOrigem').value.trim();
+      const destino = document.getElementById('trajDestino').value.trim();
+      const app = document.getElementById('trajApp').value.trim();
+      const valor = parseFloat(document.getElementById('trajValor').value) || 0;
+      if (!origem && !destino) return;
+      if (!appData.transporte) appData.transporte = { modo: 'app', trajetos: [] };
+      appData.transporte.trajetos.push({ id: Date.now(), origem, destino, app, valor });
+      document.getElementById('trajOrigem').value = '';
+      document.getElementById('trajDestino').value = '';
+      document.getElementById('trajApp').value = '';
+      document.getElementById('trajValor').value = '';
+      salvar();
+      renderTransporte();
+    }
 
-      const verdict = document.getElementById('transporteVerdict');
-      if (totalUber < totalCar) {
-        verdict.textContent = `💡 O Uber é mais vantajoso! Economia estimada de US$ ${formatarUSD(totalCar - totalUber)}.`;
-        verdict.style.color = "var(--success)";
+    function removerTrajeto(id) {
+      if (!confirm('Remover este trajeto?')) return;
+      appData.transporte.trajetos = appData.transporte.trajetos.filter(t => t.id !== id);
+      salvar();
+      renderTransporte();
+    }
+
+    function calcularTransporte() { renderTransporte(); }
+
+    function renderTransporte() {
+      if (!isPremium) return;
+      if (!appData.transporte) appData.transporte = { modo: 'carro', trajetos: [] };
+      const rate = appData.config?.dollarRate || 5.20;
+      const modo = appData.transporte.modo || 'carro';
+
+      // Restaurar seleção do radio
+      const radioEl = document.getElementById(modo === 'carro' ? 'modoCarro' : 'modoApp');
+      if (radioEl) radioEl.checked = true;
+      document.getElementById('campusCarro').style.display = modo === 'carro' ? 'block' : 'none';
+      document.getElementById('campusApp').style.display = modo === 'app' ? 'block' : 'none';
+
+      let totalUsd = 0;
+      if (modo === 'carro') {
+        const days = parseInt(document.getElementById('carDays')?.value) || 0;
+        const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
+        const park = parseFloat(document.getElementById('carPark')?.value) || 0;
+        const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
+        totalUsd = days * (daily + park) + fuel;
+        document.getElementById('trajetosLista').innerHTML = '';
       } else {
-        verdict.textContent = `🚗 Alugar um carro é mais vantajoso! Economia estimada de US$ ${formatarUSD(totalUber - totalCar)}.`;
-        verdict.style.color = "var(--brand-primary)";
+        const lista = appData.transporte.trajetos || [];
+        totalUsd = lista.reduce((a, t) => a + (t.valor || 0), 0);
+        let html = lista.length === 0 ? '<p style="font-size:13px;color:var(--text-muted)">Nenhum trajeto adicionado.</p>' : '';
+        lista.forEach(t => {
+          html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
+            <div>
+              <strong>${t.origem || '?'} → ${t.destino || '?'}</strong>
+              ${t.app ? `<div style="font-size:11px;color:var(--text-muted)">${t.app}</div>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-weight:600;">US$ ${formatarUSD(t.valor)}</span>
+              <button class="btn-action-icon" style="color:var(--danger)" onclick="removerTrajeto(${t.id})">🗑️</button>
+            </div>
+          </div>`;
+        });
+        document.getElementById('trajetosLista').innerHTML = html;
       }
+
+      document.getElementById('kpiTransporteTotal').textContent = `US$ ${formatarUSD(totalUsd)}`;
+      document.getElementById('kpiTransporteTotalBrl').textContent = `R$ ${formatarBRL(totalUsd * rate)}`;
+      document.getElementById('kpiTransporteModo').textContent = modo === 'carro' ? '🚗 Carro Alugado' : '🚌 App / Transporte';
+
+      // Comparativo Carro vs App (só mostra se tiver dados em ambos os modos)
+      const compCard = document.getElementById('cardTransporteComparativo');
+      const compTexto = document.getElementById('transporteComparativoTexto');
+      const days = parseFloat(document.getElementById('carDays')?.value) || 0;
+      const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
+      const park = parseFloat(document.getElementById('carPark')?.value) || 0;
+      const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
+      const totalCarro = days * (daily + park) + fuel;
+      const totalApp = (appData.transporte.trajetos || []).reduce((a, t) => a + (t.valor || 0), 0);
+
+      if (totalCarro > 0 && totalApp > 0 && compCard && compTexto) {
+        compCard.style.display = 'block';
+        const diff = Math.abs(totalCarro - totalApp);
+        if (totalApp < totalCarro) {
+          compTexto.innerHTML = `✅ <strong>App/transporte é mais vantajoso</strong> neste cenário — você economiza aproximadamente <strong>US$ ${formatarUSD(diff)}</strong> em relação ao carro alugado.`;
+          compTexto.style.color = '#16A34A';
+        } else if (totalCarro < totalApp) {
+          compTexto.innerHTML = `✅ <strong>Carro alugado é mais vantajoso</strong> neste cenário — você economiza aproximadamente <strong>US$ ${formatarUSD(diff)}</strong> em relação ao app/transporte.`;
+          compTexto.style.color = '#2563EB';
+        } else {
+          compTexto.innerHTML = `🤝 Os dois modos ficam com o mesmo custo estimado — escolha pela conveniência!`;
+          compTexto.style.color = 'var(--text-muted)';
+        }
+      } else if (compCard) {
+        compCard.style.display = 'none';
+      }
+    }
+
+    // ===== MINI-LISTA DE COMPRAS POR ATIVIDADE =====
+    function abrirModalComprasAtividade(atividadeId) {
+      _atividadeComprasId = atividadeId;
+      const atividade = appData.activities?.find(a => a.id === atividadeId);
+      if (!atividade) return;
+      if (!atividade.compras) atividade.compras = [];
+      document.getElementById('modalComprasTitulo').textContent = `🛍️ ${atividade.title || 'Lista de Compras'}`;
+      const dataFmt = atividade.date ? atividade.date.split('-').reverse().join('/') : '';
+      document.getElementById('modalComprasSubtitulo').textContent = [atividade.time, dataFmt].filter(Boolean).join(' · ');
+      renderListaItensCompra();
+      document.getElementById('modalComprasAtividade').classList.add('active');
+    }
+
+    function fecharModalComprasAtividade() {
+      document.getElementById('modalComprasAtividade').classList.remove('active');
+      _atividadeComprasId = null;
+      renderRoteiroCronologico();
+      renderCompras();
+    }
+
+    function adicionarItemCompra() {
+      const produto = document.getElementById('cmpProduto').value.trim();
+      if (!produto) return;
+      const marca = document.getElementById('cmpMarca').value.trim();
+      const qtd = parseInt(document.getElementById('cmpQtd').value) || 1;
+      const teto = parseFloat(document.getElementById('cmpTeto').value) || 0;
+      const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
+      if (!atividade) return;
+      if (!atividade.compras) atividade.compras = [];
+      atividade.compras.push({ id: Date.now(), produto, marca, qtd, teto, comprado: false });
+      document.getElementById('cmpProduto').value = '';
+      document.getElementById('cmpMarca').value = '';
+      document.getElementById('cmpQtd').value = '1';
+      document.getElementById('cmpTeto').value = '';
+      salvar();
+      renderListaItensCompra();
+    }
+
+    function toggleItemComprado(atividadeId, itemId) {
+      const atividade = appData.activities?.find(a => a.id === atividadeId);
+      const item = atividade?.compras?.find(c => c.id === itemId);
+      if (item) { item.comprado = !item.comprado; salvar(); renderListaItensCompra(); renderCompras(); }
+    }
+
+    function removerItemCompra(itemId) {
+      if (!confirm('Remover item?')) return;
+      const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
+      if (atividade) {
+        atividade.compras = atividade.compras.filter(c => c.id !== itemId);
+        salvar();
+        renderListaItensCompra();
+      }
+    }
+
+    let _itemCompraEditandoId = null;
+
+    function editarItemCompra(itemId) {
+      const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
+      const it = atividade?.compras?.find(c => c.id === itemId);
+      if (!it) return;
+      _itemCompraEditandoId = itemId;
+      document.getElementById('cmpProduto').value = it.produto || '';
+      document.getElementById('cmpMarca').value = it.marca || '';
+      document.getElementById('cmpQtd').value = it.qtd || 1;
+      document.getElementById('cmpTeto').value = it.teto || '';
+      const btn = document.querySelector('#modalComprasAtividade .btn-submit');
+      if (btn) { btn.textContent = '💾 Salvar Edição'; btn.onclick = salvarEdicaoItemCompra; }
+      document.getElementById('cmpProduto').focus();
+    }
+
+    function salvarEdicaoItemCompra() {
+      const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
+      const it = atividade?.compras?.find(c => c.id === _itemCompraEditandoId);
+      if (!it) return;
+      it.produto = document.getElementById('cmpProduto').value.trim();
+      it.marca = document.getElementById('cmpMarca').value.trim();
+      it.qtd = parseInt(document.getElementById('cmpQtd').value) || 1;
+      it.teto = parseFloat(document.getElementById('cmpTeto').value) || 0;
+      _itemCompraEditandoId = null;
+      document.getElementById('cmpProduto').value = '';
+      document.getElementById('cmpMarca').value = '';
+      document.getElementById('cmpQtd').value = '1';
+      document.getElementById('cmpTeto').value = '';
+      const btn = document.querySelector('#modalComprasAtividade .btn-submit');
+      if (btn) { btn.textContent = '+ Adicionar Item'; btn.onclick = adicionarItemCompra; }
+      salvar();
+      renderListaItensCompra();
+    }
+
+    function renderListaItensCompra() {
+      const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
+      const lista = document.getElementById('listaItensCompra');
+      const totalEl = document.getElementById('totalTetoAtividade');
+      if (!atividade || !lista) return;
+      const itens = atividade.compras || [];
+      let total = 0;
+      let html = itens.length === 0 ? '<p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Nenhum item ainda.</p>' : '';
+      itens.forEach(it => {
+        total += it.teto * it.qtd;
+        html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-color);font-size:13px;${it.comprado ? 'opacity:0.5;text-decoration:line-through;' : ''}">
+          <input type="checkbox" ${it.comprado ? 'checked' : ''} onchange="toggleItemComprado(${atividade.id},${it.id})" style="width:16px;height:16px;cursor:pointer;flex-shrink:0;">
+          <div style="flex:1;">
+            <strong>${it.produto}</strong>${it.marca ? ` <span style="color:var(--text-muted)">(${it.marca})</span>` : ''}
+            <span style="color:var(--text-muted)"> × ${it.qtd}</span>
+          </div>
+          <span style="font-weight:600;white-space:nowrap;">US$ ${formatarUSD(it.teto * it.qtd)}</span>
+          <button class="btn-action-icon" onclick="editarItemCompra(${it.id})">✏️</button>
+          <button class="btn-action-icon" style="color:var(--danger)" onclick="removerItemCompra(${it.id})">🗑️</button>
+        </div>`;
+      });
+      lista.innerHTML = html;
+      if (totalEl) totalEl.textContent = `US$ ${formatarUSD(total)}`;
+    }
+
+    // ===== ABA COMPRAS CONSOLIDADA =====
+    function renderCompras() {
+      if (!isPremium) return;
+      const container = document.getElementById('comprasConsolidada');
+      if (!container) return;
+      const roteiro = appData.activities || [];
+      const porDia = {};
+      roteiro.forEach(at => {
+        if (!at.compras || at.compras.length === 0) return;
+        const dia = at.date || 'Sem data';
+        if (!porDia[dia]) porDia[dia] = [];
+        porDia[dia].push(at);
+      });
+      const dias = Object.keys(porDia).sort();
+      if (dias.length === 0) {
+        container.innerHTML = '<p style="font-size:13px;color:var(--text-muted);text-align:center;padding:24px;">Nenhum item de compra adicionado ainda. Abra uma atividade no Roteiro e clique em 🛍️ para adicionar.</p>';
+        return;
+      }
+
+      // Calcular D1 baseado na data de ida da viagem
+      const dataIda = appData.config?.travelDate;
+      const dataInicioMs = dataIda ? new Date(dataIda + 'T00:00:00').getTime() : null;
+
+      function getDiaViagem(dataIso) {
+        if (!dataInicioMs || !dataIso || dataIso === 'Sem data') return null;
+        const d = new Date(dataIso + 'T00:00:00').getTime();
+        const diff = Math.round((d - dataInicioMs) / 86400000);
+        return diff >= 0 ? `D${diff + 1}` : null;
+      }
+
+      function fmtDia(d) {
+        if (!d || d === 'Sem data') return d;
+        const p = d.split('-');
+        return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
+      }
+      let html = '';
+      let totalGeral = 0;
+      dias.forEach((dia, idx) => {
+        const atividades = porDia[dia];
+        const acordId = `comprasDia_${idx}`;
+        let totalDia = 0;
+        let htmlAt = '';
+        // Ordenar atividades alfabeticamente pelo título
+        const atOrdenadas = [...atividades].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+        atOrdenadas.forEach(at => {
+          const itens = [...(at.compras || [])].sort((a, b) => (a.produto || '').localeCompare(b.produto || '', 'pt'));
+          const totalAt = itens.reduce((a, i) => a + i.teto * i.qtd, 0);
+          totalDia += totalAt;
+          totalGeral += totalAt;
+          const comprados = itens.filter(i => i.comprado).length;
+          htmlAt += `<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:12px 14px;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <strong style="font-size:13px;">${at.time ? at.time + ' · ' : ''}${at.title}</strong>
+              <span style="font-size:12px;color:var(--text-muted)">${comprados}/${itens.length} · <strong>US$ ${formatarUSD(totalAt)}</strong></span>
+            </div>`;
+          itens.forEach(it => {
+            htmlAt += `<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border-color);${it.comprado ? 'opacity:0.5;text-decoration:line-through;' : ''}">
+              <input type="checkbox" ${it.comprado ? 'checked' : ''} onchange="toggleItemCompradoConsolidado(${at.id},${it.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
+              <span style="flex:1;">${it.produto}${it.marca ? ' ('+it.marca+')' : ''} × ${it.qtd}</span>
+              <span style="font-weight:600;">US$ ${formatarUSD(it.teto * it.qtd)}</span>
+            </div>`;
+          });
+          htmlAt += '</div>';
+        });
+        html += `
+          <div style="border:1px solid var(--border-color);border-radius:10px;margin-bottom:10px;overflow:hidden;">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.caret').style.transform=this.nextElementSibling.style.display==='none'?'rotate(0deg)':'rotate(180deg)'"
+              style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;background:var(--bg-card);">
+              <span style="font-weight:700;font-size:13px;color:var(--brand-primary);">${getDiaViagem(dia) ? getDiaViagem(dia) + ' · ' : ''}${fmtDia(dia)}${dia !== 'Sem data' ? ' · ' + obterDiaSemana(dia) : ''}</span>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:12px;color:var(--text-muted)">US$ ${formatarUSD(totalDia)}</span>
+                <span class="caret" style="font-size:12px;transition:transform .2s;">▼</span>
+              </div>
+            </div>
+            <div style="padding:10px 14px;display:block;">${htmlAt}</div>
+          </div>`;
+      });
+      html += `<div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <span style="font-weight:700;color:#166534;">Total geral de compras (teto)</span>
+        <span style="font-size:18px;font-weight:700;color:#16A34A;">US$ ${formatarUSD(totalGeral)}</span>
+      </div>`;
+      container.innerHTML = html;
+    }
+
+    function toggleItemCompradoConsolidado(atividadeId, itemId) {
+      const atividade = appData.activities?.find(a => a.id === atividadeId);
+      const item = atividade?.compras?.find(c => c.id === itemId);
+      if (item) { item.comprado = !item.comprado; salvar(); renderCompras(); }
     }
 
     function renderAllData() {
@@ -2366,6 +2722,8 @@
       renderMetas();
       renderCronograma();
       renderMala();
+      renderCompras();
+      renderTransporte();
       renderAlertasPrazo();
     }
 
