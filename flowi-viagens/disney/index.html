@@ -1,1763 +1,3069 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Flowi Viagens - Disney</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+
     :root {
+
       --bg-header: #0B132B;
+
       --bg-body: #F4F6F9;
+
       --bg-card: #FFFFFF;
+
       --border-color: #E2E8F0;
+
       
+
       --brand-primary: #2563EB;
+
       --brand-light: #60A5FA;
+
       --brand-glow: rgba(37, 99, 235, 0.15);
 
       --text-main: #0F172A;
+
       --text-muted: #64748B;
+
       --text-white: #FFFFFF;
 
       --danger: #EF4444;
+
       --success: #10B981;
 
       --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body { background-color: var(--bg-body); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 14px; min-height: 100vh; display: flex; flex-direction: column; line-height: 1.5; }
+
     input, select, textarea, button { font-family: inherit; font-size: 14px; color: inherit; }
 
     .top-header { background-color: var(--bg-header); color: var(--text-white); padding: 16px 24px 0 24px; }
+
     .top-bar { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto 16px auto; }
+
     .nav-logo { display: flex; align-items: center; cursor: pointer; }
+
     .nav-icon { display: flex; flex-direction: column; gap: 3px; }
+
     .header-actions { display: flex; align-items: center; gap: 12px; }
 
     .badge-plan { font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; }
+
     .badge-free { background-color: rgba(255, 255, 255, 0.15); color: #E2E8F0; border: 1px solid rgba(255, 255, 255, 0.2); }
+
     .badge-premium { background: linear-gradient(135deg, #2563EB, #60A5FA); color: #fff; }
 
     .btn-header { background: #2563EB; border: none; color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 12px; cursor: pointer; }
+
     .btn-header:hover { background: #1d4ed8; }
+
     .nav-logo { display: flex; align-items: center; gap: 6px; }
 
     .trip-title-container { max-width: 1200px; margin: 0 auto 16px auto; }
+
     .trip-title { font-size: 24px; font-weight: 700; color: var(--text-white); }
+
     .trip-subtitle { font-size: 13px; color: #94A3B8; }
 
     .countdown-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 1200px; margin: 0 auto 20px auto; }
+
     .countdown-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 12px; text-align: center; }
+
     .countdown-num { font-size: 22px; font-weight: 700; color: var(--text-white); }
+
     .countdown-label { font-size: 10px; letter-spacing: 1px; color: #94A3B8; text-transform: uppercase; margin-top: 2px; }
 
     .nav-tabs-wrapper { max-width: 1200px; margin: 0 auto; width: 100%; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+
     .nav-tabs { display: flex; gap: 20px; width: 100%; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 4px; }
+
     .nav-tabs::-webkit-scrollbar { display: none; }
+
     .tab-btn { background: transparent; border: none; color: #94A3B8; padding: 12px 10px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; position: relative; display: flex; align-items: center; gap: 6px; }
+
     .tab-btn.active { color: var(--text-white); }
+
     .tab-btn.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--brand-primary); border-radius: 3px 3px 0 0; }
 
     .drawer-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+
     .drawer-overlay.active { opacity: 1; pointer-events: auto; }
+
     .drawer { position: fixed; top: 0; right: -280px; width: 280px; height: 100%; background: #FFFFFF; z-index: 201; transition: right 0.3s ease; padding: 24px; display: flex; flex-direction: column; gap: 16px; box-shadow: -4px 0 20px rgba(0,0,0,0.1); }
+
     .drawer.active { right: 0; }
+
     .drawer-title { font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+
     .drawer-link { color: var(--text-muted); font-size: 14px; text-decoration: none; }
 
     /* Modal de termos — abre sobre o planejador sem sair da página */
+
     .modal-termos-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: flex-start; justify-content: center; padding: 24px 16px; overflow-y: auto; }
+
     .modal-termos-overlay.active { display: flex; }
+
     .modal-termos-card { background: #fff; border-radius: 16px; max-width: 680px; width: 100%; padding: 32px 28px; position: relative; margin: auto; }
+
     .modal-termos-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); line-height: 1; }
+
     .modal-termos-titulo { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; padding-right: 32px; }
+
     .modal-termos-body { font-size: 13px; line-height: 1.7; color: var(--text-muted); }
+
     .modal-termos-body h3 { font-size: 14px; font-weight: 700; color: var(--text-main); margin: 20px 0 8px; }
+
     .modal-termos-body p { margin-bottom: 12px; }
 
     /* print-header aparece só no PDF, no topo antes de tudo */
+
     .print-header { display: none; text-align: center; padding: 16px 0 24px; border-bottom: 2px solid #E2E8F0; margin-bottom: 24px; }
+
     .print-header h1 { font-size: 22px; font-weight: 700; color: #0F172A; }
+
     .print-header p { font-size: 12px; color: #64748B; margin-top: 4px; }
 
     .main-container { max-width: 1200px; width: 100%; margin: 24px auto; padding: 0 16px; flex: 1; }
+
     .tab-content { display: none; }
+
     .tab-content.active { display: block; animation: fadeIn 0.2s ease-in-out; }
+
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
     .alert-free-data { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+
     .info-box { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
 
     .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+
     .card-title { font-size: 13px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
 
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+
     .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
 
     .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+
     .form-group label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+
     .form-control { background-color: #F8FAFC; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; color: var(--text-main); outline: none; }
 
     .radio-group { display: flex; gap: 12px; margin-top: 4px; }
+
     .radio-label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; background: #F8FAFC; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; flex: 1; }
 
     .btn-submit { background:var(--brand-primary); color:#fff; border:none; padding:8px 20px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; font-family:inherit; letter-spacing:.01em; transition:background .15s; }
+
     .btn-submit:hover { filter:brightness(1.1); }
+
     .btn-cancel { background:none; color:var(--text-muted); border:1px solid var(--border-color); padding:8px 16px; border-radius:8px; font-weight:500; font-size:13px; cursor:pointer; font-family:inherit; transition:background .15s; }
+
     .btn-cancel:hover { background:var(--bg-body); }
+
     .btn-action-icon { background:none; border:none; font-size:14px; cursor:pointer; padding:2px 4px; opacity:0.75; transition:opacity .15s; }
+
     .btn-action-icon:hover { opacity:1; }
 
     .kpi-card { background: #F8FAFC; border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; }
+
     .kpi-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
     .kpi-value { font-size: 18px; font-weight: 700; margin-top: 4px; }
+
     .kpi-subtext { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
     .kpi-value.blue { color: var(--brand-primary); }
+
     .kpi-value.green { color: var(--success); }
+
     .kpi-value.red { color: var(--danger); }
+
     .kpi-locked { color: #94A3B8; font-size: 14px; font-weight: 600; margin-top: 4px; cursor: pointer; }
 
     .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; border: none; }
+
     .status-pago { background: #D1FAE5; color: #065F46; }
+
     .status-pendente { background: #FEF3C7; color: #92400E; }
 
     .category-card { background: #F8FAFC; border: 1px solid var(--border-color); padding: 12px 14px; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; }
+
     .category-name { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+
     .category-amount { font-size: 15px; font-weight: 700; color: var(--text-main); margin-top: 4px; }
 
     .day-accordion { background: #FFFFFF; border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+
     .day-header { background: #F8FAFC; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; border-bottom: 1px solid transparent; }
+
     .day-accordion.open .day-header { border-bottom-color: var(--border-color); }
+
     .day-title-box { display: flex; align-items: center; gap: 10px; }
+
     .day-badge { background: var(--brand-primary); color: #fff; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 6px; }
+
     .day-date-str { font-weight: 700; font-size: 14px; color: var(--text-main); }
+
     .day-count-tag { font-size: 12px; color: var(--text-muted); }
+
     .day-arrow { font-size: 12px; color: var(--text-muted); transition: transform 0.2s; }
+
     .day-accordion.open .day-arrow { transform: rotate(180deg); }
+
     .day-content { display: none; padding: 8px 16px; }
+
     .day-accordion.open .day-content { display: block; }
 
     .activity-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #F1F5F9; font-size: 13px; }
+
     .activity-item:last-child { border-bottom: none; }
+
     .activity-time { font-weight: 700; color: var(--brand-primary); width: 60px; flex-shrink: 0; }
+
     .activity-info { flex: 1; padding: 0 12px; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
+
     .modal-overlay.active { display: flex; }
+
     
+
     .paywall-card { background: #0B132B; color: #FFFFFF; border-radius: 16px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; padding: 32px 24px; position: relative; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
+
     .paywall-title { font-size: 22px; font-weight: 800; line-height: 1.2; margin-bottom: 6px; }
+
     .paywall-subtitle { font-size: 13px; color: #94A3B8; margin-bottom: 24px; }
+
     .paywall-list { text-align: left; display: flex; flex-direction: column; gap: 11px; margin-bottom: 24px; }
+
     .paywall-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12.5px; line-height: 1.4; color: #E2E8F0; }
+
     .paywall-check { background: #2563EB; color: #FFF; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+
     .paywall-price-label { font-size: 32px; font-weight: 800; color: #FFFFFF; }
+
     .paywall-price-sub { font-size: 11px; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; }
+
     .btn-buy-paywall { background: #2563EB; color: #FFFFFF; font-weight: 700; border: none; padding: 16px; border-radius: 10px; width: 100%; font-size: 15px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+
     .btn-buy-paywall:hover { background: #1d4ed8; }
 
     .modal-card { background: #FFFFFF; border-radius: 12px; width: 100%; max-width: 440px; padding: 24px; position: relative; color: var(--text-main); }
+
     .modal-close { position: absolute; top: 16px; right: 16px; background: transparent; border: none; font-size: 18px; cursor: pointer; color: #94A3B8; }
 
     .btn-reset-discreet { background: transparent; border: none; color: #94A3B8; font-size: 11px; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: all 0.2s; }
+
     .btn-reset-discreet:hover { color: var(--danger); background: #FEF2F2; }
 
     footer { text-align: center; font-size: 12px; color: var(--text-muted); padding: 24px; border-top: 1px solid var(--border-color); margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
     footer a { color: var(--brand-primary); text-decoration: none; }
 
     @media print {
+
       * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
       @page { margin: 1cm; }
 
       /* Esconde toda navegação e controles */
+
       .top-header, .drawer, .drawer-overlay, footer,
+
       .alert-free-data, #cardOffline, .paywall-overlay,
+
       .modal-overlay, .modal-termos-overlay,
+
       .nav-tabs-wrapper, .btn-exportar-aba,
+
       #avisoImpressaoIOS { display: none !important; }
 
       /* Esconde formulários de entrada e botões */
+
       button, input[type="text"], input[type="number"], input[type="date"],
+
       input[type="time"], input[type="email"], input[type="hidden"],
+
       select, textarea { display: none !important; }
 
       /* Esconde cards de configuração — colapso total sem deixar espaço */
+
       .no-print {
+
         display: none !important;
+
         visibility: collapse !important;
+
         height: 0 !important;
+
         min-height: 0 !important;
+
         max-height: 0 !important;
+
         margin: 0 !important;
+
         padding: 0 !important;
+
         border: none !important;
+
         overflow: hidden !important;
+
         line-height: 0 !important;
+
         font-size: 0 !important;
+
       }
 
       #cardVisualizacaoMoeda, #cardSalvarOffline,
+
       #promoRoteiroD1, #promoOrcamentoFree, #promoMoedaFree,
+
       .form-group, .form-row, .form-section,
+
       .promo-free, .promo-box, .info-box, .alert-free-data {
+
         display: none !important;
+
         height: 0 !important;
+
         margin: 0 !important;
+
         padding: 0 !important;
+
         overflow: hidden !important;
+
       }
 
       /* Layout de impressão */
+
       body { background: white !important; color: #0F172A !important; font-size: 12px; margin: 0; padding: 0; }
+
       .main-container { padding: 8px !important; margin: 0 !important; }
+
       .tab-content { display: none !important; height: 0 !important; overflow: hidden !important; }
+
       .tab-content.print-show { display: block !important; height: auto !important; overflow: visible !important; margin-bottom: 32px; }
+
       .print-header { display: block !important; }
 
       /* Cards de conteúdo */
+
       .card { border: 1px solid #E2E8F0 !important; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; break-inside: avoid; box-shadow: none !important; background: white !important; }
+
       .card-title { display: block !important; color: #64748B !important; font-size: 10px !important; font-weight: 700 !important; }
 
       /* Tabelas e listas */
+
       table { width: 100%; border-collapse: collapse; font-size: 11px; }
+
       th { background: #F4F6F9 !important; color: #64748B; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; padding: 6px 8px; text-align: left; }
+
       td { padding: 6px 8px; border-bottom: 1px solid #F1F5F9; vertical-align: top; }
 
       /* KPIs */
+
       .kpi-grid { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
       .kpi-card { display: block !important; border: 1px solid #E2E8F0; border-radius: 6px; padding: 8px; text-align: center; }
 
       /* Checklist e cronograma — transforma checkboxes em quadradinhos/círculos para riscar */
+
       input[type="checkbox"] {
+
         display: inline-block !important;
+
         appearance: none !important;
+
         -webkit-appearance: none !important;
+
         width: 13px !important;
+
         height: 13px !important;
+
         border: 1.5px solid #64748B !important;
+
         background: white !important;
+
         vertical-align: middle !important;
+
         margin-right: 6px !important;
+
         flex-shrink: 0 !important;
+
       }
+
       /* Mala: círculo */
+
       #malaLista input[type="checkbox"] {
+
         border-radius: 50% !important;
+
       }
+
       /* Cronograma: quadrado */
+
       #cronogramaLista input[type="checkbox"] {
+
         border-radius: 2px !important;
+
       }
+
       /* Esconde botões de edição/exclusão nas linhas */
+
       .btn-action-icon { display: none !important; }
+
     }
+
     .print-header { display: none; }
+
   </style>
+
 </head>
+
 <body>
+
   <!-- Cabeçalho visível apenas no PDF (aparece no topo antes de tudo) -->
+
   <div class="print-header">
+
     <h1 id="printTitulo">Minha Viagem Disney</h1>
+
     <p id="printSubtitulo">Planejamento gerado pelo Flowi Viagens · tryflowi.github.io</p>
+
   </div>
 
   <!-- Aviso para usuários iOS/Safari -->
+
   <div id="avisoImpressaoIOS" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:24px;">
+
     <div style="background:white;border-radius:16px;padding:28px 24px;max-width:340px;text-align:center;">
+
       <div style="font-size:32px;margin-bottom:12px;">📱</div>
+
       <div style="font-weight:700;font-size:16px;color:#0F172A;margin-bottom:10px;">Exportar PDF no iPhone</div>
+
       <div style="font-size:13px;color:#64748B;line-height:1.6;margin-bottom:20px;">No Safari/iPhone, toque no botão <strong>Compartilhar</strong> <span style="font-size:16px;">⎙</span> na barra do navegador e escolha <strong>"Imprimir"</strong> para salvar como PDF.</div>
+
       <button onclick="document.getElementById('avisoImpressaoIOS').style.display='none'; if(window._restaurarPrint){window._restaurarPrint();window._restaurarPrint=null;}" style="background:#0B132B;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Entendido</button>
+
     </div>
+
   </div>
 
   <!-- MODAIS DE TERMOS (abrem sobre o planejador, sem sair da página) -->
+
   <div class="modal-termos-overlay" id="modalTermos">
+
     <div class="modal-termos-card">
+
       <button class="modal-termos-close" onclick="fecharModalTermos()">✕</button>
+
       <div class="modal-termos-titulo">Termos de Uso</div>
+
       <div class="modal-termos-body">
+
         <p>Ao utilizar o Flowi Viagens, você concorda com os termos descritos abaixo.</p>
+
         <h3>1. Uso do Serviço</h3>
+
         <p>O Flowi é uma ferramenta de planejamento pessoal. O uso é individual e intransferível. É proibida a reprodução ou redistribuição do conteúdo sem autorização.</p>
+
         <h3>2. Dados e Privacidade</h3>
+
         <p>No modo Free, seus dados ficam armazenados apenas no seu dispositivo. No modo Premium, os dados são sincronizados em nossos servidores de forma segura para acesso em múltiplos dispositivos.</p>
+
         <h3>3. Pagamentos</h3>
+
         <p>O acesso Premium é adquirido mediante pagamento único, processado pelo Mercado Pago. Consulte nossa política de reembolso para informações sobre cancelamentos.</p>
+
         <h3>4. Responsabilidades</h3>
+
         <p>O Flowi não se responsabiliza por decisões tomadas com base nas informações inseridas no aplicativo. As estimativas de orçamento e cronograma são de responsabilidade do usuário.</p>
+
         <h3>5. Contato</h3>
+
         <p>Dúvidas? Entre em contato pelo Instagram <strong>@tryflowi</strong>.</p>
+
       </div>
+
     </div>
+
   </div>
 
   <div class="modal-termos-overlay" id="modalPrivacidade">
+
     <div class="modal-termos-card">
+
       <button class="modal-termos-close" onclick="fecharModalTermos('modalPrivacidade')">✕</button>
+
       <div class="modal-termos-titulo">Política de Privacidade</div>
+
       <div class="modal-termos-body">
+
         <p>Sua privacidade é importante para nós. Esta política explica como tratamos seus dados.</p>
+
         <h3>1. Dados Coletados</h3>
+
         <p>Coletamos apenas o e-mail informado no momento da compra, para vinculação da licença Premium. Nenhum dado pessoal além deste é coletado ou armazenado por nós.</p>
+
         <h3>2. Dados do Planejamento</h3>
+
         <p>No modo Free, seus dados de planejamento (roteiro, orçamento etc.) ficam armazenados localmente no seu dispositivo e nunca são enviados a nossos servidores. No modo Premium, esses dados são sincronizados para permitir acesso em múltiplos dispositivos.</p>
+
         <h3>3. Compartilhamento</h3>
+
         <p>Não compartilhamos seus dados com terceiros, exceto o e-mail com o Mercado Pago para processamento do pagamento.</p>
+
         <h3>4. Contato</h3>
+
         <p>Para solicitações relacionadas à privacidade, entre em contato pelo Instagram <strong>@tryflowi</strong>.</p>
+
       </div>
+
     </div>
+
   </div>
 
   <div class="modal-termos-overlay" id="modalReembolso">
+
     <div class="modal-termos-card">
+
       <button class="modal-termos-close" onclick="fecharModalTermos('modalReembolso')">✕</button>
+
       <div class="modal-termos-titulo">Política de Reembolso</div>
+
       <div class="modal-termos-body">
+
         <p>Queremos que você esteja satisfeito com o Flowi Premium.</p>
+
         <h3>1. Prazo de Reembolso</h3>
+
         <p>Você pode solicitar reembolso integral em até 7 dias após a data da compra, desde que não tenha utilizado extensivamente as funcionalidades Premium.</p>
+
         <h3>2. Como Solicitar</h3>
+
         <p>Entre em contato pelo Instagram <strong>@tryflowi</strong> informando o e-mail utilizado na compra e o número da transação (disponível no comprovante do Mercado Pago).</p>
+
         <h3>3. Processamento</h3>
+
         <p>O reembolso é processado em até 10 dias úteis pelo Mercado Pago, na mesma forma de pagamento original.</p>
+
       </div>
+
     </div>
+
   </div>
 
   <header class="top-header">
+
     <div class="top-bar">
+
       <div class="nav-logo" onclick="toggleMenu()" style="cursor:pointer;">
+
         <div style="display:flex;align-items:flex-end;gap:2px">
+
           <div class="nav-icon">
+
             <span style="width:22px;height:2.5px;background:white;border-radius:2px;display:block;"></span>
+
             <span style="width:15px;height:2.5px;background:white;border-radius:2px;display:block;"></span>
+
             <span style="width:9px;height:2.5px;background:white;border-radius:2px;display:block;"></span>
+
           </div>
+
           <div style="width:7px;height:7px;background:white;border-radius:50%;margin-bottom:1px;margin-left:-4px;"></div>
+
         </div>
+
         <div style="font-size:16px;font-weight:600;letter-spacing:2px;color:white;margin-left:6px;">flowi</div>
+
       </div>
 
       <div class="header-actions">
+
         <button id="btnExportarPDF" onclick="exportarPDF()" style="display:none;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:white;font-size:11px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;">📄 Exportar PDF</button>
+
         <span id="badgePlan" class="badge-plan badge-free">FREE</span>
+
         <button id="btnHeaderAction" class="btn-header" onclick="irParaCompraPremium()">Garantir Premium R$ 15,90</button>
+
       </div>
+
     </div>
 
     <div class="trip-title-container">
+
       <h1 class="trip-title" id="displayTripTitle">Minha Viagem Disney</h1>
+
       <div class="trip-subtitle" id="displayTripSub"><span id="displayTravelersCount">1</span> viajante(s)</div>
+
     </div>
 
     <div class="countdown-grid">
+
       <div class="countdown-card"><div class="countdown-num" id="cntDays">--</div><div class="countdown-label">Dias</div></div>
+
       <div class="countdown-card"><div class="countdown-num" id="cntHours">--</div><div class="countdown-label">Horas</div></div>
+
       <div class="countdown-card"><div class="countdown-num" id="cntMins">--</div><div class="countdown-label">Min</div></div>
+
     </div>
 
     <div class="nav-tabs-wrapper">
+
       <nav class="nav-tabs" id="tabsHeader"></nav>
+
     </div>
+
   </header>
 
   <div class="drawer-overlay" id="drawerOverlay" onclick="toggleMenu()"></div>
+
   <div class="drawer" id="drawer">
+
     <div style="background:#0B132B;margin:-24px -24px 16px -24px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+
       <div style="display:flex;align-items:flex-end;gap:2px">
+
         <div style="display:flex;flex-direction:column;gap:3px">
+
           <span style="width:18px;height:2px;background:white;border-radius:2px;display:block"></span>
+
           <span style="width:12px;height:2px;background:white;border-radius:2px;display:block"></span>
+
           <span style="width:7px;height:2px;background:white;border-radius:2px;display:block"></span>
+
         </div>
+
         <div style="width:6px;height:6px;background:white;border-radius:50%;margin-bottom:1px;margin-left:-3px"></div>
+
         <span style="font-size:14px;font-weight:600;letter-spacing:2px;color:white;margin-left:5px">flowi</span>
+
       </div>
+
       <button onclick="toggleMenu()" style="color:rgba(255,255,255,0.7);font-size:20px;background:none;border:none;cursor:pointer">✕</button>
+
     </div>
+
     <a href="https://tryflowi.github.io/" class="drawer-link">🏠 Home</a>
+
     <a href="#" id="drawerMenuPrincipal" class="drawer-link"></a>
+
     <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border-color)">Legal</div>
+
     <a href="#" onclick="abrirModalTermos('modalTermos')" class="drawer-link">Termos de uso</a>
+
     <a href="#" onclick="abrirModalTermos('modalPrivacidade')" class="drawer-link">Privacidade</a>
+
     <a href="#" onclick="abrirModalTermos('modalReembolso')" class="drawer-link">Reembolso</a>
+
   </div>
 
   <main class="main-container">
+
     <div id="alertFreeData" class="alert-free-data">
+
       <div>💾 <strong>Aviso:</strong> Seus dados ficam salvos apenas neste dispositivo e navegador. Se trocar de aparelho, baixe o arquivo offline primeiro.</div>
+
     </div>
 
     <!-- TAB 1: INÍCIO -->
+
     <div id="tab-inicio" class="tab-content active">
 
       <!-- 3 botões de acesso rápido -->
+
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+
         <button onclick="abrirModalPremium('modalDicas')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
+
           💡 Dicas da Viagem
+
         </button>
+
         <button onclick="abrirModalPremium('modalMetas')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
+
           🎯 Metas de Economia
+
         </button>
+
         <button onclick="abrirModalPremium('modalMala')" style="flex:1;min-width:100px;background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-weight:600;font-size:12px;padding:10px 8px;border-radius:8px;cursor:pointer;font-family:inherit;">
+
           🧳 Checklist de Mala
+
         </button>
+
       </div>
 
       <div class="card no-print">
+
         <div class="card-title">
+
           <span>Configuração da Viagem</span>
+
           <button class="btn-reset-discreet" onclick="confirmarReset()">🔄 Resetar dados</button>
+
         </div>
+
         <div class="form-group">
+
           <label>Nome da viagem</label>
+
           <input type="text" id="cfgTripName" class="form-control" value="Minha Viagem Disney" oninput="salvarConfig()">
+
         </div>
+
         <div class="grid-2">
+
           <div class="form-group">
+
             <label>Data de ida (Chegada - D1)</label>
+
             <input type="date" id="cfgStartDate" class="form-control" onchange="salvarConfig()">
+
           </div>
+
           <div class="form-group">
+
             <label>Data de volta</label>
+
             <input type="date" id="cfgEndDate" class="form-control" onchange="salvarConfig()">
+
           </div>
+
         </div>
+
         <div class="grid-2">
+
           <div class="form-group">
+
             <label>Número de viajantes</label>
+
             <input type="number" id="cfgTravelers" class="form-control" value="1" min="1" onchange="salvarConfig()">
+
           </div>
+
           <div class="form-group">
+
             <label>Cotação Padrão Dólar (R$)</label>
+
             <input type="number" id="cfgDollarRate" class="form-control" value="5.20" step="0.05" oninput="salvarConfig()">
+
           </div>
+
         </div>
+
       </div>
 
       <!-- ALERTAS DE PRAZO (PREMIUM) -->
+
       <div class="card" id="cardAlertasPrazo" style="display:none;">
+
         <div class="card-title">⚠️ Alertas de Prazo</div>
+
         <div id="alertasPrazoLista"></div>
+
       </div>
 
       <!-- PAINEL DE RESUMO E INDICADORES CONSOLIDADOS -->
+
       <div class="card">
+
         <div class="card-title">Resumo do Orçamento <span style="font-weight:400;font-size:11px;color:var(--text-muted);text-transform:none;letter-spacing:0;">(valores em R$)</span></div>
+
         
+
         <div class="info-box" id="infoBoxResumo">
+
           ℹ️ <strong>Aviso:</strong> No modo Free, todos os lançamentos e o resumo do orçamento são exibidos apenas em Reais (BRL).
+
         </div>
 
         <div class="grid-4" style="margin-bottom: 20px;" id="kpiGridPrincipal">
+
           <div class="kpi-card">
+
             <div class="kpi-label">Gasto Total em Reais (BRL)</div>
+
             <div class="kpi-value blue" id="kpiTotalBrl">R$ 0,00</div>
+
             <div class="kpi-subtext" id="kpiTotalBrlSub">Total lançado</div>
+
           </div>
+
         </div>
 
         <div class="grid-3">
+
           <div class="kpi-card"><div class="kpi-label">Gasto Por Pessoa</div><div class="kpi-value" id="kpiPerPerson">R$ 0,00</div></div>
+
           <div class="kpi-card"><div class="kpi-label">Total Pago</div><div id="kpiTotalPaidContainer"></div></div>
+
           <div class="kpi-card"><div class="kpi-label">Total Pendente</div><div id="kpiTotalPendingContainer"></div></div>
+
           <div class="kpi-card"><div class="kpi-label">💰 Economia Realizada</div><div id="kpiEconomiaContainer" style="font-size:18px;font-weight:700;color:#16A34A;">R$ 0,00</div></div>
+
         </div>
+
       </div>
 
       <div class="card" id="cardVisualizacaoMoeda" style="display:none;">
+
         <div class="card-title">Visualizar Saldo Em</div>
+
         <div class="radio-group">
+
           <label class="radio-label">
-            <input type="radio" name="viewCurrency" value="BRL" checked onchange="atualizarMoedaVisualizacao()"> Reais (R$)
+
+            <input type="radio" name="viewCurrency" value="BRL" checked onchange="renderDashboardCalculos()"> Reais (R$)
+
           </label>
+
           <label class="radio-label">
-            <input type="radio" name="viewCurrency" value="USD" onchange="atualizarMoedaVisualizacao()"> Dólar (US$)
+
+            <input type="radio" name="viewCurrency" value="USD" onchange="renderDashboardCalculos()"> Dólar (US$)
+
           </label>
+
         </div>
+
       </div>
 
       <div class="card">
+
         <div class="card-title" id="tituloDivisaoCategoria">Divisão por Categoria (Consolidado em BRL)</div>
+
         <div id="categoriesWrapper"></div>
+
       </div>
 
       <div class="card" id="cardSalvarOffline" style="text-align: center; padding: 24px 16px;">
+
         <div style="font-size: 28px; margin-bottom: 8px;">💾</div>
+
         <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">Salvar para Uso Offline</div>
+
         <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Baixe com seus dados salvos. Se trocar de dispositivo, abra este arquivo para recuperar tudo.</div>
+
         <button class="btn-submit" style="width: auto; padding: 10px 20px; background: #0B132B;" onclick="baixarArquivoOffline()">↓ Baixar para usar offline</button>
+
       </div>
+
     </div>
 
     <!-- TAB 2: PLANEJADOR DIA A DIA -->
+
     <div id="tab-roteiro" class="tab-content">
+
       <div class="card no-print" style="margin-bottom:12px;">
+
         <input type="hidden" id="actEditId" value="">
+
         <button id="actFormToggle" onclick="toggleFormRoteiro()" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--brand-primary);padding:0;font-family:inherit;display:flex;justify-content:space-between;align-items:center;">
+
           <span>+ Adicionar atividade ao roteiro</span>
+
           <span id="actFormToggleIcon" style="font-size:12px;color:var(--text-muted);">▼</span>
+
         </button>
+
         <div id="actFormBody" style="display:none;margin-top:16px;">
+
           <div class="grid-2">
+
             <div class="form-group">
+
               <label>Data da Atividade</label>
+
               <input type="date" id="actDate" class="form-control" onchange="atualizarDiaSemanaForm()">
+
               <div id="actDiaSemana" style="display:none;font-size:12px;color:var(--brand-primary);font-weight:600;margin-top:4px;"></div>
+
             </div>
+
             <div class="form-group"><label>Horário</label><input type="time" id="actTime" class="form-control" value="09:00"></div>
+
           </div>
+
           <div class="form-group"><label>Título da Atividade / Local</label><input type="text" id="actTitle" class="form-control" placeholder="Ex: Magic Kingdom - Parque"></div>
+
           <div class="form-group"><label>Observações</label><textarea id="actDesc" class="form-control" placeholder="Ex: Chegar para o Rope Drop" rows="3" style="resize:vertical;line-height:1.5;"></textarea></div>
-          <div style="border-top:1px solid var(--border-color);margin:12px 0 12px;"></div>
-          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:8px;">🚗 Trajeto (opcional) — reflete na aba Transporte</div>
-          <div class="grid-2">
-            <div class="form-group"><label>Origem</label><input type="text" id="actTrajOrigem" class="form-control" placeholder="Ex: Hotel Rosen Inn"></div>
-            <div class="form-group"><label>Destino</label><input type="text" id="actTrajDestino" class="form-control" placeholder="Ex: Magic Kingdom"></div>
+
+          <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:12px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:700;color:#0C4A6E;margin-bottom:8px;">🚗 Trajeto (opcional) — reflete na aba Transporte</div>
+            <div class="grid-2">
+              <div class="form-group" style="margin-bottom:0;"><label>Origem</label><input type="text" id="actTrajOrigem" class="form-control" placeholder="Ex: Hotel"></div>
+              <div class="form-group" style="margin-bottom:0;"><label>Destino</label><input type="text" id="actTrajDestino" class="form-control" placeholder="Ex: Magic Kingdom"></div>
+            </div>
+            <div class="grid-2" style="margin-top:8px;">
+              <div class="form-group" style="margin-bottom:0;"><label>App / Meio</label><input type="text" id="actTrajApp" class="form-control" placeholder="Ex: Uber, Lyft..."></div>
+              <div class="form-group" style="margin-bottom:0;"><label>Teto (US$)</label><input type="number" id="actTrajTeto" class="form-control" placeholder="0.00" step="0.01"></div>
+            </div>
           </div>
-          <div class="grid-2">
-            <div class="form-group"><label>App/Meio <span style="font-weight:400;font-size:11px;color:var(--text-muted);">opcional</span></label><input type="text" id="actTrajApp" class="form-control" placeholder="Ex: Uber, Lyft, Ônibus..."></div>
-            <div class="form-group"><label>Teto (US$) <span style="font-weight:400;font-size:11px;color:var(--text-muted);">opcional</span></label><input type="number" id="actTrajTeto" class="form-control" placeholder="0.00" step="0.01"></div>
-          </div>
+
           <div style="display:flex;gap:8px;">
+
             <button class="btn-submit" id="btnActSubmit" onclick="salvarAtividade()">Salvar</button>
+
             <button class="btn-cancel" id="btnActCancel" style="display:none;" onclick="cancelarEdicaoAtividade()">Cancelar</button>
+
           </div>
+
         </div>
+
       </div>
 
       <div id="promoRoteiroD1" style="display:none;background:#EFF6FF;border:1px dashed #2563EB;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#1E40AF;">
+
         🔒 <strong>Recurso Premium:</strong> Desbloqueie a organização dinâmica por dias de viagem (D1, D2, D3...) agrupada cronologicamente. <a href="#" onclick="abrirPaywall();return false;" style="color:#2563EB;font-weight:700;text-decoration:underline;">Saber mais</a>
+
       </div>
 
       <div id="cronogramaContainer"></div>
+
     </div>
 
     <!-- TAB 3: ORÇAMENTO -->
+
     <div id="tab-orcamento" class="tab-content">
 
       <!-- Campos hidden para compatibilidade -->
+
       <input type="hidden" id="budEditId" value="">
+
       <input type="hidden" id="budAmountUsd" value="0">
+
       <input type="hidden" id="budRate" value="0">
 
       <!-- Accordion: formulário minimizado por padrão -->
+
       <div class="card no-print" style="margin-bottom:12px;">
+
         <button id="budFormToggle" onclick="toggleFormOrcamento()" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--brand-primary);padding:0;font-family:inherit;display:flex;justify-content:space-between;align-items:center;">
+
           <span>+ Adicionar item ao orçamento</span>
+
           <span id="budFormToggleIcon" style="font-size:12px;color:var(--text-muted);">▼</span>
+
         </button>
 
         <div id="budFormBody" style="display:none;margin-top:16px;">
 
           <!-- CAMPOS FREE -->
+
           <div class="form-group">
+
             <label>Descrição do Gasto</label>
+
             <input type="text" id="budDesc" class="form-control" placeholder="Ex: Passagens aéreas, Hospedagem...">
+
           </div>
+
           <div class="form-group">
+
             <label>Valor Estimado (R$)</label>
+
             <input type="number" id="budAmountBrl" class="form-control" placeholder="0.00" step="0.01">
+
           </div>
 
           <!-- CAMPOS PREMIUM -->
+
           <div id="budCamposPremium" style="display:none;">
+
             <div class="form-group">
+
               <label>Categoria</label>
+
               <select id="budCategory" class="form-control">
+
                 <option value="Passagens">✈️ Passagens</option>
+
                 <option value="Hospedagem">🏨 Hospedagem</option>
+
                 <option value="Parques e Ingressos">🏰 Parques & Ingressos</option>
+
                 <option value="Alimentação">🍕 Alimentação</option>
+
                 <option value="Compras">🛍️ Compras</option>
+
                 <option value="Outros">📌 Outros (exceto transporte — use a aba Transporte)</option>
+
               </select>
+
             </div>
+
             <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
+
               <span style="font-weight:500;font-size:13px;">Status:</span>
+
               <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
+
                 <input type="radio" name="budStatus" value="Pendente" checked onchange="onStatusChange(this)"> 🟡 Pendente
+
               </label>
+
               <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
+
                 <input type="radio" name="budStatus" value="Pago" onchange="onStatusChange(this)"> 🟢 Pago
+
               </label>
+
             </div>
+
             <div id="budPaidGroup" style="display:none;">
+
               <div class="form-group">
+
                 <label>Valor efetivamente pago (R$)
+
                   <span style="font-weight:400;font-size:11px;color:var(--text-muted);"> — se diferente do estimado, informe aqui para refletir corretamente na economia</span>
+
                 </label>
+
                 <input type="number" id="budPaidBrl" class="form-control" placeholder="0.00">
+
               </div>
+
             </div>
+
           </div>
 
           <!-- AVISO FREE -->
+
           <div id="promoOrcamentoFree" style="display:none;background:#F8FAFC;border:1px solid var(--border-color);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--text-muted);">
+
             🔒 <strong>Modo Free:</strong> Categoria, valor pago e status são exclusivos da <a href="#" onclick="abrirPaywall();return false;" style="color:var(--brand-primary);font-weight:700;">versão Premium</a>.
+
           </div>
 
           <div style="display:flex;gap:8px;">
+
             <button class="btn-submit" id="btnBudSubmit" onclick="salvarOrcamento()" style="flex:1;">Salvar</button>
+
             <button class="btn-cancel" id="btnBudCancel" style="display:none;" onclick="cancelarEdicaoOrcamento()">Cancelar</button>
+
           </div>
+
         </div>
+
       </div>
 
       <div class="card">
+
         <div class="card-title">Itens Registrados no Orçamento</div>
+
         <div id="orcamentoLista"></div>
+
       </div>
+
     </div>
 
     <!-- TAB 4: TRANSPORTE (reformulada) -->
+
     <div id="tab-transporte" class="tab-content">
+
       <div class="card no-print">
+
         <div class="card-title">🚗 Como vai se deslocar?</div>
+
         <div style="display:flex;gap:10px;margin-bottom:16px;">
+
           <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;border:2px solid var(--border-color);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;" id="lblModoCarro">
+
             <input type="radio" name="modoTransporte" value="carro" id="modoCarro" onchange="alternarModoTransporte()"> 🚗 Carro Alugado
+
           </label>
+
           <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;border:2px solid var(--border-color);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;" id="lblModoApp">
+
             <input type="radio" name="modoTransporte" value="app" id="modoApp" onchange="alternarModoTransporte()"> 🚌 Uber / App / Transporte
+
           </label>
+
         </div>
 
         <!-- Campos modo Carro -->
+
         <div id="campusCarro" style="display:none;">
+
           <div class="grid-2">
-            <div class="form-group"><label>Dias de aluguel</label><input type="number" id="carDays" class="form-control" value="7" oninput="calcularTransporte()"></div>
-            <div class="form-group"><label>Diária do carro (US$)</label><input type="number" id="carDaily" class="form-control" value="45" oninput="calcularTransporte()"></div>
+
+            <div class="form-group"><label>Dias de aluguel</label><input type="number" id="carDays" class="form-control" value="7" oninput="renderTransporte()"></div>
+
+            <div class="form-group"><label>Diária do carro (US$)</label><input type="number" id="carDaily" class="form-control" value="45" oninput="renderTransporte()"></div>
+
           </div>
+
           <div class="grid-2">
-            <div class="form-group"><label>Estacionamento/dia nos parques (US$)</label><input type="number" id="carPark" class="form-control" value="35" oninput="calcularTransporte()"></div>
-            <div class="form-group"><label>Combustível estimado total (US$)</label><input type="number" id="carFuel" class="form-control" value="80" oninput="calcularTransporte()"></div>
+
+            <div class="form-group"><label>Estacionamento/dia nos parques (US$)</label><input type="number" id="carPark" class="form-control" value="35" oninput="renderTransporte()"></div>
+
+            <div class="form-group"><label>Combustível estimado total (US$)</label><input type="number" id="carFuel" class="form-control" value="80" oninput="renderTransporte()"></div>
+
           </div>
+
         </div>
 
         <!-- Campos modo App/Uber -->
+
         <div id="campusApp" style="display:none;">
+
           <div class="grid-2">
+
             <div class="form-group"><label>Origem</label><input type="text" id="trajOrigem" class="form-control" placeholder="Ex: Hotel Rosen Inn"></div>
+
             <div class="form-group"><label>Destino</label><input type="text" id="trajDestino" class="form-control" placeholder="Ex: Magic Kingdom"></div>
+
           </div>
+
           <div class="grid-2">
+
             <div class="form-group"><label>App / Meio</label><input type="text" id="trajApp" class="form-control" placeholder="Ex: Uber, Lyft, Ônibus I-Ride..."></div>
+
             <div class="form-group"><label>Valor estimado (US$)</label><input type="number" id="trajValor" class="form-control" placeholder="0.00" step="0.01"></div>
+
           </div>
+
           <button class="btn-submit" onclick="adicionarTrajeto()">+ Adicionar Trajeto</button>
+
         </div>
+
       </div>
 
       <div class="card" id="cardTransporteComparativo" style="display:none;">
+
         <div class="card-title">💡 Vale mais a pena Carro ou App?</div>
+
         <div id="transporteComparativoTexto" style="font-size:13px;color:var(--text-muted);"></div>
+
       </div>
 
       <div class="card" id="cardTransporteRoteiro" style="display:none;">
+
         <div class="card-title">🗺️ Trajetos do Roteiro</div>
+
         <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Itens marcados como 🚗 Transporte nas atividades do roteiro. Somente leitura — edite pelo Roteiro da Viagem.</p>
+
         <div id="trajetosRoteiro"></div>
+
       </div>
 
       <div class="card" id="cardTransporteResultado">
+
         <div class="card-title">Estimativa Total de Transporte</div>
+
         <div class="kpi-grid">
+
           <div class="kpi-card"><div class="kpi-label">Total Estimado (US$)</div><div class="kpi-value blue" id="kpiTransporteTotal">US$ 0,00</div></div>
+
           <div class="kpi-card"><div class="kpi-label">Total Estimado (R$)</div><div class="kpi-value" id="kpiTransporteTotalBrl">R$ 0,00</div></div>
+
           <div class="kpi-card"><div class="kpi-label">Modo Escolhido</div><div class="kpi-value" id="kpiTransporteModo" style="font-size:13px;">—</div></div>
+
         </div>
+
         <div id="trajetosLista" style="margin-top:16px;"></div>
+
       </div>
+
     </div>
 
     <!-- TAB 5: LISTA DE COMPRAS (consolidada por dia) -->
+
     <div id="tab-compras" class="tab-content">
+
       <div class="card">
+
         <div class="card-title">🛍️ Lista de Compras por Dia</div>
-        <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 12px;font-size:12px;color:#1E40AF;margin-bottom:12px;">
-          ℹ️ Aqui aparecem apenas os itens do tipo <strong>🛍️ Compras</strong> e <strong>🛒 Mercado</strong> adicionados nas atividades do Roteiro. Alimentação e Transporte são gerenciados separadamente.
+        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px 12px;font-size:12px;color:#166534;margin-bottom:12px;">
+          💡 Aqui aparecem apenas os itens do tipo <strong>🛍️ Compras</strong> e <strong>🛒 Mercado</strong> adicionados nas atividades do Roteiro. Alimentação (🍽️) e Transporte (🚗) não aparecem aqui.
         </div>
+
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Itens adicionados nas atividades do roteiro, agrupados por dia.</p>
+
         <div id="comprasConsolidada"></div>
+
       </div>
+
     </div>
 
     <!-- MODAL: DICAS (substituiu a aba) -->
+
     <div class="modal-termos-overlay" id="modalDicas">
+
       <div class="modal-termos-card" style="max-width:720px;">
+
         <button class="modal-termos-close" onclick="fecharModalTermos('modalDicas')">✕</button>
+
         <div class="modal-termos-titulo">💡 Dicas para sua Viagem Disney</div>
+
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;" id="dicasGrid">
+
           <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px;">
+
             <div style="font-size:15px;font-weight:700;color:#1E40AF;margin-bottom:8px;">📲 Apps Essenciais</div>
+
             <ul style="font-size:12px;color:#1E3A5F;line-height:1.7;margin:0;padding-left:16px;">
+
               <li>Baixe o <strong>My Disney Experience</strong> antes de viajar</li>
+
               <li>Vincule seus ingressos assim que chegar</li>
+
               <li>Use o Mobile Order para pular fila de comida</li>
+
             </ul>
+
           </div>
+
           <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:14px;">
+
             <div style="font-size:15px;font-weight:700;color:#166534;margin-bottom:8px;">🎢 Nos Parques</div>
+
             <ul style="font-size:12px;color:#14532D;line-height:1.7;margin:0;padding-left:16px;">
+
               <li>Chegue 45-60 min antes da abertura (Rope Drop)</li>
+
               <li>Atração mais concorrida primeiro</li>
+
               <li>Intercale dias de parque com descanso</li>
+
             </ul>
+
           </div>
+
           <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px;">
+
             <div style="font-size:15px;font-weight:700;color:#9A3412;margin-bottom:8px;">⏰ Genie+ & Lightning Lane</div>
+
             <ul style="font-size:12px;color:#7C2D12;line-height:1.7;margin:0;padding-left:16px;">
+
               <li>Agende o 1º Lightning Lane às 07:00 no app</li>
+
               <li>Priorize: Rise of the Resistance, Tron, TSMM</li>
+
               <li>Avatar (AK) e Guardians (EPCOT) têm fila individual paga</li>
+
             </ul>
+
           </div>
+
           <div style="background:#FDF4FF;border:1px solid #E9D5FF;border-radius:10px;padding:14px;">
+
             <div style="font-size:15px;font-weight:700;color:#6B21A8;margin-bottom:8px;">🛡️ Seguro & Chip</div>
+
             <ul style="font-size:12px;color:#581C87;line-height:1.7;margin:0;padding-left:16px;">
+
               <li>Seguro com cobertura médica mínima US$60k</li>
+
               <li>eSIM: ative antes de embarcar</li>
+
               <li>Mínimo 10GB para 7 dias de uso normal</li>
+
             </ul>
+
           </div>
+
           <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:10px;padding:14px;grid-column:1/-1;">
+
             <div style="font-size:15px;font-weight:700;color:#0C4A6E;margin-bottom:8px;">📋 Ordem de Contratações</div>
+
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:12px;color:#0C4A6E;">
+
               <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">✈️</div><strong>12-6 meses</strong><br>Passagens e passaporte</div>
+
               <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">🏨</div><strong>6 meses</strong><br>Hotel e ingressos</div>
+
               <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">🍽️</div><strong>60 dias</strong><br>Restaurantes (6h da manhã)</div>
+
               <div style="text-align:center;background:white;border-radius:8px;padding:8px;"><div style="font-size:18px;">🎢</div><strong>7-3 dias</strong><br>Lightning Lane Individual</div>
+
             </div>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
 
     <!-- MODAL: LISTA DE COMPRAS POR ATIVIDADE -->
+
     <div class="modal-termos-overlay" id="modalComprasAtividade">
+
       <div class="modal-termos-card" style="max-width:500px;">
+
         <button class="modal-termos-close" onclick="fecharModalComprasAtividade()">✕</button>
+
         <div class="modal-termos-titulo" id="modalComprasTitulo">📋 Lista da Atividade</div>
+
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;" id="modalComprasSubtitulo"></div>
 
         <div class="grid-2" style="margin-bottom:8px;">
+
           <div class="form-group">
+
             <label>Tipo</label>
+
             <select id="cmpTipo" class="form-control">
+
               <option value="compras">🛍️ Compras</option>
+
               <option value="mercado">🛒 Mercado</option>
+
               <option value="alimentacao">🍽️ Alimentação</option>
+
+
             </select>
+
           </div>
+
           <div class="form-group"><label>Descrição</label><input type="text" id="cmpProduto" class="form-control" placeholder="Ex: Tênis Nike, Jantar..."></div>
+
         </div>
+
         <div class="grid-2" style="margin-bottom:8px;">
+
           <div class="form-group"><label>Marca / Detalhe <span style="font-weight:400;font-size:11px;color:var(--text-muted);">opcional</span></label><input type="text" id="cmpMarca" class="form-control" placeholder="Ex: Nike, Texas Roadhouse..."></div>
+
           <div class="form-group"><label>Teto (US$)</label><input type="number" id="cmpTeto" class="form-control" placeholder="0.00" step="0.01"></div>
+
         </div>
+
         <button class="btn-submit" onclick="adicionarItemCompra()" style="margin-bottom:16px;">+ Adicionar</button>
 
         <div id="listaItensCompra" style="margin-bottom:12px;"></div>
 
         <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px 14px;">
+
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+
             <span style="font-size:13px;color:#166534;font-weight:600;">Teto total desta parada:</span>
+
             <span style="font-size:16px;font-weight:700;color:#16A34A;" id="totalTetoAtividade">US$ 0,00</span>
+
           </div>
+
           <div id="totalTetoTipos" style="font-size:11px;color:#166534;display:flex;gap:12px;flex-wrap:wrap;"></div>
+
         </div>
+
       </div>
+
     </div>
 
-
-
     <!-- TAB 8: CRONOGRAMA DE TAREFAS -->
+
     <div id="tab-cronograma" class="tab-content">
+
       <div class="card no-print">
+
         <div class="card-title" id="croFormTitle">Adicionar Tarefa ao Cronograma</div>
+
         <input type="hidden" id="croEditId" value="">
+
         <div class="grid-2">
+
           <div class="form-group">
+
             <label>Mês/Ano da tarefa</label>
+
             <input type="month" id="croMes" class="form-control">
+
           </div>
+
           <div class="form-group">
+
             <label>Tarefa</label>
+
             <input type="text" id="croTitulo" class="form-control" placeholder="Ex: Pagar passaporte, Comprar passagens...">
+
           </div>
+
         </div>
+
         <div class="form-group" style="max-width:200px;">
+
           <label>Valor (R$) <span style="font-weight:400;color:var(--text-muted);font-size:11px;">opcional</span></label>
+
           <input type="number" id="croValor" class="form-control" placeholder="0.00" step="0.01">
+
         </div>
+
         <button class="btn-submit" id="btnCroSubmit" onclick="salvarTarefaCronograma()">Adicionar ao Cronograma</button>
+
         <button class="btn-cancel" id="btnCroCancel" style="display:none;" onclick="cancelarEdicaoCronograma()">Cancelar Edição</button>
+
       </div>
 
       <div class="card">
+
         <div class="card-title">Tarefas Organizadas por Mês</div>
+
         <div id="cronogramaLista"></div>
+
       </div>
+
     </div>
 
   </main>
 
-
-
   <!-- MODAL METAS DE ECONOMIA -->
+
   <div class="modal-termos-overlay" id="modalMetas">
+
     <div class="modal-termos-card" style="max-width:600px;">
+
       <button class="modal-termos-close" onclick="fecharModalTermos('modalMetas')">✕</button>
+
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+
         <div class="modal-termos-titulo" style="margin-bottom:0;">🎯 Metas de Economia</div>
+
         <button onclick="exportarPDF('metas')" style="background:none;border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;">📄 Exportar PDF</button>
+
       </div>
+
       <div id="tab-metas">
+
       <div class="card no-print">
+
         <div class="card-title">🎯 Meta de Economia Mensal</div>
+
         <div class="info-box">
+
           ℹ️ <strong>Como funciona:</strong> a meta em reais é calculada automaticamente com base no <strong>total já orçado</strong> na aba Orçamento. Escolha o mês de início e o app divide esse valor igualmente entre os meses restantes até a data da viagem.
+
         </div>
 
         <div class="grid-2">
+
           <div class="form-group">
+
             <label>Mês/Ano de início das reservas</label>
+
             <input type="month" id="metaMesInicio" class="form-control" onchange="salvarMetaConfig()">
+
           </div>
+
           <div class="form-group">
+
             <label>Meta total (puxada do Orçamento)</label>
+
             <input type="text" id="metaValorTotal" class="form-control" value="R$ 0,00" disabled style="background:#F1F5F9; color:var(--text-muted); font-weight:700;">
+
           </div>
+
         </div>
 
         <div id="metaAvisoSemData" style="display:none; background:#FEF3C7; border:1px solid #FDE68A; color:#92400E; padding:10px 14px; border-radius:8px; font-size:13px;">
+
           ⚠️ Defina a <strong>Data de ida</strong> na aba Início para calcular o prazo até a viagem.
+
         </div>
+
       </div>
 
       <div class="card" id="cardResumoMetas" style="display:none;">
+
         <div class="card-title">Resumo da Meta</div>
+
         <div class="grid-3">
+
           <div class="kpi-card">
+
             <div class="kpi-label">Valor por Mês</div>
+
             <div class="kpi-value blue" id="metaValorMensal">R$ 0,00</div>
+
           </div>
+
           <div class="kpi-card">
+
             <div class="kpi-label">Meses Restantes</div>
+
             <div class="kpi-value" id="metaMesesRestantes">0</div>
+
           </div>
+
           <div class="kpi-card">
+
             <div class="kpi-label">Meta Total</div>
+
             <div class="kpi-value green" id="metaTotalDisplay">R$ 0,00</div>
+
           </div>
+
         </div>
+
       </div>
 
       <div class="card" id="cardListaMetas" style="display:none;">
+
         <div class="card-title">Reserva Mês a Mês</div>
+
         <div id="metasLista"></div>
+
       </div>
+
     </div>
+
     </div>
+
   </div>
 
   <!-- MODAL CHECKLIST DE MALA -->
+
   <div class="modal-termos-overlay" id="modalMala">
+
     <div class="modal-termos-card" style="max-width:600px;">
+
       <button class="modal-termos-close" onclick="fecharModalTermos('modalMala')">✕</button>
+
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+
         <div class="modal-termos-titulo" style="margin-bottom:0;">🧳 Checklist de Mala</div>
+
         <button onclick="exportarPDF('mala')" style="background:none;border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;">📄 Exportar PDF</button>
+
       </div>
+
       <div id="tab-mala">
+
       <div class="card no-print">
+
         <div class="card-title" id="malaFormTitle">Adicionar Item à Mala</div>
+
         <input type="hidden" id="malaEditId" value="">
+
         <div class="grid-2">
+
           <div class="form-group">
+
             <label>Categoria</label>
+
             <select id="malaCategoria" class="form-control">
+
               <option value="Documentos">📄 Documentos</option>
+
               <option value="Roupas">👕 Roupas</option>
+
               <option value="Eletrônicos">🔌 Eletrônicos</option>
+
               <option value="Itens de Parque">🎢 Itens de Parque</option>
+
               <option value="Higiene e Saúde">🧴 Higiene e Saúde</option>
+
               <option value="Outros">📦 Outros</option>
+
             </select>
+
           </div>
+
           <div class="form-group">
+
             <label>Item</label>
+
             <input type="text" id="malaItem" class="form-control" placeholder="Ex: Passaporte, Protetor solar...">
+
           </div>
+
         </div>
+
         <button class="btn-submit" id="btnMalaSubmit" onclick="salvarItemMala()">Adicionar à Mala</button>
+
         <button class="btn-cancel" id="btnMalaCancel" style="display:none;" onclick="cancelarEdicaoMala()">Cancelar Edição</button>
+
       </div>
 
       <div class="card">
+
         <div class="card-title">
+
           <span>Itens por Categoria</span>
+
           <span id="malaProgressoTexto" style="font-weight:700; color:var(--brand-primary); text-transform:none; font-size:13px;">0% embalado</span>
+
         </div>
+
         <div class="barra-progresso" style="width:100%; height:8px; background:var(--border-color); border-radius:20px; overflow:hidden; margin-bottom:16px;">
+
           <div id="malaBarraFill" style="height:100%; width:0%; background:linear-gradient(90deg,var(--brand-primary),var(--brand-light)); border-radius:20px; transition:width .3s;"></div>
+
         </div>
+
         <div id="malaLista"></div>
+
       </div>
+
     </div>
+
+    </div>
+
+  </div>
+
+  <!-- MODAL: TRAJETO DA ATIVIDADE -->
+  <div class="modal-termos-overlay" id="modalTrajetoAtividade">
+    <div class="modal-termos-card" style="max-width:440px;">
+      <button class="modal-termos-close" onclick="fecharModalTrajeto()">✕</button>
+      <div class="modal-termos-titulo">🚗 Trajeto da Atividade</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;" id="modalTrajetoSubtitulo"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Origem</label><input type="text" id="trajAtOrigem" class="form-control" placeholder="Ex: Hotel Rosen Inn"></div>
+        <div class="form-group"><label>Destino</label><input type="text" id="trajAtDestino" class="form-control" placeholder="Ex: Magic Kingdom"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>App / Meio</label><input type="text" id="trajAtApp" class="form-control" placeholder="Ex: Uber, Lyft..."></div>
+        <div class="form-group"><label>Teto (US$)</label><input type="number" id="trajAtTeto" class="form-control" placeholder="0.00" step="0.01"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn-submit" onclick="salvarTrajetoAtividade()">Salvar Trajeto</button>
+        <button class="btn-cancel" id="btnRemoverTrajeto" onclick="removerTrajetoAtividade()" style="color:var(--danger);border-color:var(--danger);display:none;">🗑️ Remover</button>
+      </div>
     </div>
   </div>
 
   <!-- MODAL PAYWALL PREMIUM -->
+
   <div class="modal-overlay" id="paywallModal">
+
     <div class="paywall-card">
+
       <button class="modal-close" style="color:#FFF;" onclick="fecharPaywall()">✕</button>
+
       <div class="paywall-title">Da economia ao embarque.<br>Sem fila, sem susto, sem esquecer nada.</div>
+
       <div class="paywall-subtitle">Do primeiro real guardado até a última mala fechada.</div>
+
       <div class="paywall-list">
+
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Roteiro dinâmico D1, D2:</strong> agrupamento automático e cronológico por dia da viagem, com dia da semana</div></div>
+
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Orçamento completo:</strong> categorias, orçado vs. pago e conversão Real ↔ Dólar</div></div>
+
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Câmbio dinâmico:</strong> lance em USD e veja o saldo em qualquer uma das duas moedas</div></div>
+
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Metas de economia:</strong> quanto guardar por mês para atingir o orçamento total</div></div>
+
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Cronograma de tarefas:</strong> organize o que precisa fazer mês a mês até a viagem</div></div>
+
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Checklist de mala:</strong> itens por categoria com progresso de embalagem</div></div>
+
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Alertas de prazo:</strong> avisos automáticos de tarefas atrasadas e contagem regressiva</div></div>
+
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Calculadora Uber vs. Carro:</strong> saiba onde economizar</div></div>
+
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Dicas para uma viagem segura e confortável:</strong> app, ingressos, seguro viagem, internet, Genie+ e mais</div></div>
+
         <div class="paywall-item" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;"><div class="paywall-check">✓</div><div><strong>📄 Exportar PDF completo:</strong> imprima ou compartilhe todo o seu planejamento — roteiro, orçamento, checklist e cronograma — em um único documento</div></div>
+
       </div>
+
       <div class="paywall-price-label">R$ 15,90</div>
+
       <div class="paywall-price-sub">pagamento único - acesso vitalício</div>
+
       <button onclick="fecharPaywall(); irParaCompraPremium();" class="btn-buy-paywall">Garantir o Premium por R$ 15,90 →</button>
+
     </div>
+
   </div>
 
   <!-- MODAL LOGIN -->
+
   <div class="modal-overlay" id="loginModal">
+
     <div class="modal-card">
+
       <button class="modal-close" onclick="fecharLoginModal()">✕</button>
+
       <h3 style="margin-bottom:12px; font-size:18px;">Acessar Meus Flowis</h3>
+
       <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Digite o e-mail usado na compra para liberar todas as funções neste dispositivo.</p>
+
       <div class="form-group"><label>E-mail</label><input type="email" id="loginEmail" class="form-control" placeholder="seuemail@exemplo.com"></div>
+
       <button class="btn-submit" id="btnAtivarPremium" style="margin-top:8px;" onclick="verificarLicencaPremium()">Verificar e Acessar</button>
+
       <div id="loginStatus" style="font-size:13px; margin-top:12px; text-align:center; min-height:18px;"></div>
+
     </div>
+
   </div>
 
   <!-- MODAL E-MAIL PARA COMPRA -->
+
   <div class="modal-overlay" id="emailCompraModal">
+
     <div class="modal-card">
+
       <button class="modal-close" onclick="fecharEmailCompraModal()">✕</button>
+
       <h3 style="margin-bottom:12px; font-size:18px;">Quase lá!</h3>
+
       <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Digite o e-mail que você quer usar para acessar o Premium depois da compra.</p>
+
       <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:10px 12px; font-size:12px; color:#166534; margin-bottom:16px;">
+
         💡 Já comprou outro Flowi antes? Use o <strong>mesmo e-mail</strong> para juntar todos os seus produtos na sua Central Flowi.
+
       </div>
+
       <div class="form-group"><label>E-mail</label><input type="email" id="emailCompraInput" class="form-control" placeholder="seuemail@exemplo.com"></div>
+
       <button class="btn-submit" id="btnIrParaPagamento" style="margin-top:8px;" onclick="confirmarEmailEIrParaPagamento()">Continuar para o pagamento</button>
+
       <div id="emailCompraStatus" style="font-size:13px; margin-top:12px; text-align:center; min-height:18px;"></div>
+
     </div>
+
   </div>
 
   <footer>
+
     <div style="font-weight:600;letter-spacing:1px;color:var(--text-muted);">FLOWI · Cada destino, uma experiência · <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a></div>
+
     <div>Dúvidas? <a href="https://instagram.com/tryflowi" target="_blank">@tryflowi</a></div>
+
     <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;justify-content:center">
+
       <button class="btn-reset-discreet" style="margin-top:0" onclick="confirmarReset()">🔄 Resetar aplicativo</button>
+
     </div>
+
   </footer>
 
   <script>
+
     const CHECKOUT_BASE_URL = 'https://flowi-webhook-mercadopago.tryflowicontato.workers.dev/criar-checkout?produto=flowi-disney';
 
     // Identificador deste produto na tabela licencas_flowi — precisa bater
+
     // com o produto_id cadastrado em produtos_flowi para o link de pagamento
+
     // "Flowi Viagens - Disney Premium".
+
     const PRODUTO_ID = 'flowi-disney';
 
     // Configuração do Supabase — usada para verificar licenças reais de
+
     // compra no modal "Já sou Premium".
+
     const SUPABASE_URL = 'https://gkvanakreiiiprriyats.supabase.co';
+
     const SUPABASE_ANON_KEY = 'sb_publishable_1Lx3D9jBwegVvvqTK39JAg_yV6zuw3s';
+
     let supabaseClient = null;
+
     try {
+
       if (window.supabase) {
+
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
       }
+
     } catch (e) {
+
       console.warn('Supabase não inicializado:', e);
+
     }
 
     let isPremium = false;
+
     let activeTabId = 'inicio';
 
     let appData = {
+
       config: { tripName: 'Minha Viagem Disney', startDate: '', endDate: '', travelers: 1, dollarRate: 5.20 },
+
       activities: [],
+
       budgetItems: [],
+
       metas: { mesInicio: '' },
+
       cronograma: [],
+
       mala: []
+
     };
 
     const TABS_CONFIG = [
+
       { id: 'inicio', label: 'Início', premium: false },
+
       { id: 'orcamento', label: 'Orçamento', premium: false },
+
       { id: 'roteiro', label: 'Roteiro da Viagem', premium: false },
+
       { id: 'cronograma', label: '🗓️ Cronograma', premium: true },
+
       { id: 'compras', label: '🛍️ Lista de Compras', premium: true },
+
       { id: 'transporte', label: '🚗 Transporte', premium: true }
+
     ];
 
     /* --- FUNÇÕES AUXILIARES DE FORMATAÇÃO DE MOEDA (CONTÁBIL) --- */
+
     function formatarBRL(valor) {
+
       return (valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
     }
 
     function formatarUSD(valor) {
+
       return (valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
     }
 
     window.addEventListener('DOMContentLoaded', () => { carregar(); });
 
     // Restaura estado após impressão (funciona em Android/Desktop; iOS não dispara este evento)
+
     window.addEventListener('afterprint', () => {
+
       if (window._restaurarPrint) { window._restaurarPrint(); window._restaurarPrint = null; }
+
     });
 
     function irParaCompraPremium() {
+
       document.getElementById('emailCompraModal').classList.add('active');
+
       document.getElementById('emailCompraStatus').textContent = '';
+
     }
 
     function fecharEmailCompraModal() {
+
       document.getElementById('emailCompraModal').classList.remove('active');
+
     }
 
     function confirmarEmailEIrParaPagamento() {
+
       const emailInput = document.getElementById('emailCompraInput');
+
       const statusEl = document.getElementById('emailCompraStatus');
+
       const email = emailInput.value.trim().toLowerCase();
 
       if (!email || !email.includes('@') || !email.includes('.')) {
+
         statusEl.textContent = 'Digite um e-mail válido.';
+
         statusEl.style.color = 'var(--danger)';
+
         return;
+
       }
 
       // Guarda o e-mail localmente também, para reconhecimento automático
+
       // assim que a licença for confirmada.
+
       localStorage.setItem('flowi_hub_email', email);
 
       const urlFinal = `${CHECKOUT_BASE_URL}&email=${encodeURIComponent(email)}`;
+
       window.open(urlFinal, '_blank');
+
       fecharEmailCompraModal();
+
     }
 
     function exportarPDF(abaId) {
+
       if (!isPremium) { abrirPaywall(); return; }
 
       const titulo = appData.config?.tripName || 'Minha Viagem Disney';
+
       const viajantes = appData.config?.travelers || 1;
+
       const dataIda = appData.config?.travelDate || '';
+
       const elTitulo = document.getElementById('printTitulo');
+
       const elSub = document.getElementById('printSubtitulo');
 
       // Garante que todas as abas premium estejam renderizadas antes de imprimir
+
       renderAllData();
 
       // Remove elementos de formulário do DOM fisicamente (não só CSS)
+
       // para garantir zero espaço em todos os browsers/dispositivos.
+
       const removidos = [];
+
       document.querySelectorAll('.no-print, #cardVisualizacaoMoeda, #cardSalvarOffline, #promoRoteiroD1, #promoOrcamentoFree, #promoMoedaFree').forEach(el => {
+
         const placeholder = document.createComment('no-print-placeholder');
+
         el.parentNode.insertBefore(placeholder, el);
+
         el.parentNode.removeChild(el);
+
         removidos.push({ el, placeholder });
+
       });
 
       // Remove classes de impressão anteriores
+
       document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
 
       if (abaId) {
+
         const nomesAbas = { inicio: 'Início', roteiro: 'Roteiro da Viagem', orcamento: 'Orçamento', metas: 'Metas de Economia', cronograma: 'Cronograma', mala: 'Checklist de Mala', transporte: 'Uber vs. Carro', dicas: 'Dicas' };
+
         if (elTitulo) elTitulo.textContent = titulo;
+
         if (elSub) elSub.textContent = `${nomesAbas[abaId] || abaId} · ${viajantes} viajante(s) · Flowi Viagens`;
+
         const alvo = document.getElementById(`tab-${abaId}`);
+
         if (alvo) alvo.classList.add('print-show');
+
       } else {
+
         if (elTitulo) elTitulo.textContent = titulo;
+
         if (elSub) elSub.textContent = `${viajantes} viajante(s)${dataIda ? ' · Ida: ' + dataIda : ''} · Planejamento completo · Flowi Viagens`;
+
         document.querySelectorAll('.tab-content').forEach(s => s.classList.add('print-show'));
+
       }
 
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
       const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
       const restaurar = () => {
+
         // Restaura todos os elementos removidos nas posições originais
+
         removidos.forEach(({ el, placeholder }) => {
+
           if (placeholder.parentNode) {
+
             placeholder.parentNode.insertBefore(el, placeholder);
+
             placeholder.parentNode.removeChild(placeholder);
+
           }
+
         });
+
         document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
+
         renderTabs();
+
       };
 
       if (isIOS || isSafari) {
+
         const aviso = document.getElementById('avisoImpressaoIOS');
+
         if (aviso) aviso.style.display = 'flex';
+
         // Restaura após o usuário fechar o aviso (handled inline no botão)
+
         window._restaurarPrint = restaurar;
+
         setTimeout(() => { try { window.print(); } catch(e) {} }, 100);
+
         return;
+
       }
 
       window.print();
+
       restaurar();
+
     }
 
     function abrirModalTermos(id) {
+
       const drawer = document.getElementById('drawer');
+
       if (drawer && drawer.classList.contains('active')) toggleMenu();
+
       document.getElementById(id || 'modalTermos').classList.add('active');
+
     }
 
     function abrirModalPremium(id) {
+
       if (!isPremium) { abrirPaywall(); return; }
+
       abrirModalTermos(id);
+
       // Renderiza o conteúdo do modal após abrir
+
       if (id === 'modalMetas') renderMetas();
+
       if (id === 'modalMala') renderMala();
+
     }
 
     function fecharModalTermos(id) {
+
       document.getElementById(id || 'modalTermos').classList.remove('active');
+
     }
 
     // Fechar modal de termos clicando fora do card
+
     document.querySelectorAll('.modal-termos-overlay').forEach(el => {
+
       el.addEventListener('click', function(e) {
+
         if (e.target === el) el.classList.remove('active');
+
       });
+
     });
 
     function confirmarReset() {
+
       if (confirm("⚠️ ATENÇÃO: Deseja realmente resetar o aplicativo?\n\nIsso apagará todas as atividades, itens do orçamento e configurações salvas.")) {
+
         localStorage.removeItem('flowi_disney_user_data');
+
         location.reload();
+
       }
+
     }
 
     async function carregar() {
-      // PASSO 1 — Dados locais → render imediato
+
+      // PASSO 1 — Dados locais → render imediato, zero delay.
+
       const saved = localStorage.getItem('flowi_disney_user_data');
+
       let dadosLocais = null;
-      if (saved) { try { dadosLocais = JSON.parse(saved); } catch(e) {} }
+
+      if (saved) {
+
+        try { dadosLocais = JSON.parse(saved); } catch(e) {}
+
+      }
+
       if (dadosLocais) appData = { ...appData, ...dadosLocais };
+
       if (!appData.metas) appData.metas = { mesInicio: '' };
+
       if (!appData.cronograma) appData.cronograma = [];
+
       if (!appData.mala) appData.mala = [];
+
       if (!appData.compras) appData.compras = [];
+
       if (!appData.transporte) appData.transporte = { modo: 'carro', trajetos: [] };
-      if (!appData.activities) appData.activities = [];
-      if (!appData.budgetItems) appData.budgetItems = [];
 
       isPremium = localStorage.getItem('flowi_is_premium') === 'true';
 
-      // Restaura aba salva ANTES de renderizar (para renderTabs marcar a certa)
-      const abaSalva = localStorage.getItem('flowi_disney_aba');
-      if (abaSalva && TABS_CONFIG.find(t => t.id === abaSalva)) {
-        activeTabId = abaSalva;
-      }
+      // Renderiza IMEDIATAMENTE com dados locais — usuário nunca vê tela em branco.
 
       atualizarInterfaceState();
+
       renderTabs();
       carregarInputsConfig();
       renderAllData();
       iniciarContador();
 
-      // Ativa visualmente a aba correta
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      const tabAlvo = document.getElementById(`tab-${activeTabId}`);
-      if (tabAlvo) tabAlvo.classList.add('active');
+      // Restaura a aba que estava ativa antes do F5
+      try {
+        const abaAnterior = localStorage.getItem('flowi_disney_active_tab');
+        if (abaAnterior && abaAnterior !== 'inicio') switchTab(abaAnterior);
+      } catch(e) {}
 
-      // PASSO 2 — Sincronização em background (sem tocar na UI exceto se mudou algo)
+      // PASSO 2 — Verificação e sincronização em background, completamente silenciosa.
+
+      // Nenhuma parte deste bloco toca na UI enquanto estiver carregando.
+
       const emailSalvo = localStorage.getItem('flowi_hub_email');
+
       if (!emailSalvo || !supabaseClient) return;
 
-      try {
-        const { data: licenca } = await supabaseClient
-          .from('licencas_flowi').select('ativo')
-          .eq('email', emailSalvo.toLowerCase().trim())
-          .eq('produto', PRODUTO_ID).eq('ativo', true).maybeSingle();
+      // Snapshot do estado atual para comparar depois
 
-        const eraPremium = isPremium;
+      const snapshotAntes = JSON.stringify(appData);
+
+      const premiumAntes = isPremium;
+
+      try {
+
+        // Verifica licença em background
+
+        const { data: licenca } = await supabaseClient
+
+          .from('licencas_flowi')
+
+          .select('ativo')
+
+          .eq('email', emailSalvo.toLowerCase().trim())
+
+          .eq('produto', PRODUTO_ID)
+
+          .eq('ativo', true)
+
+          .maybeSingle();
+
         if (licenca && !isPremium) {
+
           isPremium = true;
+
           localStorage.setItem('flowi_is_premium', 'true');
+
         }
+
+        // Sincroniza dados com nuvem se for Premium
 
         if (isPremium) {
-          const dadosAntes = JSON.stringify(appData);
-          await sincronizarComNuvem(emailSalvo, dadosLocais);
-          const dadosDepois = JSON.stringify(appData);
 
-          // Só re-renderiza se os dados ou o status Premium mudaram
-          if (dadosAntes !== dadosDepois || eraPremium !== isPremium) {
-            atualizarInterfaceState();
-            renderTabs();
-            carregarInputsConfig();
-            renderAllData();
-            // Mantém a aba que estava ativa
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            const t = document.getElementById(`tab-${activeTabId}`);
-            if (t) t.classList.add('active');
-          }
+          await sincronizarComNuvem(emailSalvo, dadosLocais);
+
         }
+
       } catch(e) {
-        console.warn('Erro na sincronização:', e);
+
+        console.warn('Erro na sincronização em background:', e);
+
       }
+
+      // Só atualiza a UI se algo mudou de verdade — sem flash desnecessário
+
+      const mudouPremium = isPremium !== premiumAntes;
+
+      const mudouDados = JSON.stringify(appData) !== snapshotAntes;
+
+      if (mudouPremium) {
+
+        atualizarInterfaceState();
+
+        renderTabs();
+
+      }
+
+      if (mudouDados) {
+
+        carregarInputsConfig();
+
+        renderAllData();
+
+      }
+
     }
 
     async function sincronizarComNuvem(email, dadosLocais) {
+
       try {
+
         const { data: registroNuvem } = await supabaseClient
+
           .from('dados_flowi')
+
           .select('dados, atualizado_em')
+
           .eq('email', email.toLowerCase().trim())
+
           .eq('produto', PRODUTO_ID)
+
           .maybeSingle();
 
         if (!registroNuvem) {
+
           // Primeira vez ficando Premium: sobe os dados locais que já
+
           // existirem (virada Free → Premium), sem perguntar nada.
+
           if (dadosLocais) await salvarNaNuvem(email, appData);
+
           return;
+
         }
 
         const dadosDaNuvem = registroNuvem.dados;
+
         const localTemDados = dadosLocais && Object.keys(dadosLocais).length > 0;
 
         if (!localTemDados) {
+
           // Aparelho novo sem dados locais: usa a nuvem diretamente.
+
           appData = { ...appData, ...dadosDaNuvem };
+
           localStorage.setItem('flowi_disney_user_data', JSON.stringify(appData));
+
           return;
+
         }
 
         // Nuvem sempre prevalece — garante consistência entre aparelhos sem
+
         // interromper o usuário com confirmações confusas. O localStorage
+
         // anterior fica sobrescrito, mas a nuvem é a fonte confiável porque
+
         // é ela que recebe cada edição em tempo real (com debounce).
+
         appData = { ...appData, ...dadosDaNuvem };
+
         localStorage.setItem('flowi_disney_user_data', JSON.stringify(appData));
 
       } catch (e) {
+
         console.warn('Erro ao sincronizar com a nuvem:', e);
+
       }
+
     }
 
     async function salvarNaNuvem(email, dados) {
+
       if (!supabaseClient) return;
+
       try {
+
         const { data, error } = await supabaseClient
+
           .from('dados_flowi')
+
           .upsert(
+
             {
+
               email: email.toLowerCase().trim(),
+
               produto: PRODUTO_ID,
+
               dados: dados,
+
               atualizado_em: new Date().toISOString(),
+
             },
+
             { onConflict: 'email,produto' },
+
           )
+
           .select('atualizado_em')
+
           .maybeSingle();
 
         if (error) throw error;
+
         if (data) ultimaSincronizacaoNuvem = data.atualizado_em;
+
       } catch (e) {
+
         console.warn('Erro ao salvar na nuvem:', e);
+
       }
+
     }
 
     let debounceSincronizacao = null;
 
     function salvar() {
+
       localStorage.setItem('flowi_disney_user_data', JSON.stringify(appData));
+
       renderDashboardCalculos();
 
       // Se Premium, sincroniza com a nuvem automaticamente (com pequeno
+
       // atraso para agrupar edições rápidas em sequência numa só chamada).
+
       const emailSalvo = localStorage.getItem('flowi_hub_email');
+
       if (isPremium && emailSalvo && supabaseClient) {
+
         clearTimeout(debounceSincronizacao);
+
         debounceSincronizacao = setTimeout(() => {
+
           salvarNaNuvem(emailSalvo, appData);
+
         }, 400);
+
       }
+
     }
 
     function renderTabs() {
+
       const nav = document.getElementById('tabsHeader');
+
       nav.innerHTML = '';
+
       TABS_CONFIG.forEach(tab => {
+
         const btn = document.createElement('button');
+
         btn.className = `tab-btn ${activeTabId === tab.id ? 'active' : ''}`;
+
         if (tab.premium && !isPremium) {
+
           btn.innerHTML = `<span>🔒</span> ${tab.label}`;
+
           btn.onclick = () => abrirPaywall();
+
         } else {
+
           btn.innerHTML = tab.label;
+
           btn.onclick = () => switchTab(tab.id);
+
         }
+
         nav.appendChild(btn);
+
       });
 
       // Injeta botão de exportar PDF no início de cada aba (só Premium)
+
       if (isPremium) {
+
         TABS_CONFIG.forEach(tab => {
+
           const el = document.getElementById(`tab-${tab.id}`);
+
           if (!el) return;
+
           // Remove botão anterior se existir
+
           const anterior = el.querySelector('.btn-exportar-aba');
+
           if (anterior) anterior.remove();
+
           // Cria novo botão
+
           const btnExp = document.createElement('button');
+
           btnExp.className = 'btn-exportar-aba';
+
           btnExp.innerHTML = '📄 Exportar esta aba em PDF';
+
           btnExp.style.cssText = 'display:block;margin:0 0 16px auto;background:none;border:1px solid var(--border-color);border-radius:8px;padding:6px 14px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;';
+
           btnExp.onclick = () => exportarPDF(tab.id);
+
           el.insertBefore(btnExp, el.firstChild);
+
         });
+
       }
+
     }
 
     function switchTab(id) {
       activeTabId = id;
-      localStorage.setItem('flowi_disney_aba', id);
       renderTabs();
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       const target = document.getElementById(`tab-${id}`);
       if (target) target.classList.add('active');
-      if (id === 'transporte') calcularTransporte();
+      // Salva aba ativa no localStorage para F5 manter a aba
+      try { localStorage.setItem('flowi_disney_active_tab', id); } catch(e) {}
+      if (id === 'orcamento') renderOrcamento();
+      if (id === 'roteiro') renderRoteiroCronologico();
+      if (id === 'transporte') renderTransporte();
       if (id === 'metas') renderMetas();
       if (id === 'cronograma') renderCronograma();
       if (id === 'mala') renderMala();
       if (id === 'compras') renderCompras();
+      if (id === 'inicio') renderDashboardCalculos();
     }
 
     function atualizarInterfaceState() {
+
       const badge = document.getElementById('badgePlan');
+
       const btnHeader = document.getElementById('btnHeaderAction');
+
       const alertFree = document.getElementById('alertFreeData');
+
       const cardOffline = document.getElementById('cardSalvarOffline');
+
       const promoD1 = document.getElementById('promoRoteiroD1');
+
       const promoOrc = document.getElementById('promoOrcamentoFree');
+
       const cardVisualizacaoMoeda = document.getElementById('cardVisualizacaoMoeda');
+
       const kpiTotalBrlSub = document.getElementById('kpiTotalBrlSub');
 
       if (isPremium) {
+
         badge.className = 'badge-plan badge-premium';
+
         badge.textContent = 'PREMIUM';
+
         btnHeader.textContent = 'Meus Flowis';
+
         btnHeader.onclick = () => window.location.href = 'https://tryflowi.github.io/hub.html';
+
         alertFree.style.display = 'none';
+
         if (cardOffline) cardOffline.style.display = 'none';
+
         if (promoD1) promoD1.style.display = 'none';
+
         if (promoOrc) promoOrc.style.display = 'none';
+
         if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none';
+
         if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Total lançado';
+
         const btnPDF = document.getElementById('btnExportarPDF');
+
         if (btnPDF) btnPDF.style.display = 'inline-flex';
+
       } else {
+
         badge.className = 'badge-plan badge-free';
+
         badge.textContent = 'FREE';
+
         btnHeader.textContent = 'Garantir Premium R$ 15,90';
+
         btnHeader.onclick = () => irParaCompraPremium();
+
         alertFree.style.display = 'flex';
+
         if (cardOffline) cardOffline.style.display = 'block';
+
         if (promoD1) promoD1.style.display = 'block';
+
         if (promoOrc) promoOrc.style.display = 'block';
+
         if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none';
+
         if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Total lançado em Reais';
+
       }
 
       atualizarDiaSemanaForm();
+
       renderAlertasPrazo();
+
     }
 
     function carregarInputsConfig() {
+
       document.getElementById('cfgTripName').value = appData.config.tripName || 'Minha Viagem Disney';
+
       document.getElementById('cfgStartDate').value = appData.config.startDate || '';
+
       document.getElementById('cfgEndDate').value = appData.config.endDate || '';
+
       document.getElementById('cfgTravelers').value = appData.config.travelers || 1;
+
       document.getElementById('cfgDollarRate').value = appData.config.dollarRate || 5.20;
+
       document.getElementById('budRate').value = appData.config.dollarRate || 5.20;
+
       atualizarHeaderTitles();
+
     }
 
     function salvarConfig() {
+
       appData.config.tripName = document.getElementById('cfgTripName').value;
+
       appData.config.startDate = document.getElementById('cfgStartDate').value;
+
       appData.config.endDate = document.getElementById('cfgEndDate').value;
+
       appData.config.travelers = parseInt(document.getElementById('cfgTravelers').value) || 1;
+
       appData.config.dollarRate = parseFloat(document.getElementById('cfgDollarRate').value) || 5.20;
+
       atualizarHeaderTitles();
+
       salvar();
+
       renderRoteiroCronologico();
+
       renderMetas();
+
       renderAlertasPrazo();
+
       // Não chama renderDashboardCalculos aqui para preservar o estado
+
       // dos botões 💱 nos cards de categoria ao editar a cotação.
+
     }
 
     function atualizarHeaderTitles() {
+
       document.getElementById('displayTripTitle').textContent = appData.config.tripName || 'Minha Viagem Disney';
+
       document.getElementById('displayTravelersCount').textContent = appData.config.travelers || 1;
+
     }
 
     function iniciarContador() {
-      setInterval(() => {
-        if (!appData.config.startDate) return;
-        const target = new Date(appData.config.startDate + 'T00:00:00');
+      function atualizarContador() {
+        const startDate = appData.config?.startDate || appData.config?.travelDate;
+        if (!startDate) return;
+        const target = new Date(startDate + 'T00:00:00');
         const now = new Date();
         const diff = target - now;
-        if (diff <= 0) return;
+        if (diff <= 0) {
+          document.getElementById('cntDays').textContent = '0';
+          document.getElementById('cntHours').textContent = '0';
+          document.getElementById('cntMins').textContent = '0';
+          return;
+        }
         document.getElementById('cntDays').textContent = Math.floor(diff / (1000 * 60 * 60 * 24));
         document.getElementById('cntHours').textContent = Math.floor((diff / (1000 * 60 * 60)) % 24);
         document.getElementById('cntMins').textContent = Math.floor((diff / 1000 / 60) % 60);
-      }, 1000);
+      }
+      atualizarContador(); // Atualiza imediatamente
+      setInterval(atualizarContador, 1000);
     }
 
     function formatarDataBR(dataIso) {
+
       if(!dataIso) return '';
+
       const partes = dataIso.split('-');
+
       return `${partes[2]}/${partes[1]}/${partes[0]}`;
+
     }
 
     function obterDiaSemana(dataIso) {
+
       if (!dataIso) return '';
+
       const dias = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
       const data = new Date(dataIso + 'T00:00:00');
+
       return dias[data.getDay()];
+
     }
 
     function atualizarDiaSemanaForm() {
+
       const el = document.getElementById('actDiaSemana');
+
       if (!el) return;
+
       const dataVal = document.getElementById('actDate').value;
+
       if (isPremium && dataVal) {
+
         el.textContent = '📅 ' + obterDiaSemana(dataVal);
+
         el.style.display = 'block';
+
       } else {
+
         el.style.display = 'none';
+
       }
+
     }
 
-    /* --- LÓGICA DE ENTRADA DO FORMULÁRIO (USD -> BRL) --- */
-    function toggleFormularioEstrangeiro() {
-      const isEstrangeiro = isPremium && document.querySelector('input[name="budType"]:checked').value === 'estrangeiro';
-
-      document.getElementById('groupBudBrl').style.display = isEstrangeiro ? 'none' : 'flex';
-      document.getElementById('groupBudUsd').style.display = isEstrangeiro ? 'flex' : 'none';
-      document.getElementById('groupBudRate').style.display = isEstrangeiro ? 'flex' : 'none';
-      document.getElementById('brlPreviewBox').style.display = isEstrangeiro ? 'block' : 'none';
-
-      if (isEstrangeiro && !document.getElementById('budRate').value) {
-        document.getElementById('budRate').value = appData.config.dollarRate || 5.20;
-      }
-      calcularPreviewBRL();
-    }
-
-    function calcularPreviewBRL() {
-      const isEstrangeiro = document.querySelector('input[name="budType"]:checked').value === 'estrangeiro';
-      if (!isEstrangeiro) return;
-
-      const usd = parseFloat(document.getElementById('budAmountUsd').value) || 0;
-      const rate = parseFloat(document.getElementById('budRate').value) || appData.config.dollarRate || 5.20;
-      
-      const brlConverted = usd * rate;
-      document.getElementById('brlPreviewValue').textContent = `R$ ${formatarBRL(brlConverted)}`;
-    }
 
     function salvarOrcamento() {
+
       const editId = document.getElementById('budEditId').value;
+
       const desc = document.getElementById('budDesc').value.trim();
+
       const amountBrl = parseFloat(document.getElementById('budAmountBrl').value) || 0;
 
       if (!desc || amountBrl <= 0) return alert('Informe a descrição e o valor em Reais (BRL).');
 
       let category = 'Outros';
+
       let paidBrl = 0;
+
       let status = 'Pendente';
 
       if (isPremium) {
+
         category = document.getElementById('budCategory')?.value || 'Outros';
+
         paidBrl = parseFloat(document.getElementById('budPaidBrl')?.value) || 0;
+
         const statusRadio = document.querySelector('input[name="budStatus"]:checked');
+
         status = statusRadio ? statusRadio.value : 'Pendente';
+
       }
 
       if (editId) {
+
         const item = appData.budgetItems.find(i => String(i.id) === String(editId));
+
         if (item) {
+
           item.desc = desc;
+
           item.amountBrl = amountBrl;
+
           item.category = category;
+
           item.paidBrl = paidBrl;
+
           item.status = status;
+
         }
+
       } else {
+
         appData.budgetItems.push({ id: Date.now(), desc, category, amountBrl, paidBrl, status });
+
       }
 
       salvar();
+
       renderOrcamento();
+
       renderMetas();
+
       cancelarEdicaoOrcamento();
+
       // Fecha o formulário após salvar
+
       const formBody = document.getElementById('budFormBody');
+
       if (formBody) formBody.style.display = 'none';
+
       const toggleBtn = document.getElementById('budFormToggle');
+
       if (toggleBtn) toggleBtn.textContent = '+ Adicionar item ao orçamento';
+
     }
 
     function editarOrcamento(id) {
+
       const item = appData.budgetItems.find(i => String(i.id) === String(id));
+
       if (!item) return;
+
       document.getElementById('budEditId').value = item.id;
+
       document.getElementById('budDesc').value = item.desc;
+
       document.getElementById('budAmountBrl').value = item.amountBrl || 0;
+
       if (isPremium) {
+
         const catEl = document.getElementById('budCategory');
+
         if (catEl) catEl.value = item.category || 'Outros';
+
         const paidEl = document.getElementById('budPaidBrl');
+
         if (paidEl) paidEl.value = item.paidBrl || '';
+
         const radios = document.querySelectorAll('input[name="budStatus"]');
+
         radios.forEach(r => {
+
           r.checked = r.value === (item.status || 'Pendente');
+
         });
+
         // Mostra/oculta campo valor pago conforme status
+
         const paidGroup = document.getElementById('budPaidGroup');
+
         if (paidGroup) paidGroup.style.display = item.status === 'Pago' ? 'block' : 'none';
+
       }
+
       const cancelBtn = document.getElementById('btnBudCancel');
+
       const submitBtn = document.getElementById('btnBudSubmit');
+
       if (cancelBtn) cancelBtn.style.display = 'inline-block';
+
       if (submitBtn) submitBtn.textContent = 'Salvar Alterações';
+
       toggleFormOrcamento(true);
+
       window.scrollTo({ top: document.getElementById('tab-orcamento').offsetTop - 20, behavior: 'smooth' });
+
     }
 
     function cancelarEdicaoOrcamento() {
+
       document.getElementById('budEditId').value = '';
+
       document.getElementById('budDesc').value = '';
+
       document.getElementById('budAmountBrl').value = '';
+
       const paidEl = document.getElementById('budPaidBrl');
+
       if (paidEl) paidEl.value = '';
+
       const catEl = document.getElementById('budCategory');
+
       if (catEl) catEl.value = 'Passagens';
+
       const radios = document.querySelectorAll('input[name="budStatus"]');
+
       if (radios.length) radios[0].checked = true;
+
       const cancelBtn = document.getElementById('btnBudCancel');
+
       const submitBtn = document.getElementById('btnBudSubmit');
+
       if (cancelBtn) cancelBtn.style.display = 'none';
+
       if (submitBtn) submitBtn.textContent = 'Salvar';
+
       toggleFormOrcamento(false);
+
     }
 
     function toggleStatusOrcamento(id) {
+
       if (!isPremium) { abrirPaywall(); return; }
-      const item = appData.budgetItems.find(i => i.id === id);
+
+      const item = appData.budgetItems.find(i => String(i.id) === String(id));
+
       if (item) {
+
         item.status = item.status === 'Pago' ? 'Pendente' : 'Pago';
+
         if (item.status === 'Pago' && (!item.paidBrl || item.paidBrl === 0)) {
+
           item.paidBrl = item.amountBrl;
+
         }
+
         salvar();
+
         renderOrcamento();
+
       }
+
     }
 
     function removerOrcamento(id) {
-      appData.budgetItems = appData.budgetItems.filter(i => i.id !== id);
+
+      appData.budgetItems = appData.budgetItems.filter(i => String(i.id) !== String(id));
+
       salvar();
+
       renderOrcamento();
+
       renderMetas();
+
     }
 
     function onStatusChange(radio) {
+
       const paidGroup = document.getElementById('budPaidGroup');
+
       const paidInput = document.getElementById('budPaidBrl');
+
       if (!paidGroup || !paidInput) return;
+
       if (radio.value === 'Pago') {
+
         paidGroup.style.display = 'block';
+
         // Pré-popula com o valor estimado se o campo estiver vazio
+
         if (!paidInput.value) {
+
           const estimado = document.getElementById('budAmountBrl')?.value;
+
           if (estimado) paidInput.value = estimado;
+
         }
+
       } else {
+
         paidGroup.style.display = 'none';
+
         paidInput.value = '';
+
       }
+
     }
 
     function toggleFormOrcamento(forcarAbrir) {
+
       const body = document.getElementById('budFormBody');
+
       const icon = document.getElementById('budFormToggleIcon');
+
       const toggle = document.getElementById('budFormToggle');
+
       if (!body) return;
+
       const abrir = forcarAbrir !== undefined ? forcarAbrir : body.style.display === 'none';
+
       body.style.display = abrir ? 'block' : 'none';
+
       if (icon) icon.textContent = abrir ? '▲' : '▼';
+
       if (toggle) toggle.querySelector('span').textContent = abrir ? '− Fechar formulário' : '+ Adicionar item ao orçamento';
+
       // Mostra campos premium ou free
+
       const campoPremium = document.getElementById('budCamposPremium');
+
       const promoFree = document.getElementById('promoOrcamentoFree');
+
       if (campoPremium) campoPremium.style.display = isPremium ? 'block' : 'none';
+
       if (promoFree) promoFree.style.display = isPremium ? 'none' : 'block';
+
     }
 
     function toggleFormRoteiro(forcarAbrir) {
+
       const body = document.getElementById('actFormBody');
+
       const icon = document.getElementById('actFormToggleIcon');
+
       const toggle = document.getElementById('actFormToggle');
+
       if (!body) return;
+
       const abrir = forcarAbrir !== undefined ? forcarAbrir : body.style.display === 'none';
+
       body.style.display = abrir ? 'block' : 'none';
+
       if (icon) icon.textContent = abrir ? '▲' : '▼';
+
       if (toggle) toggle.querySelector('span').textContent = abrir ? '− Fechar formulário' : '+ Adicionar atividade ao roteiro';
+
     }
 
     // ID do dia expandido no roteiro (para expandir só o dia certo ao editar)
+
     let _diaExpandidoId = null;
 
     function renderOrcamento() {
+
       const container = document.getElementById('orcamentoLista');
-      if (!container) return;
+
       container.innerHTML = '';
-      if (!appData.budgetItems) appData.budgetItems = [];
 
       if (appData.budgetItems.length === 0) {
+
         container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">Nenhum item orçado ainda. Clique em "+ Adicionar" acima para começar.</div>';
+
         return;
+
       }
 
       if (!isPremium) {
+
         // Free: lista simples, sem agrupamento
+
         const itens = [...appData.budgetItems].sort((a, b) => (a.desc || '').localeCompare(b.desc || '', 'pt'));
+
         itens.forEach(item => {
+
           const row = document.createElement('div');
+
           row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border-color);font-size:13px;gap:8px;';
+
           row.innerHTML = `
+
             <strong style="flex:1;">${item.desc}</strong>
+
             <div style="display:flex;align-items:center;gap:10px;">
+
               <span style="font-weight:700;color:var(--brand-primary);">R$ ${formatarBRL(item.amountBrl)}</span>
+
               <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
+
               <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
+
             </div>
+
           `;
+
           container.appendChild(row);
+
         });
+
         return;
+
       }
 
       // Premium: agrupa por categoria em accordion, minimizado, alfabético
+
       const ordemCats = ['Passagens','Hospedagem','Parques e Ingressos','Alimentação','Compras','Outros'];
+
       const porCat = {};
+
       appData.budgetItems.forEach(item => {
+
         const cat = item.category || 'Outros';
+
         if (!porCat[cat]) porCat[cat] = [];
+
         porCat[cat].push(item);
+
       });
 
       // Ordena categorias pela ordem padrão, colocando as demais no final
+
       const cats = [...new Set([...ordemCats, ...Object.keys(porCat)])].filter(c => porCat[c]);
 
       cats.forEach((cat, idx) => {
+
         const itens = [...porCat[cat]].sort((a, b) => (a.desc || '').localeCompare(b.desc || '', 'pt'));
+
         const totalCat = itens.reduce((s, i) => s + (i.amountBrl || 0), 0);
+
         const pagosCat = itens.filter(i => i.status === 'Pago').reduce((s, i) => s + (i.paidBrl || i.amountBrl || 0), 0);
+
         const acordId = `catAccord_${idx}`;
 
         const wrapper = document.createElement('div');
+
         wrapper.style.cssText = 'border:1px solid var(--border-color);border-radius:10px;margin-bottom:8px;overflow:hidden;';
 
         // Header do accordion
+
         const header = document.createElement('div');
+
         header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;background:var(--bg-card);';
+
         header.innerHTML = `
+
           <div style="display:flex;align-items:center;gap:10px;">
+
             <strong style="font-size:14px;font-weight:700;">${cat}</strong>
+
             <span style="font-size:11px;color:var(--text-muted);font-weight:400;">${itens.length} ite${itens.length > 1 ? 'ns' : 'm'}</span>
+
           </div>
+
           <div style="display:flex;align-items:center;gap:12px;">
+
             <span style="font-size:12px;font-weight:600;">R$ ${formatarBRL(totalCat)}</span>
+
             ${pagosCat > 0 ? `<span style="font-size:11px;color:var(--success);">Pago: R$ ${formatarBRL(pagosCat)}</span>` : ''}
+
             <span class="caret-cat" style="font-size:11px;color:var(--text-muted);transition:transform .2s;">▼</span>
+
           </div>
+
         `;
 
         // Body do accordion (minimizado por padrão)
+
         const body = document.createElement('div');
+
         body.id = acordId;
+
         body.style.display = 'none';
 
         header.onclick = () => {
+
           const aberto = body.style.display !== 'none';
+
           body.style.display = aberto ? 'none' : 'block';
+
           header.querySelector('.caret-cat').style.transform = aberto ? 'rotate(0deg)' : 'rotate(180deg)';
+
         };
 
         itens.forEach(item => {
+
           const status = item.status || 'Pendente';
+
           const row = document.createElement('div');
+
           row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid var(--border-color);font-size:13px;gap:8px;';
+
           row.innerHTML = `
+
             <div style="flex:1;">
+
               <span style="font-weight:500;color:var(--text-main);">${item.desc}</span>
+
               ${status === 'Pago' ? `<div style="font-size:11px;color:var(--success);">Pago: R$ ${formatarBRL(item.paidBrl || item.amountBrl)}</div>` : ''}
+
             </div>
+
             <div style="display:flex;align-items:center;gap:8px;">
+
               <span style="font-weight:600;white-space:nowrap;">R$ ${formatarBRL(item.amountBrl)}</span>
+
               <button class="badge-status ${status === 'Pago' ? 'status-pago' : 'status-pendente'}" onclick="toggleStatusOrcamento(${item.id})">${status}</button>
+
               <button class="btn-action-icon" onclick="editarOrcamento(${item.id})">✏️</button>
+
               <button class="btn-action-icon" style="color:var(--danger);" onclick="removerOrcamento(${item.id})">🗑️</button>
+
             </div>
+
           `;
+
           body.appendChild(row);
+
         });
 
         wrapper.appendChild(header);
+
         wrapper.appendChild(body);
+
         container.appendChild(wrapper);
+
       });
+
     }
 
     function atualizarMoedaVisualizacao() {
+
       if (!isPremium) return;
+
       renderDashboardCalculos();
+
     }
 
     /* --- CÁLCULO DAS DASHBOARDS E RESUMOS CONSOLIDADOS --- */
+
     function renderDashboardCalculos() {
       // Salva estado dos botões 💱 antes de re-renderizar os cards de categoria
       const estadosBotoes = {};
@@ -1801,7 +3107,7 @@
           }
         }
         const doRoteiro = (appData.activities || []).reduce((s, at) =>
-          s + (at.trajeto?.teto || 0), 0);
+          s + (at.compras||[]).filter(c=>c.tipo==='transporte').reduce((a,c)=>a+(c.teto||0),0), 0);
         return manual + doRoteiro;
       })();
       const transpBrlTotal = transpUsdTotal * rate;
@@ -2085,7 +3391,7 @@
       if (!mes || !titulo) return alert('Informe o mês/ano e a tarefa.');
 
       if (editId) {
-        const item = appData.cronograma.find(t => t.id == editId);
+        const item = appData.cronograma.find(t => String(t.id) === String(editId));
         if (item) { item.mes = mes; item.titulo = titulo; item.valor = valor; }
       } else {
         appData.cronograma.push({ id: Date.now(), mes, titulo, valor, feito: false });
@@ -2098,7 +3404,7 @@
     }
 
     function editarTarefaCronograma(id) {
-      const item = appData.cronograma.find(t => t.id === id);
+      const item = appData.cronograma.find(t => String(t.id) === String(id));
       if (!item) return;
 
       document.getElementById('croEditId').value = item.id;
@@ -2125,7 +3431,7 @@
     }
 
     function toggleTarefaCronograma(id) {
-      const item = appData.cronograma.find(t => t.id === id);
+      const item = appData.cronograma.find(t => String(t.id) === String(id));
       if (item) {
         item.feito = !item.feito;
         salvar();
@@ -2136,7 +3442,7 @@
 
     function removerTarefaCronograma(id) {
       if (confirm('Deseja excluir esta tarefa do cronograma?')) {
-        appData.cronograma = appData.cronograma.filter(t => t.id !== id);
+        appData.cronograma = appData.cronograma.filter(t => String(t.id) !== String(id));
         salvar();
         renderCronograma();
         renderAlertasPrazo();
@@ -2230,7 +3536,7 @@
     }
 
     function editarItemMala(id) {
-      const item = appData.mala.find(m => m.id === id);
+      const item = appData.mala.find(m => String(m.id) === String(id));
       if (!item) return;
 
       document.getElementById('malaEditId').value = item.id;
@@ -2255,7 +3561,7 @@
     }
 
     function toggleItemMala(id) {
-      const item = appData.mala.find(m => m.id === id);
+      const item = appData.mala.find(m => String(m.id) === String(id));
       if (item) {
         item.feito = !item.feito;
         salvar();
@@ -2265,7 +3571,7 @@
 
     function removerItemMala(id) {
       if (confirm('Deseja excluir este item da mala?')) {
-        appData.mala = appData.mala.filter(m => m.id !== id);
+        appData.mala = appData.mala.filter(m => String(m.id) !== String(id));
         salvar();
         renderMala();
       }
@@ -2415,12 +3721,12 @@
       const trajDestino = document.getElementById('actTrajDestino')?.value.trim() || '';
       const trajApp = document.getElementById('actTrajApp')?.value.trim() || '';
       const trajTeto = parseFloat(document.getElementById('actTrajTeto')?.value) || 0;
-      const trajeto = (trajOrigem || trajDestino) ? { origem: trajOrigem, destino: trajDestino, app: trajApp, teto: trajTeto } : null;
+      const trajeto = (trajOrigem || trajDestino || trajTeto) ? { origem: trajOrigem, destino: trajDestino, app: trajApp, teto: trajTeto } : null;
 
       if (!date || !title) return alert('Informe a data e o título.');
 
       if (editId) {
-        const item = appData.activities.find(a => a.id == editId);
+        const item = appData.activities.find(a => String(a.id) === String(editId));
         if (item) { item.date = date; item.time = time; item.title = title; item.desc = desc; item.trajeto = trajeto; }
         _diaExpandidoId = date;
       } else {
@@ -2435,7 +3741,7 @@
     }
 
     function editarAtividade(id) {
-      const item = appData.activities.find(a => a.id === id);
+      const item = appData.activities.find(a => String(a.id) === String(id));
       if (!item) return;
 
       document.getElementById('actEditId').value = item.id;
@@ -2443,17 +3749,20 @@
       document.getElementById('actTime').value = item.time;
       document.getElementById('actTitle').value = item.title;
       document.getElementById('actDesc').value = item.desc || '';
-      document.getElementById('actTrajOrigem').value = item.trajeto?.origem || '';
-      document.getElementById('actTrajDestino').value = item.trajeto?.destino || '';
-      document.getElementById('actTrajApp').value = item.trajeto?.app || '';
-      document.getElementById('actTrajTeto').value = item.trajeto?.teto || '';
+      const t = item.trajeto;
+      if (t) {
+        const o = document.getElementById('actTrajOrigem'); if (o) o.value = t.origem || '';
+        const d = document.getElementById('actTrajDestino'); if (d) d.value = t.destino || '';
+        const a = document.getElementById('actTrajApp'); if (a) a.value = t.app || '';
+        const v = document.getElementById('actTrajTeto'); if (v) v.value = t.teto || '';
+      }
 
       const cancelBtn = document.getElementById('btnActCancel');
       const submitBtn = document.getElementById('btnActSubmit');
       if (cancelBtn) cancelBtn.style.display = 'inline-block';
       if (submitBtn) submitBtn.textContent = 'Salvar Alterações';
       atualizarDiaSemanaForm();
-      _diaExpandidoId = item.date; // Expande só o dia desta atividade
+      _diaExpandidoId = item.date;
       toggleFormRoteiro(true);
       window.scrollTo({ top: document.getElementById('tab-roteiro').offsetTop - 20, behavior: 'smooth' });
     }
@@ -2464,8 +3773,9 @@
       document.getElementById('actTime').value = '09:00';
       document.getElementById('actTitle').value = '';
       document.getElementById('actDesc').value = '';
-      const campos = ['actTrajOrigem','actTrajDestino','actTrajApp','actTrajTeto'];
-      campos.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      ['actTrajOrigem','actTrajDestino','actTrajApp','actTrajTeto'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+      });
       const cancelBtn = document.getElementById('btnActCancel');
       const submitBtn = document.getElementById('btnActSubmit');
       if (cancelBtn) cancelBtn.style.display = 'none';
@@ -2475,9 +3785,20 @@
     }
 
     function removerAtividade(id) {
-      appData.activities = appData.activities.filter(a => a.id !== id);
+      if (!confirm('Remover esta atividade?')) return;
+      // Salva quais dias estavam abertos antes de re-renderizar
+      const diasAbertos = new Set();
+      document.querySelectorAll('.day-accordion.open .day-header .day-date-str').forEach(el => {
+        diasAbertos.add(el.textContent.split(' · ')[0]);
+      });
+      appData.activities = appData.activities.filter(a => String(a.id) !== String(id));
       salvar();
       renderRoteiroCronologico();
+      // Reabre os dias que estavam abertos
+      document.querySelectorAll('.day-accordion').forEach(acc => {
+        const dateStr = acc.querySelector('.day-date-str')?.textContent.split(' · ')[0];
+        if (dateStr && diasAbertos.has(dateStr)) acc.classList.add('open');
+      });
     }
 
     function toggleAccordion(headerElem) { headerElem.parentElement.classList.toggle('open'); }
@@ -2525,9 +3846,7 @@
 
       const datasOrdenadas = Object.keys(agrupado).sort();
 
-      // Expande: o dia sendo editado, ou o primeiro dia se nenhum estiver definido
-      const primeiraData = datasOrdenadas[0];
-      if (!_diaExpandidoId) _diaExpandidoId = primeiraData;
+      const startDateStr = appData.config?.startDate || appData.config?.travelDate || '';
       const startDateTime = startDateStr ? new Date(startDateStr + 'T00:00:00').getTime() : null;
 
       datasOrdenadas.forEach(dataStr => {
@@ -2540,7 +3859,6 @@
           diaTag = diffDays > 0 ? `D${diffDays}` : `Pré-Viagem`;
         }
 
-        // Dia expande só se for o _diaExpandidoId
         const esteAberto = dataStr === _diaExpandidoId;
         const accordion = document.createElement('div');
         accordion.className = `day-accordion${esteAberto ? ' open' : ''}`;
@@ -2566,9 +3884,9 @@
               <span class="day-count-tag">(${atividades.length} atividade${atividades.length > 1 ? 's' : ''})</span>
               ${resumoDiaHtml ? `<span style="margin-left:8px;">${resumoDiaHtml}</span>` : ''}
             </div>
-            <span class="day-arrow">${esteAberto ? '▲' : '▼'}</span>
+            <span class="day-arrow">▼</span>
           </div>
-          <div class="day-content" style="${esteAberto ? '' : 'display:none;'}">
+          <div class="day-content">
         `;
 
         atividades.forEach(item => {
@@ -2593,8 +3911,13 @@
                 <strong>${item.title}</strong>
                 ${item.desc ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:pre-wrap;">${item.desc}</div>` : ''}
                 ${nItens > 0 ? `<div style="font-size:11px;color:var(--brand-primary);margin-top:4px;cursor:pointer;" onclick="abrirModalComprasAtividade(${item.id})">${resumoAtHtml} ▾</div>` : ''}
+                ${item.trajeto && (item.trajeto.origem || item.trajeto.destino) ? `
+                  <div style="font-size:11px;color:#0C4A6E;margin-top:4px;background:#F0F9FF;border-radius:6px;padding:3px 8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;" onclick="abrirModalTrajeto(${item.id})">
+                    🚗 ${item.trajeto.origem||'?'} → ${item.trajeto.destino||'?'}${item.trajeto.teto ? ` · US$ ${formatarUSD(item.trajeto.teto)}` : ''} ✏️
+                  </div>` : ''}
               </div>
               <div style="display:flex;flex-direction:row;gap:4px;align-items:center;">
+                ${isPremium ? `<button class="btn-action-icon" title="Trajeto" onclick="abrirModalTrajeto(${item.id})">🚗</button>` : ''}
                 ${isPremium ? `<button class="btn-action-icon" title="Lista da atividade" onclick="abrirModalComprasAtividade(${item.id})">📋</button>` : ''}
                 <button class="btn-action-icon" onclick="editarAtividade(${item.id})">✏️</button>
                 <button class="btn-action-icon" style="color:var(--danger);" onclick="removerAtividade(${item.id})">🗑️</button>
@@ -2606,6 +3929,9 @@
         accordion.innerHTML = html;
         container.appendChild(accordion);
       });
+
+      // Limpa após renderizar — só expande o dia na próxima edição
+      _diaExpandidoId = null;
     }
 
     // ===== TRANSPORTE REFORMULADO =====
@@ -2639,7 +3965,7 @@
 
     function removerTrajeto(id) {
       if (!confirm('Remover este trajeto?')) return;
-      appData.transporte.trajetos = appData.transporte.trajetos.filter(t => t.id !== id);
+      appData.transporte.trajetos = appData.transporte.trajetos.filter(t => String(t.id) !== String(id));
       salvar();
       renderTransporte();
     }
@@ -2764,7 +4090,16 @@
     function fecharModalComprasAtividade() {
       document.getElementById('modalComprasAtividade').classList.remove('active');
       _atividadeComprasId = null;
+      // Preserva dias abertos antes de re-renderizar
+      const diasAbertos = new Set();
+      document.querySelectorAll('.day-accordion.open .day-date-str').forEach(el => {
+        diasAbertos.add(el.textContent.split(' · ')[0]);
+      });
       renderRoteiroCronologico();
+      document.querySelectorAll('.day-accordion').forEach(acc => {
+        const ds = acc.querySelector('.day-date-str')?.textContent.split(' · ')[0];
+        if (ds && diasAbertos.has(ds)) acc.classList.add('open');
+      });
       renderCompras();
     }
 
@@ -2795,7 +4130,7 @@
       if (!confirm('Remover item?')) return;
       const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
       if (atividade) {
-        atividade.compras = atividade.compras.filter(c => c.id !== itemId);
+        atividade.compras = atividade.compras.filter(c => String(c.id) !== String(itemId));
         salvar();
         renderListaItensCompra();
       }
@@ -2805,12 +4140,12 @@
 
     function editarItemCompra(itemId) {
       const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
-      const it = atividade?.compras?.find(c => c.id === itemId);
+      const it = atividade?.compras?.find(c => String(c.id) === String(itemId));
       if (!it) return;
       _itemCompraEditandoId = itemId;
+      const tipoEl = document.getElementById('cmpTipo'); if (tipoEl) tipoEl.value = it.tipo || 'compras';
       document.getElementById('cmpProduto').value = it.produto || '';
       document.getElementById('cmpMarca').value = it.marca || '';
-      document.getElementById('cmpQtd').value = it.qtd || 1;
       document.getElementById('cmpTeto').value = it.teto || '';
       const btn = document.querySelector('#modalComprasAtividade .btn-submit');
       if (btn) { btn.textContent = '💾 Salvar Edição'; btn.onclick = salvarEdicaoItemCompra; }
@@ -2819,19 +4154,19 @@
 
     function salvarEdicaoItemCompra() {
       const atividade = appData.activities?.find(a => a.id === _atividadeComprasId);
-      const it = atividade?.compras?.find(c => c.id === _itemCompraEditandoId);
+      const it = atividade?.compras?.find(c => String(c.id) === String(_itemCompraEditandoId));
       if (!it) return;
+      const tipoEl = document.getElementById('cmpTipo');
+      it.tipo = tipoEl ? tipoEl.value : (it.tipo || 'compras');
       it.produto = document.getElementById('cmpProduto').value.trim();
       it.marca = document.getElementById('cmpMarca').value.trim();
-      it.qtd = parseInt(document.getElementById('cmpQtd').value) || 1;
       it.teto = parseFloat(document.getElementById('cmpTeto').value) || 0;
       _itemCompraEditandoId = null;
       document.getElementById('cmpProduto').value = '';
       document.getElementById('cmpMarca').value = '';
-      document.getElementById('cmpQtd').value = '1';
       document.getElementById('cmpTeto').value = '';
       const btn = document.querySelector('#modalComprasAtividade .btn-submit');
-      if (btn) { btn.textContent = '+ Adicionar Item'; btn.onclick = adicionarItemCompra; }
+      if (btn) { btn.textContent = '+ Adicionar'; btn.onclick = adicionarItemCompra; }
       salvar();
       renderListaItensCompra();
     }
@@ -2955,6 +4290,59 @@
         <span style="font-size:18px;font-weight:700;color:#16A34A;">US$ ${formatarUSD(totalGeral)}</span>
       </div>`;
       container.innerHTML = html;
+    }
+
+    // ===== MODAL TRAJETO DA ATIVIDADE =====
+    let _atividadeTrajetoId = null;
+
+    function abrirModalTrajeto(atividadeId) {
+      if (!isPremium) { abrirPaywall(); return; }
+      _atividadeTrajetoId = atividadeId;
+      const at = appData.activities?.find(a => String(a.id) === String(atividadeId));
+      if (!at) return;
+      document.getElementById('modalTrajetoSubtitulo').textContent = `${at.time || ''} · ${at.title}`;
+      const t = at.trajeto || {};
+      document.getElementById('trajAtOrigem').value = t.origem || '';
+      document.getElementById('trajAtDestino').value = t.destino || '';
+      document.getElementById('trajAtApp').value = t.app || '';
+      document.getElementById('trajAtTeto').value = t.teto || '';
+      const btnRem = document.getElementById('btnRemoverTrajeto');
+      if (btnRem) btnRem.style.display = (t.origem || t.destino) ? 'inline-block' : 'none';
+      document.getElementById('modalTrajetoAtividade').classList.add('active');
+    }
+
+    function fecharModalTrajeto() {
+      document.getElementById('modalTrajetoAtividade').classList.remove('active');
+      _atividadeTrajetoId = null;
+      // Preserva dias abertos
+      const diasAbertos = new Set();
+      document.querySelectorAll('.day-accordion.open .day-date-str').forEach(el => diasAbertos.add(el.textContent.split(' · ')[0]));
+      renderRoteiroCronologico();
+      document.querySelectorAll('.day-accordion').forEach(acc => {
+        const ds = acc.querySelector('.day-date-str')?.textContent.split(' · ')[0];
+        if (ds && diasAbertos.has(ds)) acc.classList.add('open');
+      });
+      renderTransporte();
+    }
+
+    function salvarTrajetoAtividade() {
+      const at = appData.activities?.find(a => String(a.id) === String(_atividadeTrajetoId));
+      if (!at) return;
+      at.trajeto = {
+        origem: document.getElementById('trajAtOrigem').value.trim(),
+        destino: document.getElementById('trajAtDestino').value.trim(),
+        app: document.getElementById('trajAtApp').value.trim(),
+        teto: parseFloat(document.getElementById('trajAtTeto').value) || 0
+      };
+      salvar();
+      fecharModalTrajeto();
+    }
+
+    function removerTrajetoAtividade() {
+      if (!confirm('Remover este trajeto?')) return;
+      const at = appData.activities?.find(a => String(a.id) === String(_atividadeTrajetoId));
+      if (at) { at.trajeto = null; salvar(); }
+      fecharModalTrajeto();
     }
 
     function toggleItemCompradoConsolidado(atividadeId, itemId) {
