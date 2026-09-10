@@ -1230,11 +1230,9 @@
       const mudouPremium = isPremium !== premiumAntes;
       const mudouDados = JSON.stringify(appData) !== snapshotAntes;
 
-      if (mudouPremium) {
+      if (mudouPremium || mudouDados) {
         atualizarInterfaceState();
         renderTabs();
-      }
-      if (mudouDados) {
         carregarInputsConfig();
         renderAllData();
       }
