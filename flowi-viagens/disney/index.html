@@ -2416,107 +2416,128 @@
       renderRoteiroCronologico();
     }
 
-    function toggleAccordion(headerElem) {
-  headerElem.parentElement.classList.toggle('open');
-}
+    function toggleAccordion(headerElem) { headerElem.parentElement.classList.toggle('open'); }
 
-let _diaExpandidoId = null;
+    function renderRoteiroCronologico() {
+      const container = document.getElementById('cronogramaContainer');
+      container.innerHTML = '';
 
-function renderRoteiroCronologico() {
-  const container = document.getElementById('cronogramaContainer');
-  if (!container) return;
-  container.innerHTML = '';
-
-  if (!appData.activities || appData.activities.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Nenhuma atividade cadastrada. Adicione itens acima para montar seu roteiro.</div>';
-    return;
-  }
-
-  // Agrupa as atividades por data
-  const agrupadoPorData = {};
-  appData.activities.forEach(act => {
-    const data = act.date || 'sem-data';
-    if (!agrupadoPorData[data]) agrupadoPorData[data] = [];
-    agrupadoPorData[data].push(act);
-  });
-
-  // Ordena as datas cronologicamente
-  const datasOrdenadas = Object.keys(agrupadoPorData).sort();
-
-  datasOrdenadas.forEach((dataKey, index) => {
-    const atividadesDoDia = agrupadoPorData[dataKey];
-    // Ordena as atividades do mesmo dia por horário
-    atividadesDoDia.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
-
-    const dayCard = document.createElement('div');
-    dayCard.className = 'day-accordion';
-    dayCard.id = `day-accordion-${dataKey}`;
-
-    // Define se o dia deve vir aberto (se for o dia selecionado OU por padrão abre todos)
-    const deveEstarAberto = _diaExpandidoId ? (_diaExpandidoId === dataKey) : true;
-    if (deveEstarAberto) {
-      dayCard.classList.add('open');
-    }
-
-    const dataFormatada = dataKey !== 'sem-data' ? formatarDataBR(dataKey) : 'Sem data definida';
-    const diaSemana = dataKey !== 'sem-data' ? obterDiaSemana(dataKey) : '';
-    const badgeDia = isPremium ? `D${index + 1}` : `Dia ${index + 1}`;
-
-    // Monta o cabeçalho clicável
-    const dayHeader = document.createElement('div');
-    dayHeader.className = 'day-header';
-    dayHeader.innerHTML = `
-      <div class="day-title-box">
-        <span class="day-badge">${badgeDia}</span>
-        <div>
-          <span class="day-date-str">${dataFormatada}</span>
-          ${diaSemana ? `<span style="font-size:12px;color:var(--text-muted);margin-left:6px;">(${diaSemana})</span>` : ''}
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span class="day-count-tag">${atividadesDoDia.length} atividade(s)</span>
-        <span class="day-arrow">▼</span>
-      </div>
-    `;
-
-    // Clique no cabeçalho para expandir/recolher
-    dayHeader.addEventListener('click', () => {
-      const estaAberto = dayCard.classList.contains('open');
-      if (estaAberto) {
-        dayCard.classList.remove('open');
-        if (_diaExpandidoId === dataKey) _diaExpandidoId = null;
-      } else {
-        dayCard.classList.add('open');
-        _diaExpandidoId = dataKey;
+      if (appData.activities.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Nenhuma atividade cadastrada. Adicione itens acima para montar seu roteiro.</div>';
+        return;
       }
-    });
 
-    // Conteúdo das atividades
-    const dayContent = document.createElement('div');
-    dayContent.className = 'day-content';
+      const atividadesOrdenadas = [...appData.activities].sort((a, b) => {
+        const datetimeA = (a.date || '') + ' ' + (a.time || '00:00');
+        const datetimeB = (b.date || '') + ' ' + (b.time || '00:00');
+        return datetimeA.localeCompare(datetimeB);
+      });
 
-    atividadesDoDia.forEach(act => {
-      const itemEl = document.createElement('div');
-      itemEl.className = 'activity-item';
-      itemEl.innerHTML = `
-        <div class="activity-time">${act.time || '--:--'}</div>
-        <div class="activity-info">
-          <strong style="color:var(--text-main);">${act.title || 'Sem título'}</strong>
-          ${act.desc ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${act.desc}</div>` : ''}
-        </div>
-        <div style="display:flex;gap:4px;">
-          <button class="btn-action-icon" onclick="editarAtividade(${act.id})">✏️</button>
-          <button class="btn-action-icon" style="color:var(--danger);" onclick="removerAtividade(${act.id})">🗑️</button>
-        </div>
-      `;
-      dayContent.appendChild(itemEl);
-    });
+      if (!isPremium) {
+        atividadesOrdenadas.forEach(item => {
+          const card = document.createElement('div');
+          card.style.cssText = 'background:#FFF; border:1px solid var(--border-color); border-radius:8px; padding:12px 16px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; font-size:13px;';
+          card.innerHTML = `
+            <div style="display:flex; align-items:center;">
+              <div style="font-weight:700; color:var(--text-muted); font-size:12px; margin-right:12px; width:85px; flex-shrink:0;">${formatarDataBR(item.date)}</div>
+              <div class="activity-time">${item.time || '--:--'}</div>
+              <div class="activity-info">
+                <strong>${item.title}</strong>
+                ${item.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-top:2px; white-space:pre-wrap;">${item.desc}</div>` : ''}
+            </div>
+          `;
+          container.appendChild(card);
+        });
+        return;
+      }
 
-    dayCard.appendChild(dayHeader);
-    dayCard.appendChild(dayContent);
-    container.appendChild(dayCard);
-  });
-}
+      const agrupado = {};
+      atividadesOrdenadas.forEach(act => {
+        if (!agrupado[act.date]) agrupado[act.date] = [];
+        agrupado[act.date].push(act);
+      });
+
+      const datasOrdenadas = Object.keys(agrupado).sort();
+      const startDateStr = appData.config.startDate;
+      const startDateTime = startDateStr ? new Date(startDateStr + 'T00:00:00').getTime() : null;
+
+      datasOrdenadas.forEach(dataStr => {
+        const atividades = agrupado[dataStr];
+
+        let diaTag = 'Dia';
+        if (startDateTime) {
+          const currentDateTime = new Date(dataStr + 'T00:00:00').getTime();
+          const diffDays = Math.floor((currentDateTime - startDateTime) / (1000 * 60 * 60 * 24)) + 1;
+          diaTag = diffDays > 0 ? `D${diffDays}` : `Pré-Viagem`;
+        }
+
+        // Dia expande só se for o _diaExpandidoId
+        const esteAberto = dataStr === _diaExpandidoId;
+        const accordion = document.createElement('div');
+        accordion.className = `day-accordion${esteAberto ? ' open' : ''}`;
+
+        // Resumo por tipo de todos os itens do dia
+        const tiposEmoji = { compras:'🛍️', mercado:'🛒', alimentacao:'🍽️', transporte:'🚗' };
+        const resumoDia = {};
+        atividades.forEach(at => (at.compras || []).forEach(c => {
+          const t = c.tipo || 'compras';
+          if (!resumoDia[t]) resumoDia[t] = { teto: 0, qtd: 0 };
+          resumoDia[t].teto += (c.teto || 0);
+          resumoDia[t].qtd += 1;
+        }));
+        const resumoDiaHtml = Object.entries(resumoDia).map(([t, v]) =>
+          `<span style="font-size:11px;color:var(--text-muted);">${tiposEmoji[t]||'📋'} US$ ${formatarUSD(v.teto)}</span>`
+        ).join(' · ');
+
+        let html = `
+          <div class="day-header" onclick="toggleAccordion(this)">
+            <div class="day-title-box">
+              <span class="day-badge">${diaTag}</span>
+              <span class="day-date-str">${formatarDataBR(dataStr)} · ${obterDiaSemana(dataStr)}</span>
+              <span class="day-count-tag">(${atividades.length} atividade${atividades.length > 1 ? 's' : ''})</span>
+              ${resumoDiaHtml ? `<span style="margin-left:8px;">${resumoDiaHtml}</span>` : ''}
+            </div>
+            <span class="day-arrow">${esteAberto ? '▲' : '▼'}</span>
+          </div>
+          <div class="day-content" style="${esteAberto ? '' : 'display:none;'}">
+        `;
+
+        atividades.forEach(item => {
+          const itens = item.compras || [];
+          const nItens = itens.length;
+          // Resumo por tipo na atividade
+          const tiposAt = {};
+          itens.forEach(c => {
+            const t = c.tipo || 'compras';
+            if (!tiposAt[t]) tiposAt[t] = { teto: 0, qtd: 0 };
+            tiposAt[t].teto += (c.teto || 0);
+            tiposAt[t].qtd += 1;
+          });
+          const resumoAtHtml = Object.entries(tiposAt).map(([t, v]) =>
+            `${tiposEmoji[t]||'📋'} ${v.qtd} · US$ ${formatarUSD(v.teto)}`
+          ).join(' &nbsp; ');
+
+          html += `
+            <div class="activity-item">
+              <div class="activity-time">${item.time || '--:--'}</div>
+              <div class="activity-info">
+                <strong>${item.title}</strong>
+                ${item.desc ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:pre-wrap;">${item.desc}</div>` : ''}
+                ${nItens > 0 ? `<div style="font-size:11px;color:var(--brand-primary);margin-top:4px;cursor:pointer;" onclick="abrirModalComprasAtividade(${item.id})">${resumoAtHtml} ▾</div>` : ''}
+              </div>
+              <div style="display:flex;flex-direction:row;gap:4px;align-items:center;">
+                ${isPremium ? `<button class="btn-action-icon" title="Lista da atividade" onclick="abrirModalComprasAtividade(${item.id})">📋</button>` : ''}
+                <button class="btn-action-icon" onclick="editarAtividade(${item.id})">✏️</button>
+                <button class="btn-action-icon" style="color:var(--danger);" onclick="removerAtividade(${item.id})">🗑️</button>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+        accordion.innerHTML = html;
+        container.appendChild(accordion);
+      });
+    }
 
     // ===== TRANSPORTE REFORMULADO =====
     let _atividadeComprasId = null; // ID da atividade cujo modal de compras está aberto
