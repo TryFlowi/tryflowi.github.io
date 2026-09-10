@@ -1759,7 +1759,7 @@ const valorAbaTransporte = (typeof calcularTransporte === 'function') ? calcular
       const catTotalsBrl = {};
 
       appData.budgetItems.forEach(item => {
-        const brl = item.amountBrl || 0;
+        const brl = Number(item.amountBrl) || 0;
         totalBrl += brl;
 
         if (item.isEstrangeiro) {
