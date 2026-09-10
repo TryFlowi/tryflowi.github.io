@@ -1187,15 +1187,7 @@
       renderAllData();
       iniciarContador();
 
-      // Restaura a aba que estava ativa antes do F5
-      const abaRestaurada = localStorage.getItem('flowi_disney_aba');
-      if (abaRestaurada && TABS_CONFIG.find(t => t.id === abaRestaurada)) {
-        const podeAbrir = !TABS_CONFIG.find(t => t.id === abaRestaurada)?.premium || isPremium;
-        if (podeAbrir) switchTab(abaRestaurada);
-      }
-
-      // PASSO 2 — Verificação e sincronização em background, completamente silenciosa.
-      // Nenhuma parte deste bloco toca na UI enquanto estiver carregando.
+      // PASSO 2 — Verificação e sincronização em background
       const emailSalvo = localStorage.getItem('flowi_hub_email');
       if (!emailSalvo || !supabaseClient) return;
 
@@ -1226,15 +1218,19 @@
         console.warn('Erro na sincronização em background:', e);
       }
 
-      // Só atualiza a UI se algo mudou de verdade — sem flash desnecessário
-      const mudouPremium = isPremium !== premiumAntes;
-      const mudouDados = JSON.stringify(appData) !== snapshotAntes;
+      // Sempre re-renderiza tudo após verificar licença e sincronizar nuvem
+      // Isso garante que abas como Orçamento e Roteiro mostrem os dados
+      // mesmo quando a transição Free→Premium acontece no carregamento
+      atualizarInterfaceState();
+      renderTabs();
+      carregarInputsConfig();
+      renderAllData();
 
-      if (mudouPremium || mudouDados) {
-        atualizarInterfaceState();
-        renderTabs();
-        carregarInputsConfig();
-        renderAllData();
+      // Restaura aba ativa
+      const abaFinal = localStorage.getItem('flowi_disney_aba');
+      if (abaFinal && TABS_CONFIG.find(t => t.id === abaFinal)) {
+        const podeAbrir = !TABS_CONFIG.find(t => t.id === abaFinal)?.premium || isPremium;
+        if (podeAbrir) switchTab(abaFinal);
       }
     }
 
@@ -1655,7 +1651,9 @@
 
     function renderOrcamento() {
       const container = document.getElementById('orcamentoLista');
+      if (!container) return;
       container.innerHTML = '';
+      if (!appData.budgetItems) appData.budgetItems = [];
 
       if (appData.budgetItems.length === 0) {
         container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">Nenhum item orçado ainda. Clique em "+ Adicionar" acima para começar.</div>';
@@ -2485,7 +2483,9 @@
 
     function renderRoteiroCronologico() {
       const container = document.getElementById('cronogramaContainer');
+      if (!container) return;
       container.innerHTML = '';
+      if (!appData.activities) appData.activities = [];
 
       if (appData.activities.length === 0) {
         container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Nenhuma atividade cadastrada. Adicione itens acima para montar seu roteiro.</div>';
