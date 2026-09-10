@@ -1747,7 +1747,7 @@
       document.querySelectorAll('.category-card[id]').forEach(card => {
         estadosBotoes[card.id] = card.dataset.modo || 'brl';
       });
-
+const valorAbaTransporte = (typeof calcularTransporte === 'function') ? calcularTransporte() : 0;
       let totalBrl = 0;
       let totalNationalBrl = 0;
       let totalForeignBrl = 0;
@@ -1780,7 +1780,9 @@
         const cat = item.category || 'Outros';
         catTotalsBrl[cat] = (catTotalsBrl[cat] || 0) + brl;
       });
-
+totalBrl += valorAbaTransporte;
+  totalNationalBrl += valorAbaTransporte;
+  catTotalsBrl['Transporte'] = valorAbaTransporte;
       const travelers = appData.config.travelers || 1;
       const rate = appData.config.dollarRate || 5.20;
       const viewCurrencyEl = document.querySelector('input[name="viewCurrency"]:checked');
@@ -1805,8 +1807,12 @@
         pendingBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
         if (economiaBox) economiaBox.innerHTML = '<div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>';
       } else {
-        paidBox.innerHTML = `<div class="kpi-value green">R$ ${formatarBRL(totalPaidBrl)}</div>`;
-        pendingBox.innerHTML = `<div class="kpi-value red">R$ ${formatarBRL(totalPendingBrl)}</div>`;
+    // Calcula os valores pagos e pendentes da aba Transporte
+    const transpPago = (typeof calcularTransportePago === 'function') ? calcularTransportePago() : 0;
+    const transpPendente = Math.max(0, valorAbaTransporte - transpPago);
+
+    paidBox.innerHTML = `<div class="kpi-value green">R$ ${formatarBRL(totalPaidBrl + transpPago)}</div>`;
+    pendingBox.innerHTML = `<div class="kpi-value red">R$ ${formatarBRL(totalPendingBrl + transpPendente)}</div>`;
         // Economia = diferença entre o valor orçado e o valor efetivamente pago nos itens já pagos
         let totalOrcadoPago = 0;
         let totalEfetivamentePago = 0;
