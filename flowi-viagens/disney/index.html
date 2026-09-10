@@ -1795,20 +1795,23 @@ const valorAbaTransporte = (typeof calcularTransporte === 'function') ? calcular
   if (!catTotalsBrl['Transporte']) {
     catTotalsBrl['Transporte'] = valorAbaTransporte;
   }
-      const travelers = appData.config.travelers || 1;
-      const rate = appData.config.dollarRate || 5.20;
-      const viewCurrencyEl = document.querySelector('input[name="viewCurrency"]:checked');
-      const viewCurrency = (isPremium && viewCurrencyEl) ? viewCurrencyEl.value : 'BRL';
+    const travelers = parseInt(appData.config?.travelers || appData.config?.passengers || appData.config?.peopleCount) || 1;
+    const rate = appData.config?.dollarRate || 5.20;
+    const viewCurrencyEl = document.querySelector('input[name="viewCurrency"]:checked');
+    const viewCurrency = (isPremium && viewCurrencyEl) ? viewCurrencyEl.value : 'BRL';
 
-      if (viewCurrency === 'USD') {
-        const totalUsdConsolidado = rate > 0 ? (totalBrl / rate) : 0;
-        const perPersonUsd = rate > 0 ? ((totalBrl / travelers) / rate) : 0;
-        document.getElementById('kpiTotalBrl').textContent = `US$ ${formatarUSD(totalUsdConsolidado)}`;
-        document.getElementById('kpiPerPerson').textContent = `US$ ${formatarUSD(perPersonUsd)}`;
-      } else {
-        document.getElementById('kpiTotalBrl').textContent = `R$ ${formatarBRL(totalBrl)}`;
-        document.getElementById('kpiPerPerson').textContent = `R$ ${formatarBRL(totalBrl / travelers)}`;
-      }
+    const elTotal = document.getElementById('kpiTotalBrl') || document.getElementById('kpiGastoTotal') || document.querySelector('[data-kpi="gasto-total"]');
+    const elPessoa = document.getElementById('kpiPerPerson') || document.getElementById('kpiGastoPessoa') || document.querySelector('[data-kpi="gasto-pessoa"]');
+
+    if (viewCurrency === 'USD') {
+      const totalUsdConsolidado = rate > 0 ? (totalBrl / rate) : 0;
+      const perPersonUsd = rate > 0 ? ((totalBrl / travelers) / rate) : 0;
+      if (elTotal) elTotal.textContent = `US$ ${formatarUSD(totalUsdConsolidado)}`;
+      if (elPessoa) elPessoa.textContent = `US$ ${formatarUSD(perPersonUsd)}`;
+    } else {
+      if (elTotal) elTotal.textContent = `R$ ${formatarBRL(totalBrl)}`;
+      if (elPessoa) elPessoa.textContent = `R$ ${formatarBRL(totalBrl / travelers)}`;
+    }
 
       const paidBox = document.getElementById('kpiTotalPaidContainer');
       const pendingBox = document.getElementById('kpiTotalPendingContainer');
