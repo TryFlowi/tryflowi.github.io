@@ -466,26 +466,6 @@
             <div class="kpi-value blue" id="kpiTotalBrl">R$ 0,00</div>
             <div class="kpi-subtext" id="kpiTotalBrlSub">Total lançado</div>
           </div>
-          <div class="kpi-card" id="kpiNationalCard">
-            <div class="kpi-label">Total de Gastos Nacionais</div>
-            <div class="kpi-value" id="kpiNationalBrl">R$ 0,00</div>
-            <div class="kpi-subtext">Apenas itens Nacionais</div>
-          </div>
-          <div class="kpi-card" id="kpiForeignCard" style="display:none;">
-            <div class="kpi-label">Total a Converter (Estrangeiro BRL)</div>
-            <div class="kpi-value green" id="kpiForeignBrl">R$ 0,00</div>
-            <div class="kpi-subtext">A comprar em moeda estrangeira</div>
-          </div>
-          <div class="kpi-card" id="kpiUsdCard" style="display:none;">
-            <div class="kpi-label">Saldo Estimado em Dólar (USD)</div>
-            <div class="kpi-value blue" id="kpiTotalUsd">US$ 0,00</div>
-            <div class="kpi-subtext">Poder de compra no exterior</div>
-          </div>
-          <div class="kpi-card" id="kpiUsdLockedCard" style="display:none;">
-            <div class="kpi-label">Conversão Real ↔ Dólar</div>
-            <div class="kpi-locked" onclick="abrirPaywall()">🔒 Premium</div>
-            <div class="kpi-subtext">Câmbio dinâmico e saldo em USD</div>
-          </div>
         </div>
 
         <div class="grid-3">
@@ -1340,10 +1320,6 @@
 
       const groupBudType = document.getElementById('groupBudType');
       const promoMoedaFree = document.getElementById('promoMoedaFree');
-      const kpiForeignCard = document.getElementById('kpiForeignCard');
-      const kpiUsdCard = document.getElementById('kpiUsdCard');
-      const kpiUsdLockedCard = document.getElementById('kpiUsdLockedCard');
-      const kpiNationalCard = document.getElementById('kpiNationalCard');
       const infoBoxResumo = document.getElementById('infoBoxResumo');
       const cardVisualizacaoMoeda = document.getElementById('cardVisualizacaoMoeda');
       const kpiTotalBrlSub = document.getElementById('kpiTotalBrlSub');
@@ -1362,10 +1338,6 @@
         if (promoOrc) promoOrc.style.display = 'none';
         if (groupBudType) groupBudType.style.display = 'flex';
         if (promoMoedaFree) promoMoedaFree.style.display = 'none';
-        if (kpiForeignCard) kpiForeignCard.style.display = 'block';
-        if (kpiUsdCard) kpiUsdCard.style.display = 'block';
-        if (kpiUsdLockedCard) kpiUsdLockedCard.style.display = 'none';
-        if (kpiNationalCard) kpiNationalCard.style.display = 'block';
         if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none'; // Removido — divisão por categoria sempre em BRL
         if (infoBoxResumo) infoBoxResumo.innerHTML = 'ℹ️ <strong>Aviso:</strong> Escolha abaixo em qual moeda deseja visualizar o saldo consolidado da sua viagem.';
         const btnPDF = document.getElementById('btnExportarPDF');
@@ -1392,11 +1364,6 @@
         document.getElementById('groupBudUsd').style.display = 'none';
         document.getElementById('groupBudRate').style.display = 'none';
         document.getElementById('brlPreviewBox').style.display = 'none';
-
-        if (kpiForeignCard) kpiForeignCard.style.display = 'none';
-        if (kpiUsdCard) kpiUsdCard.style.display = 'none';
-        if (kpiUsdLockedCard) kpiUsdLockedCard.style.display = 'block';
-        if (kpiNationalCard) kpiNationalCard.style.display = 'none';
         if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none';
         if (infoBoxResumo) infoBoxResumo.innerHTML = 'ℹ️ <strong>Aviso:</strong> No modo Free, todos os lançamentos e o resumo do orçamento são exibidos apenas em Reais (BRL).';
         if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Total lançado em Reais';
@@ -1723,10 +1690,6 @@
         document.getElementById('kpiPerPerson').textContent = `R$ ${formatarBRL(totalBrl / travelers)}`;
       }
 
-      document.getElementById('kpiNationalBrl').textContent = `R$ ${formatarBRL(totalNationalBrl)}`;
-      document.getElementById('kpiForeignBrl').textContent = `R$ ${formatarBRL(totalForeignBrl)}`;
-      document.getElementById('kpiTotalUsd').textContent = `US$ ${formatarUSD(totalUsdEstimated)}`;
-
       const paidBox = document.getElementById('kpiTotalPaidContainer');
       const pendingBox = document.getElementById('kpiTotalPendingContainer');
       const economiaBox = document.getElementById('kpiEconomiaContainer');
@@ -1794,9 +1757,10 @@
           grid.appendChild(card);
         });
 
-        // Transporte: vem exclusivamente da aba Transporte (não do orçamento manual)
+        // Transporte: valor em USD da aba Transporte, exibido em BRL por padrão
         const transpCard = document.createElement('div');
         transpCard.className = 'category-card';
+        transpCard.id = 'cat_Transporte';
         const transpUsd = (() => {
           if (!appData.transporte) return 0;
           if (appData.transporte.modo === 'app') {
@@ -1809,10 +1773,12 @@
           return days * (daily + park) + fuel;
         })();
         const transpBrl = transpUsd * rate;
+        transpCard.dataset.modo = 'brl';
         transpCard.innerHTML = `
           <div class="category-name">🚗 Transporte</div>
-          <div class="category-amount">US$ ${formatarUSD(transpUsd)}</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">≈ R$ ${formatarBRL(transpBrl)} · calculado na aba Transporte</div>
+          <div class="category-amount" id="cat_Transporte_val">R$ ${formatarBRL(transpBrl)}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Calculado na aba Transporte · cotação R$ ${rate}/US$</div>
+          ${isPremium ? `<button onclick="toggleCategoriaMoeda('cat_Transporte',${transpBrl},${rate},${transpUsd})" style="margin-top:6px;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;">💱 ver em US$</button>` : ''}
         `;
         grid.appendChild(transpCard);
         wrapper.appendChild(grid);
@@ -1987,14 +1953,15 @@
       }
     }
 
-    function toggleCategoriaMoeda(cardId, valorBrl, rate) {
+    function toggleCategoriaMoeda(cardId, valorBrl, rate, valorUsdOriginal) {
       const card = document.getElementById(cardId);
       const valEl = document.getElementById(cardId + '_val');
       const btn = card?.querySelector('button');
       if (!card || !valEl) return;
       const modo = card.dataset.modo || 'brl';
       if (modo === 'brl') {
-        const usd = rate > 0 ? valorBrl / rate : 0;
+        // Se tem valor USD original (ex: Transporte), usa ele direto; senão converte
+        const usd = valorUsdOriginal !== undefined ? valorUsdOriginal : (rate > 0 ? valorBrl / rate : 0);
         valEl.textContent = `US$ ${formatarUSD(usd)}`;
         if (btn) btn.textContent = '💱 ver em R$';
         card.dataset.modo = 'usd';
