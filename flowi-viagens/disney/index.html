@@ -808,7 +808,7 @@
 
           <div class="kpi-card">
 
-            <div class="kpi-label">Gasto Total em Reais (BRL)</div>
+            <div class="kpi-label">Total Projetado em Reais</div>
 
             <div class="kpi-value blue" id="kpiTotalBrl">R$ 0,00</div>
 
@@ -914,8 +914,8 @@
 
           <div class="form-group"><label>Observações</label><textarea id="actDesc" class="form-control" placeholder="Ex: Chegar para o Rope Drop" rows="3" style="resize:vertical;line-height:1.5;"></textarea></div>
 
-          <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:12px;margin-bottom:12px;">
-            <div style="font-size:12px;font-weight:700;color:#0C4A6E;margin-bottom:8px;">🚗 Trajeto (opcional) — reflete na aba Transporte</div>
+          <div id="actTrajBlock" style="display:none;background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:12px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:700;color:#0C4A6E;margin-bottom:8px;">🚗 Trajeto — reflete na aba Transporte</div>
             <div class="grid-2">
               <div class="form-group" style="margin-bottom:0;"><label>Origem</label><input type="text" id="actTrajOrigem" class="form-control" placeholder="Ex: Hotel"></div>
               <div class="form-group" style="margin-bottom:0;"><label>Destino</label><input type="text" id="actTrajDestino" class="form-control" placeholder="Ex: Magic Kingdom"></div>
@@ -940,7 +940,7 @@
 
       <div id="promoRoteiroD1" style="display:none;background:#EFF6FF;border:1px dashed #2563EB;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#1E40AF;">
 
-        🔒 <strong>Recurso Premium:</strong> Desbloqueie a organização dinâmica por dias de viagem (D1, D2, D3...) agrupada cronologicamente. <a href="#" onclick="abrirPaywall();return false;" style="color:#2563EB;font-weight:700;text-decoration:underline;">Saber mais</a>
+        🔒 <strong>Recurso Premium:</strong> Desbloqueie o roteiro completo — dias organizados em D1, D2, D3 com horário e dia da semana, lista de compras e alimentação por atividade, trajetos de Uber integrados e tudo refletindo automaticamente no seu orçamento e transporte. <a href="#" onclick="abrirPaywall();return false;" style="color:#2563EB;font-weight:700;text-decoration:underline;">Garantir Premium →</a>
 
       </div>
 
@@ -1221,7 +1221,10 @@
 
         <button class="modal-termos-close" onclick="fecharModalTermos('modalDicas')">✕</button>
 
-        <div class="modal-termos-titulo">💡 Dicas para sua Viagem Disney</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div class="modal-termos-titulo" style="margin-bottom:0;">💡 Dicas para sua Viagem Disney</div>
+          <button onclick="exportarPDF('dicas')" style="background:none;border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;">📄 Exportar PDF</button>
+        </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;" id="dicasGrid">
 
@@ -1381,45 +1384,26 @@
     <!-- TAB 8: CRONOGRAMA DE TAREFAS -->
 
     <div id="tab-cronograma" class="tab-content">
-
-      <div class="card no-print">
-
-        <div class="card-title" id="croFormTitle">Adicionar Tarefa ao Cronograma</div>
-
-        <input type="hidden" id="croEditId" value="">
-
-        <div class="grid-2">
-
-          <div class="form-group">
-
-            <label>Mês/Ano da tarefa</label>
-
-            <input type="month" id="croMes" class="form-control">
-
+      <input type="hidden" id="croEditId" value="">
+      <div class="card no-print" style="margin-bottom:12px;">
+        <button id="croFormToggle" onclick="toggleFormCronograma()" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--brand-primary);padding:0;font-family:inherit;display:flex;justify-content:space-between;align-items:center;">
+          <span>+ Adicionar tarefa ao cronograma</span>
+          <span id="croFormToggleIcon" style="font-size:12px;color:var(--text-muted);">▼</span>
+        </button>
+        <div id="croFormBody" style="display:none;margin-top:16px;">
+          <div class="grid-2">
+            <div class="form-group"><label>Mês/Ano</label><input type="month" id="croMes" class="form-control"></div>
+            <div class="form-group"><label>Tarefa</label><input type="text" id="croTitulo" class="form-control" placeholder="Ex: Comprar passagens..."></div>
           </div>
-
-          <div class="form-group">
-
-            <label>Tarefa</label>
-
-            <input type="text" id="croTitulo" class="form-control" placeholder="Ex: Pagar passaporte, Comprar passagens...">
-
+          <div class="form-group" style="max-width:200px;">
+            <label>Valor (R$) <span style="font-weight:400;color:var(--text-muted);font-size:11px;">opcional</span></label>
+            <input type="number" id="croValor" class="form-control" placeholder="0.00" step="0.01">
           </div>
-
+          <div style="display:flex;gap:8px;">
+            <button class="btn-submit" id="btnCroSubmit" onclick="salvarTarefaCronograma()">Salvar</button>
+            <button class="btn-cancel" id="btnCroCancel" style="display:none;" onclick="cancelarEdicaoCronograma()">Cancelar</button>
+          </div>
         </div>
-
-        <div class="form-group" style="max-width:200px;">
-
-          <label>Valor (R$) <span style="font-weight:400;color:var(--text-muted);font-size:11px;">opcional</span></label>
-
-          <input type="number" id="croValor" class="form-control" placeholder="0.00" step="0.01">
-
-        </div>
-
-        <button class="btn-submit" id="btnCroSubmit" onclick="salvarTarefaCronograma()">Adicionar ao Cronograma</button>
-
-        <button class="btn-cancel" id="btnCroCancel" style="display:none;" onclick="cancelarEdicaoCronograma()">Cancelar Edição</button>
-
       </div>
 
       <div class="card">
@@ -1662,27 +1646,11 @@
       <div class="paywall-subtitle">Do primeiro real guardado até a última mala fechada.</div>
 
       <div class="paywall-list">
-
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Roteiro dinâmico D1, D2:</strong> agrupamento automático e cronológico por dia da viagem, com dia da semana</div></div>
-
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Orçamento completo:</strong> categorias, orçado vs. pago e conversão Real ↔ Dólar</div></div>
-
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Câmbio dinâmico:</strong> lance em USD e veja o saldo em qualquer uma das duas moedas</div></div>
-
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Metas de economia:</strong> quanto guardar por mês para atingir o orçamento total</div></div>
-
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Cronograma de tarefas:</strong> organize o que precisa fazer mês a mês até a viagem</div></div>
-
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Checklist de mala:</strong> itens por categoria com progresso de embalagem</div></div>
-
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Alertas de prazo:</strong> avisos automáticos de tarefas atrasadas e contagem regressiva</div></div>
-
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Calculadora Uber vs. Carro:</strong> saiba onde economizar</div></div>
-
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Dicas para uma viagem segura e confortável:</strong> app, ingressos, seguro viagem, internet, Genie+ e mais</div></div>
-
-        <div class="paywall-item" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;"><div class="paywall-check">✓</div><div><strong>📄 Exportar PDF completo:</strong> imprima ou compartilhe todo o seu planejamento — roteiro, orçamento, checklist e cronograma — em um único documento</div></div>
-
+        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Roteiro D1, D2, D3</strong> com lista de compras, alimentação e trajetos integrados por atividade</div></div>
+        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Orçamento por categoria</strong> com controle de pago vs. estimado e economia realizada</div></div>
+        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Transporte calculado</strong> — carro vs Uber, com estimativa em US$ e R$</div></div>
+        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Dicas exclusivas Disney</strong> — Genie+, Rope Drop, seguro viagem e muito mais</div></div>
+        <div class="paywall-item" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;"><div class="paywall-check">✓</div><div><strong>📄 PDF + Nuvem</strong> — exporte seu planejamento completo e acesse em qualquer dispositivo</div></div>
       </div>
 
       <div class="paywall-price-label">R$ 15,90</div>
@@ -1942,25 +1910,45 @@
       document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
 
       if (abaId) {
-
-        const nomesAbas = { inicio: 'Início', roteiro: 'Roteiro da Viagem', orcamento: 'Orçamento', metas: 'Metas de Economia', cronograma: 'Cronograma', mala: 'Checklist de Mala', transporte: 'Uber vs. Carro', dicas: 'Dicas' };
-
+        const nomesAbas = { inicio: 'Início', roteiro: 'Roteiro da Viagem', orcamento: 'Orçamento', metas: 'Metas de Economia', cronograma: 'Cronograma', mala: 'Checklist de Mala', transporte: 'Transporte', dicas: 'Dicas' };
         if (elTitulo) elTitulo.textContent = titulo;
-
         if (elSub) elSub.textContent = `${nomesAbas[abaId] || abaId} · ${viajantes} viajante(s) · Flowi Viagens`;
 
-        const alvo = document.getElementById(`tab-${abaId}`);
-
-        if (alvo) alvo.classList.add('print-show');
-
+        // metas/mala/dicas: são modais — cria wrapper temporário com o conteúdo real
+        if (['metas','mala','dicas'].includes(abaId)) {
+          const modalId = { metas: 'modalMetas', mala: 'modalMala', dicas: 'modalDicas' }[abaId];
+          const modal = document.getElementById(modalId);
+          const wrapper = document.createElement('div');
+          wrapper.id = 'printModalWrapper';
+          wrapper.className = 'tab-content print-show';
+          wrapper.style.background = 'white';
+          wrapper.style.padding = '16px';
+          if (modal) {
+            // Copia o conteúdo do modal-card (não o overlay)
+            const card = modal.querySelector('.modal-termos-card');
+            if (card) wrapper.innerHTML = card.innerHTML;
+            // Remove botões de fechar e exportar do wrapper
+            wrapper.querySelectorAll('.modal-termos-close, button').forEach(b => b.remove());
+          }
+          document.querySelector('.main-container')?.appendChild(wrapper);
+        } else {
+          const alvo = document.getElementById(`tab-${abaId}`);
+          if (alvo) {
+            // Expande todos os acordeões dentro desta aba para o PDF
+            alvo.querySelectorAll('.day-accordion').forEach(a => a.classList.add('open'));
+            alvo.querySelectorAll('[id^="catAccord_"]').forEach(b => b.style.display = 'block');
+            alvo.classList.add('print-show');
+          }
+        }
       } else {
-
         if (elTitulo) elTitulo.textContent = titulo;
-
         if (elSub) elSub.textContent = `${viajantes} viajante(s)${dataIda ? ' · Ida: ' + dataIda : ''} · Planejamento completo · Flowi Viagens`;
-
-        document.querySelectorAll('.tab-content').forEach(s => s.classList.add('print-show'));
-
+        document.querySelectorAll('.tab-content').forEach(s => {
+          // Expande acordeões para o PDF completo
+          s.querySelectorAll('.day-accordion').forEach(a => a.classList.add('open'));
+          s.querySelectorAll('[id^="catAccord_"]').forEach(b => b.style.display = 'block');
+          s.classList.add('print-show');
+        });
       }
 
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -1984,7 +1972,7 @@
         });
 
         document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('print-show'));
-
+        const pw = document.getElementById('printModalWrapper'); if (pw) pw.remove();
         renderTabs();
 
       };
@@ -2054,15 +2042,10 @@
     });
 
     function confirmarReset() {
-
-      if (confirm("⚠️ ATENÇÃO: Deseja realmente resetar o aplicativo?\n\nIsso apagará todas as atividades, itens do orçamento e configurações salvas.")) {
-
-        localStorage.removeItem('flowi_disney_user_data');
-
+      if (confirm("⚠️ ATENÇÃO: Isso apagará todos os dados desta viagem.\n\nContinuar?")) {
+        ['flowi_disney_user_data','flowi_is_premium','flowi_hub_email','flowi_disney_active_tab'].forEach(k => localStorage.removeItem(k));
         location.reload();
-
       }
-
     }
 
     async function carregar() {
@@ -2432,19 +2415,21 @@
 
         btnHeader.textContent = 'Meus Flowis';
 
-        btnHeader.onclick = () => window.location.href = 'https://tryflowi.github.io/hub.html';
+        btnHeader.onclick = () => window.location.href = 'https://tryflowi.github.io/';
 
         alertFree.style.display = 'none';
 
         if (cardOffline) cardOffline.style.display = 'none';
 
         if (promoD1) promoD1.style.display = 'none';
+        const trajBlock = document.getElementById('actTrajBlock');
+        if (trajBlock) trajBlock.style.display = 'block';
 
         if (promoOrc) promoOrc.style.display = 'none';
 
         if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none';
 
-        if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Total lançado';
+        if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Orçamento + Transporte';
 
         const btnPDF = document.getElementById('btnExportarPDF');
 
@@ -2465,12 +2450,14 @@
         if (cardOffline) cardOffline.style.display = 'block';
 
         if (promoD1) promoD1.style.display = 'block';
+        const trajBlockF = document.getElementById('actTrajBlock');
+        if (trajBlockF) trajBlockF.style.display = 'none';
 
         if (promoOrc) promoOrc.style.display = 'block';
 
         if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none';
 
-        if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Total lançado em Reais';
+        if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Orçamento + Transporte';
 
       }
 
@@ -2781,15 +2768,29 @@
     }
 
     function removerOrcamento(id) {
-
+      // Salva quais categorias estavam abertas
+      const catsAbertas = new Set();
+      document.querySelectorAll('#orcamentoLista > div').forEach(wrapper => {
+        const body = wrapper.querySelector('[id^="catAccord_"]');
+        if (body && body.style.display !== 'none') {
+          const cat = wrapper.querySelector('strong')?.textContent;
+          if (cat) catsAbertas.add(cat);
+        }
+      });
       appData.budgetItems = appData.budgetItems.filter(i => String(i.id) !== String(id));
-
       salvar();
-
       renderOrcamento();
-
       renderMetas();
-
+      // Reabre as categorias que estavam abertas
+      document.querySelectorAll('#orcamentoLista > div').forEach(wrapper => {
+        const cat = wrapper.querySelector('strong')?.textContent;
+        if (cat && catsAbertas.has(cat)) {
+          const body = wrapper.querySelector('[id^="catAccord_"]');
+          const caret = wrapper.querySelector('.caret-cat');
+          if (body) { body.style.display = 'block'; }
+          if (caret) caret.style.transform = 'rotate(180deg)';
+        }
+      });
     }
 
     function onStatusChange(radio) {
@@ -2852,6 +2853,17 @@
 
       if (promoFree) promoFree.style.display = isPremium ? 'none' : 'block';
 
+    }
+
+    function toggleFormCronograma(forcarAbrir) {
+      const body = document.getElementById('croFormBody');
+      const icon = document.getElementById('croFormToggleIcon');
+      const toggle = document.getElementById('croFormToggle');
+      if (!body) return;
+      const abrir = forcarAbrir !== undefined ? forcarAbrir : body.style.display === 'none';
+      body.style.display = abrir ? 'block' : 'none';
+      if (icon) icon.textContent = abrir ? '▲' : '▼';
+      if (toggle) toggle.querySelector('span').textContent = abrir ? '− Fechar' : '+ Adicionar tarefa ao cronograma';
     }
 
     function toggleFormRoteiro(forcarAbrir) {
@@ -3412,9 +3424,9 @@
       document.getElementById('croTitulo').value = item.titulo;
       document.getElementById('croValor').value = item.valor || '';
 
-      document.getElementById('croFormTitle').textContent = 'Editar Tarefa do Cronograma';
       document.getElementById('btnCroSubmit').textContent = 'Salvar Alterações';
-      document.getElementById('btnCroCancel').style.display = 'block';
+      document.getElementById('btnCroCancel').style.display = 'inline-block';
+      toggleFormCronograma(true);
 
       window.scrollTo({ top: document.getElementById('tab-cronograma').offsetTop - 20, behavior: 'smooth' });
     }
@@ -3425,9 +3437,9 @@
       document.getElementById('croTitulo').value = '';
       document.getElementById('croValor').value = '';
 
-      document.getElementById('croFormTitle').textContent = 'Adicionar Tarefa ao Cronograma';
-      document.getElementById('btnCroSubmit').textContent = 'Adicionar ao Cronograma';
+      document.getElementById('btnCroSubmit').textContent = 'Salvar';
       document.getElementById('btnCroCancel').style.display = 'none';
+      toggleFormCronograma(false);
     }
 
     function toggleTarefaCronograma(id) {
@@ -3866,14 +3878,22 @@
         // Resumo por tipo de todos os itens do dia
         const tiposEmoji = { compras:'🛍️', mercado:'🛒', alimentacao:'🍽️', transporte:'🚗' };
         const resumoDia = {};
-        atividades.forEach(at => (at.compras || []).forEach(c => {
-          const t = c.tipo || 'compras';
-          if (!resumoDia[t]) resumoDia[t] = { teto: 0, qtd: 0 };
-          resumoDia[t].teto += (c.teto || 0);
-          resumoDia[t].qtd += 1;
-        }));
+        atividades.forEach(at => {
+          (at.compras || []).forEach(c => {
+            const t = c.tipo || 'compras';
+            if (!resumoDia[t]) resumoDia[t] = { teto: 0, qtd: 0 };
+            resumoDia[t].teto += (c.teto || 0);
+            resumoDia[t].qtd += 1;
+          });
+          // Adiciona trajeto do item.trajeto no resumo do dia (só Premium)
+          if (isPremium && at.trajeto && (at.trajeto.origem || at.trajeto.destino)) {
+            if (!resumoDia['trajeto']) resumoDia['trajeto'] = { teto: 0, qtd: 0 };
+            resumoDia['trajeto'].teto += (at.trajeto.teto || 0);
+            resumoDia['trajeto'].qtd += 1;
+          }
+        });
         const resumoDiaHtml = Object.entries(resumoDia).map(([t, v]) =>
-          `<span style="font-size:11px;color:var(--text-muted);">${tiposEmoji[t]||'📋'} US$ ${formatarUSD(v.teto)}</span>`
+          `<span style="font-size:11px;color:var(--text-muted);">${t==='trajeto'?'🚗':(tiposEmoji[t]||'📋')} US$ ${formatarUSD(v.teto)}</span>`
         ).join(' · ');
 
         let html = `
@@ -3900,8 +3920,12 @@
             tiposAt[t].teto += (c.teto || 0);
             tiposAt[t].qtd += 1;
           });
+          // Adiciona trajeto do item.trajeto no resumo da atividade (só Premium)
+          if (isPremium && item.trajeto && (item.trajeto.origem || item.trajeto.destino)) {
+            tiposAt['trajeto'] = { teto: item.trajeto.teto || 0, qtd: 1 };
+          }
           const resumoAtHtml = Object.entries(tiposAt).map(([t, v]) =>
-            `${tiposEmoji[t]||'📋'} ${v.qtd} · US$ ${formatarUSD(v.teto)}`
+            `${t==='trajeto'?'🚗':(tiposEmoji[t]||'📋')} ${v.qtd} · US$ ${formatarUSD(v.teto)}`
           ).join(' &nbsp; ');
 
           html += `
@@ -3911,7 +3935,7 @@
                 <strong>${item.title}</strong>
                 ${item.desc ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:pre-wrap;">${item.desc}</div>` : ''}
                 ${nItens > 0 ? `<div style="font-size:11px;color:var(--brand-primary);margin-top:4px;cursor:pointer;" onclick="abrirModalComprasAtividade(${item.id})">${resumoAtHtml} ▾</div>` : ''}
-                ${item.trajeto && (item.trajeto.origem || item.trajeto.destino) ? `
+                ${isPremium && item.trajeto && (item.trajeto.origem || item.trajeto.destino) ? `
                   <div style="font-size:11px;color:#0C4A6E;margin-top:4px;background:#F0F9FF;border-radius:6px;padding:3px 8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;" onclick="abrirModalTrajeto(${item.id})">
                     🚗 ${item.trajeto.origem||'?'} → ${item.trajeto.destino||'?'}${item.trajeto.teto ? ` · US$ ${formatarUSD(item.trajeto.teto)}` : ''} ✏️
                   </div>` : ''}
