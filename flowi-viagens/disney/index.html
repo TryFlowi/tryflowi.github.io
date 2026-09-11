@@ -1114,17 +1114,17 @@
 
           <div class="grid-2">
 
-            <div class="form-group"><label>Dias de aluguel</label><input type="number" id="carDays" class="form-control" value="7" oninput="renderTransporte()"></div>
+            <div class="form-group"><label>Dias de aluguel</label><input type="number" id="carDays" class="form-control" placeholder="Ex: 7" oninput="renderTransporte()"></div>
 
-            <div class="form-group"><label>Diária do carro (US$)</label><input type="number" id="carDaily" class="form-control" value="45" oninput="renderTransporte()"></div>
+            <div class="form-group"><label>Diária do carro (US$)</label><input type="number" id="carDaily" class="form-control" placeholder="Ex: 45" oninput="renderTransporte()"></div>
 
           </div>
 
           <div class="grid-2">
 
-            <div class="form-group"><label>Estacionamento/dia nos parques (US$)</label><input type="number" id="carPark" class="form-control" value="35" oninput="renderTransporte()"></div>
+            <div class="form-group"><label>Estacionamento/dia nos parques (US$)</label><input type="number" id="carPark" class="form-control" placeholder="Ex: 35" oninput="renderTransporte()"></div>
 
-            <div class="form-group"><label>Combustível estimado total (US$)</label><input type="number" id="carFuel" class="form-control" value="80" oninput="renderTransporte()"></div>
+            <div class="form-group"><label>Combustível estimado total (US$)</label><input type="number" id="carFuel" class="form-control" placeholder="Ex: 80" oninput="renderTransporte()"></div>
 
           </div>
 
@@ -1262,7 +1262,7 @@
 
           <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px;">
 
-            <div style="font-size:15px;font-weight:700;color:#9A3412;margin-bottom:8px;">⏰ Genie+ & Lightning Lane</div>
+            <div style="font-size:15px;font-weight:700;color:#9A3412;margin-bottom:8px;">⏰ Lightning Lane Multi Pass & Lightning Lane</div>
 
             <ul style="font-size:12px;color:#7C2D12;line-height:1.7;margin:0;padding-left:16px;">
 
@@ -1649,7 +1649,7 @@
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Roteiro D1, D2, D3</strong> com lista de compras, alimentação e trajetos integrados por atividade</div></div>
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Orçamento por categoria</strong> com controle de pago vs. estimado e economia realizada</div></div>
         <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Transporte calculado</strong> — carro vs Uber, com estimativa em US$ e R$</div></div>
-        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Dicas exclusivas Disney</strong> — Genie+, Rope Drop, seguro viagem e muito mais</div></div>
+        <div class="paywall-item"><div class="paywall-check">✓</div><div><strong>Dicas exclusivas Disney</strong> — Lightning Lane, Rope Drop, seguro viagem e muito mais</div></div>
         <div class="paywall-item" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 12px;"><div class="paywall-check">✓</div><div><strong>📄 PDF + Nuvem</strong> — exporte seu planejamento completo e acesse em qualquer dispositivo</div></div>
       </div>
 
@@ -2415,7 +2415,7 @@
 
         btnHeader.textContent = 'Meus Flowis';
 
-        btnHeader.onclick = () => window.location.href = 'https://tryflowi.github.io/';
+        btnHeader.onclick = () => window.location.href = 'https://tryflowi.github.io/hub.html';
 
         alertFree.style.display = 'none';
 
@@ -2430,6 +2430,9 @@
         if (cardVisualizacaoMoeda) cardVisualizacaoMoeda.style.display = 'none';
 
         if (kpiTotalBrlSub) kpiTotalBrlSub.textContent = 'Orçamento + Transporte';
+
+        const infoBoxResumo = document.getElementById('infoBoxResumo');
+        if (infoBoxResumo) infoBoxResumo.style.display = 'none';
 
         const btnPDF = document.getElementById('btnExportarPDF');
 
