@@ -209,7 +209,30 @@ footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 40px; display: f
   .footer-top { flex-direction: column; }
   .footer-links { gap: 12px; }
 }
-</style>
+
+  /* Banner cookies */
+  #cookieBanner {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+    background: rgba(10,10,10,0.97); backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 16px 24px; display: flex; align-items: center;
+    justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  #cookieBanner p { font-size: 12px; color: rgba(255,255,255,0.55); margin: 0; line-height: 1.6; flex: 1; min-width: 200px; }
+  #cookieBanner a { color: rgba(255,255,255,0.75); text-decoration: underline; }
+  #cookieBanner .cookie-btn {
+    background: #10b981; color: white; border: none; border-radius: 8px;
+    padding: 8px 20px; font-size: 12px; font-weight: 600; cursor: pointer;
+    white-space: nowrap; font-family: inherit;
+  }
+  #cookieBanner .cookie-btn-recusar {
+    background: transparent; color: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 8px 16px; font-size: 12px; cursor: pointer;
+    white-space: nowrap; font-family: inherit;
+  }
+
+  </style>
 </head>
 <body>
 
@@ -452,12 +475,23 @@ async function verificarLicencaModal() {
 function enviarVoto(){
   var input = document.getElementById('voto-input'), v = input && input.value.trim();
   if(!v) return;
-  var votos = JSON.parse(localStorage.getItem('flowi-votos') || '[]');
-  votos.push({texto: v, data: new Date().toISOString()});
-  localStorage.setItem('flowi-votos', JSON.stringify(votos));
-  input.value = '';
-  renderVotos();
-  alert('Sugestão enviada! Obrigada ❤️');
+  var btn = document.querySelector('.votar-btn');
+  if(btn){ btn.textContent = 'Enviando...'; btn.disabled = true; }
+  fetch('https://formspree.io/f/xkjnyyvz', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ sugestao: v, origem: 'Flowi Home' })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(){
+    input.value = '';
+    if(btn){ btn.textContent = 'Sugerir'; btn.disabled = false; }
+    alert('Sugestão enviada! Obrigada ❤️');
+  })
+  .catch(function(){
+    if(btn){ btn.textContent = 'Sugerir'; btn.disabled = false; }
+    alert('Erro ao enviar. Tente novamente.');
+  });
 }
 
 function renderVotos(){
@@ -481,6 +515,35 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 });
 </script>
+
+
+  <!-- Banner de Cookies LGPD -->
+  <div id="cookieBanner" style="display:none;">
+    <p>
+      Usamos cookies essenciais para funcionamento do site e cookies analíticos para melhorar sua experiência.
+      Ao continuar, você concorda com nossa <a href="./privacidade.html" target="_blank">Política de Privacidade</a>.
+    </p>
+    <div style="display:flex;gap:8px;">
+      <button class="cookie-btn-recusar" onclick="recusarCookies()">Só essenciais</button>
+      <button class="cookie-btn" onclick="aceitarCookies()">Aceitar e continuar</button>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      if(!localStorage.getItem('flowi-cookies-consent')){
+        document.getElementById('cookieBanner').style.display = 'flex';
+      }
+    })();
+    function aceitarCookies(){
+      localStorage.setItem('flowi-cookies-consent','all');
+      document.getElementById('cookieBanner').style.display = 'none';
+    }
+    function recusarCookies(){
+      localStorage.setItem('flowi-cookies-consent','essential');
+      document.getElementById('cookieBanner').style.display = 'none';
+    }
+  </script>
 
 </body>
 </html>
