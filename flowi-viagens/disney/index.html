@@ -913,19 +913,12 @@
         <div id="actFormBody" style="display:none;margin-top:16px;">
 
           <div class="grid-2">
-
             <div class="form-group">
-
               <label>Data da Atividade</label>
-
               <input type="date" id="actDate" class="form-control" onchange="atualizarDiaSemanaForm()">
-
               <div id="actDiaSemana" style="display:none;font-size:12px;color:var(--brand-primary);font-weight:600;margin-top:4px;"></div>
-
             </div>
-
             <div class="form-group"><label>Horário</label><input type="time" id="actTime" class="form-control" value="09:00"></div>
-
           </div>
 
           <div class="form-group"><label>Título da Atividade / Local</label><input type="text" id="actTitle" class="form-control" placeholder="Ex: Magic Kingdom - Parque"></div>
@@ -944,12 +937,12 @@
             </div>
           </div>
 
-          <div style="display:flex;gap:8px;">
-
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <button class="btn-submit" id="btnActSubmit" onclick="salvarAtividade()">Salvar</button>
-
             <button class="btn-cancel" id="btnActCancel" style="display:none;" onclick="cancelarEdicaoAtividade()">Cancelar</button>
-
+            <span id="btnListaComprasForm" style="display:none;">
+              <button onclick="abrirListaComprasFormulario()" style="background:var(--brand-glow);border:1px solid var(--brand-primary);color:var(--brand-primary);font-size:12px;padding:8px 12px;border-radius:8px;cursor:pointer;font-family:inherit;" title="Adicionar lista de compras a esta atividade">🛍️ Lista de compras</button>
+            </span>
           </div>
 
         </div>
@@ -3155,16 +3148,21 @@
           if (appData.transporte.modo === 'app') {
             manual = (appData.transporte.trajetos || []).reduce((a, t) => a + (t.valor || 0), 0);
           } else {
-            const days = parseFloat(document.getElementById('carDays')?.value) || 0;
-            const daily = parseFloat(document.getElementById('carDaily')?.value) || 0;
-            const park = parseFloat(document.getElementById('carPark')?.value) || 0;
-            const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
+            // Modo carro: ler de appData.transporte.carro (não do DOM, que pode não estar renderizado)
+            const car = appData.transporte.carro || {};
+            const days = parseFloat(car.days) || parseFloat(document.getElementById('carDays')?.value) || 0;
+            const daily = parseFloat(car.daily) || parseFloat(document.getElementById('carDaily')?.value) || 0;
+            const park = parseFloat(car.park) || parseFloat(document.getElementById('carPark')?.value) || 0;
+            const fuel = parseFloat(car.fuel) || parseFloat(document.getElementById('carFuel')?.value) || 0;
             manual = days * (daily + park) + fuel;
           }
         }
         const doRoteiro = (appData.activities || []).reduce((s, at) =>
           s + (at.compras||[]).filter(c=>c.tipo==='transporte').reduce((a,c)=>a+(c.teto||0),0), 0);
-        return manual + doRoteiro;
+        // Trajetos do campo trajeto das atividades
+        const trajetosAt = (appData.activities || []).reduce((s, at) =>
+          s + (at.trajeto?.teto || 0), 0);
+        return manual + doRoteiro + trajetosAt;
       })();
       const transpBrlTotal = transpUsdTotal * rate;
       const totalBrlComTransporte = totalBrl + transpBrlTotal;
@@ -3845,8 +3843,10 @@
 
       const cancelBtn = document.getElementById('btnActCancel');
       const submitBtn = document.getElementById('btnActSubmit');
+      const listaBtn = document.getElementById('btnListaComprasForm');
       if (cancelBtn) cancelBtn.style.display = 'inline-block';
       if (submitBtn) submitBtn.textContent = 'Salvar Alterações';
+      if (listaBtn && isPremium) listaBtn.style.display = 'inline-block';
       atualizarDiaSemanaForm();
       _diaExpandidoId = item.date;
       toggleFormRoteiro(true);
@@ -3864,10 +3864,27 @@
       });
       const cancelBtn = document.getElementById('btnActCancel');
       const submitBtn = document.getElementById('btnActSubmit');
+      const listaBtn = document.getElementById('btnListaComprasForm');
       if (cancelBtn) cancelBtn.style.display = 'none';
       if (submitBtn) submitBtn.textContent = 'Salvar';
+      if (listaBtn) listaBtn.style.display = 'none';
       atualizarDiaSemanaForm();
       toggleFormRoteiro(false);
+    }
+
+    function salvarTituloDia(dataStr, valor) {
+      if (!appData.titulosDia) appData.titulosDia = {};
+      appData.titulosDia[dataStr] = valor;
+      salvar();
+    }
+
+    function abrirListaComprasFormulario() {
+      const editId = document.getElementById('actEditId')?.value;
+      if (editId) {
+        abrirModalComprasAtividade(parseInt(editId) || editId);
+      } else {
+        alert('Salve a atividade primeiro para poder adicionar itens à lista de compras.');
+      }
     }
 
     function toggleAtividadeFeita(id) {
@@ -3985,6 +4002,8 @@
           `<span style="font-size:11px;color:var(--text-muted);">${t==='trajeto'?'🚗':(tiposEmoji[t]||'📋')} US$ ${formatarUSD(v.teto)}</span>`
         ).join(' · ');
 
+        const tituloDia = appData.titulosDia?.[dataStr] || '';
+
         let html = `
           <div class="day-header" onclick="toggleAccordion(this)">
             <div class="day-title-box">
@@ -3994,6 +4013,12 @@
               ${resumoDiaHtml ? `<span style="margin-left:8px;">${resumoDiaHtml}</span>` : ''}
             </div>
             <span class="day-arrow">▼</span>
+          </div>
+          <div class="day-titulo-edit" style="padding:6px 16px;background:#F8FAFC;border-bottom:1px solid var(--border-color);">
+            <input type="text" value="${tituloDia}" placeholder="Ex: Dia de parque, Dia de compras..." 
+              onclick="event.stopPropagation()"
+              oninput="salvarTituloDia('${dataStr}', this.value)"
+              style="width:100%;border:none;background:transparent;font-size:12px;color:var(--text-muted);font-style:italic;outline:none;font-family:inherit;padding:2px 0;">
           </div>
           <div class="day-content">
         `;
@@ -4099,6 +4124,16 @@
       document.getElementById('campusCarro').style.display = modo === 'carro' ? 'block' : 'none';
       document.getElementById('campusApp').style.display = modo === 'app' ? 'block' : 'none';
 
+      // Restaura valores salvos do carro no DOM
+      if (modo === 'carro' && appData.transporte.carro) {
+        const c = appData.transporte.carro;
+        const el = (id) => document.getElementById(id);
+        if (c.days && el('carDays') && !el('carDays').value) el('carDays').value = c.days;
+        if (c.daily && el('carDaily') && !el('carDaily').value) el('carDaily').value = c.daily;
+        if (c.park && el('carPark') && !el('carPark').value) el('carPark').value = c.park;
+        if (c.fuel && el('carFuel') && !el('carFuel').value) el('carFuel').value = c.fuel;
+      }
+
       // Trajetos do roteiro (campo trajeto nas atividades)
       const trajetosRoteiro = [];
       (appData.activities || []).forEach(at => {
@@ -4130,6 +4165,9 @@
         const park = parseFloat(document.getElementById('carPark')?.value) || 0;
         const fuel = parseFloat(document.getElementById('carFuel')?.value) || 0;
         totalUsd = days * (daily + park) + fuel;
+        // Salva valores do carro no appData para o dashboard poder ler sem depender do DOM
+        appData.transporte.carro = { days, daily, park, fuel };
+        salvar();
         document.getElementById('trajetosLista').innerHTML = '';
       } else {
         const lista = [...(appData.transporte.trajetos || [])].sort((a, b) => {
