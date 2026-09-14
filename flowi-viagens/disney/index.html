@@ -759,23 +759,41 @@
         </div>
 
         <div class="grid-2">
-
           <div class="form-group">
-
             <label>Número de viajantes</label>
-
             <input type="number" id="cfgTravelers" class="form-control" value="1" min="1" onchange="salvarConfig()">
-
           </div>
-
           <div class="form-group">
-
             <label>Cotação Padrão Dólar (R$)</label>
-
             <input type="number" id="cfgDollarRate" class="form-control" value="5.20" step="0.05" oninput="salvarConfig()">
-
           </div>
+        </div>
 
+        <div class="form-group">
+          <label>Local da hospedagem</label>
+          <input type="text" id="cfgHotel" class="form-control" placeholder="Ex: Hotel Rosen Inn, Disney's All-Star..." oninput="salvarConfig()">
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Voo de ida — partida</label>
+            <input type="datetime-local" id="cfgVooIdaPartida" class="form-control" onchange="salvarConfig()">
+          </div>
+          <div class="form-group">
+            <label>Voo de ida — chegada em Orlando</label>
+            <input type="datetime-local" id="cfgVooIdaChegada" class="form-control" onchange="salvarConfig()">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Voo de volta — partida de Orlando</label>
+            <input type="datetime-local" id="cfgVooVoltaPartida" class="form-control" onchange="salvarConfig()">
+          </div>
+          <div class="form-group">
+            <label>Voo de volta — chegada</label>
+            <input type="datetime-local" id="cfgVooVoltaChegada" class="form-control" onchange="salvarConfig()">
+          </div>
         </div>
 
       </div>
@@ -1290,6 +1308,18 @@
 
             </ul>
 
+          </div>
+
+          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:14px;grid-column:1/-1;">
+            <div style="font-size:15px;font-weight:700;color:#9A3412;margin-bottom:8px;">🏰 Regiões do Magic Kingdom</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px;color:#7C2D12;">
+              <div style="background:white;border-radius:8px;padding:8px;"><strong>Main Street U.S.A.</strong><br>Entrada do parque. Lojas, restaurantes, foto com o castelo. Ideal para compras no final do dia.</div>
+              <div style="background:white;border-radius:8px;padding:8px;"><strong>Fantasyland</strong><br>Clássicos Disney. Peter Pan, It's a Small World, 7 Anões. Fila muito alta — chegue cedo ou use Lightning Lane.</div>
+              <div style="background:white;border-radius:8px;padding:8px;"><strong>Tomorrowland</strong><br>Space Mountain, Tron (Lightning Lane Individual), Buzz Lightyear. Área futurista.</div>
+              <div style="background:white;border-radius:8px;padding:8px;"><strong>Adventureland</strong><br>Jungle Cruise, Pirates of the Caribbean. Ótima para o período da tarde.</div>
+              <div style="background:white;border-radius:8px;padding:8px;"><strong>Liberty Square</strong><br>Haunted Mansion, Hall of Presidents. Menor movimento — bom para descansar o roteiro.</div>
+              <div style="background:white;border-radius:8px;padding:8px;"><strong>Frontierland</strong><br>Big Thunder Mountain, Splash Mountain (Tiana's Bayou). Atrações de montanha-russa clássicas.</div>
+            </div>
           </div>
 
           <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:10px;padding:14px;grid-column:1/-1;">
@@ -1924,11 +1954,14 @@
           wrapper.style.background = 'white';
           wrapper.style.padding = '16px';
           if (modal) {
-            // Copia o conteúdo do modal-card (não o overlay)
             const card = modal.querySelector('.modal-termos-card');
             if (card) wrapper.innerHTML = card.innerHTML;
-            // Remove botões de fechar e exportar do wrapper
             wrapper.querySelectorAll('.modal-termos-close, button').forEach(b => b.remove());
+            // Mala: expandir todos os acordeões de categoria
+            if (abaId === 'mala') {
+              wrapper.querySelectorAll('.mala-cat-body').forEach(b => { b.style.display = 'block'; });
+              wrapper.querySelectorAll('.mala-caret').forEach(c => { c.style.transform = 'rotate(180deg)'; });
+            }
           }
           document.querySelector('.main-container')?.appendChild(wrapper);
         } else {
@@ -2475,8 +2508,12 @@
       document.getElementById('cfgTripName').value = appData.config.tripName || 'Minha Viagem Disney';
 
       document.getElementById('cfgStartDate').value = appData.config.startDate || '';
-
       document.getElementById('cfgEndDate').value = appData.config.endDate || '';
+      if (document.getElementById('cfgHotel')) document.getElementById('cfgHotel').value = appData.config.hotel || '';
+      if (document.getElementById('cfgVooIdaPartida')) document.getElementById('cfgVooIdaPartida').value = appData.config.vooIdaPartida || '';
+      if (document.getElementById('cfgVooIdaChegada')) document.getElementById('cfgVooIdaChegada').value = appData.config.vooIdaChegada || '';
+      if (document.getElementById('cfgVooVoltaPartida')) document.getElementById('cfgVooVoltaPartida').value = appData.config.vooVoltaPartida || '';
+      if (document.getElementById('cfgVooVoltaChegada')) document.getElementById('cfgVooVoltaChegada').value = appData.config.vooVoltaChegada || '';
 
       document.getElementById('cfgTravelers').value = appData.config.travelers || 1;
 
@@ -2493,8 +2530,12 @@
       appData.config.tripName = document.getElementById('cfgTripName').value;
 
       appData.config.startDate = document.getElementById('cfgStartDate').value;
-
       appData.config.endDate = document.getElementById('cfgEndDate').value;
+      appData.config.hotel = document.getElementById('cfgHotel')?.value || '';
+      appData.config.vooIdaPartida = document.getElementById('cfgVooIdaPartida')?.value || '';
+      appData.config.vooIdaChegada = document.getElementById('cfgVooIdaChegada')?.value || '';
+      appData.config.vooVoltaPartida = document.getElementById('cfgVooVoltaPartida')?.value || '';
+      appData.config.vooVoltaChegada = document.getElementById('cfgVooVoltaChegada')?.value || '';
 
       appData.config.travelers = parseInt(document.getElementById('cfgTravelers').value) || 1;
 
@@ -3129,7 +3170,7 @@
       const totalBrlComTransporte = totalBrl + transpBrlTotal;
 
       // Tetos do roteiro por categoria para comparativo
-      const tipoParaCat = { compras: 'Compras', mercado: 'Alimentação', alimentacao: 'Alimentação' };
+      const tipoParaCat = { compras: 'Compras', mercado: 'Compras', alimentacao: 'Alimentação' };
       const tetoRoteiroPorCat = {};
       (appData.activities || []).forEach(at => {
         (at.compras || []).forEach(c => {
@@ -3623,32 +3664,62 @@
         agrupado[item.categoria].push(item);
       });
 
-      categoriasOrdem.forEach(cat => {
+      // Ordem alfabética dentro de cada categoria
+      Object.keys(agrupado).forEach(cat => {
+        agrupado[cat].sort((a, b) => (a.item || '').localeCompare(b.item || '', 'pt'));
+      });
+
+      // Categorias que estavam abertas antes (para preservar estado)
+      const abertas = new Set();
+      container.querySelectorAll('[data-cat-aberta]').forEach(el => abertas.add(el.dataset.catAberta));
+
+      categoriasOrdem.forEach((cat, idx) => {
         if (!agrupado[cat]) return;
         const itensCategoria = agrupado[cat];
         const feitosCategoria = itensCategoria.filter(i => i.feito).length;
+        const estaAberta = abertas.size === 0 || abertas.has(cat); // primeira vez: todas abertas
+        const acordId = `malaAcord_${idx}`;
 
         const grupo = document.createElement('div');
-        grupo.style.cssText = 'margin-bottom:18px;';
-        grupo.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:13px; color:var(--brand-primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border-color);">
-            <span>${iconesCategoria[cat] || '📦'} ${cat}</span>
-            <span style="color:var(--text-muted); font-weight:600; text-transform:none; letter-spacing:0;">${feitosCategoria}/${itensCategoria.length}</span>
+        grupo.style.cssText = 'border:1px solid var(--border-color);border-radius:10px;margin-bottom:8px;overflow:hidden;';
+        grupo.dataset.catAberta = cat;
+
+        // Header clicável
+        const header = document.createElement('div');
+        header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;background:var(--bg-card);';
+        header.innerHTML = `
+          <span style="font-weight:700;font-size:13px;color:var(--brand-primary);">${iconesCategoria[cat] || '📦'} ${cat}</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:12px;color:var(--text-muted);">${feitosCategoria}/${itensCategoria.length}</span>
+            <span class="mala-caret" style="font-size:11px;color:var(--text-muted);transition:transform .2s;${estaAberta ? 'transform:rotate(180deg)' : ''}"">▼</span>
           </div>
         `;
 
+        const body = document.createElement('div');
+        body.id = acordId;
+        body.style.display = estaAberta ? 'block' : 'none';
+        body.classList.add('mala-cat-body');
+
+        header.onclick = () => {
+          const aberto = body.style.display !== 'none';
+          body.style.display = aberto ? 'none' : 'block';
+          header.querySelector('.mala-caret').style.transform = aberto ? 'rotate(0deg)' : 'rotate(180deg)';
+        };
+
         itensCategoria.forEach(item => {
           const linha = document.createElement('div');
-          linha.style.cssText = 'display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid #F1F5F9;';
+          linha.style.cssText = 'display:flex; align-items:center; gap:10px; padding:10px 14px; border-top:1px solid var(--border-color);';
           linha.innerHTML = `
             <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggleItemMala(${item.id})" style="width:18px; height:18px; accent-color:var(--brand-primary); flex-shrink:0;">
             <div style="flex:1; font-size:14px; ${item.feito ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${item.item}</div>
             <button class="btn-action-icon" onclick="editarItemMala(${item.id})">✏️</button>
             <button class="btn-action-icon" style="color:var(--danger);" onclick="removerItemMala(${item.id})">🗑️</button>
           `;
-          grupo.appendChild(linha);
+          body.appendChild(linha);
         });
 
+        grupo.appendChild(header);
+        grupo.appendChild(body);
         container.appendChild(grupo);
       });
     }
@@ -3799,6 +3870,21 @@
       toggleFormRoteiro(false);
     }
 
+    function toggleAtividadeFeita(id) {
+      const item = appData.activities.find(a => String(a.id) === String(id));
+      if (!item) return;
+      item.feito = !item.feito;
+      salvar();
+      // Preserva dias abertos
+      const diasAbertos = new Set();
+      document.querySelectorAll('.day-accordion.open .day-date-str').forEach(el => diasAbertos.add(el.textContent.split(' · ')[0]));
+      renderRoteiroCronologico();
+      document.querySelectorAll('.day-accordion').forEach(acc => {
+        const ds = acc.querySelector('.day-date-str')?.textContent.split(' · ')[0];
+        if (ds && diasAbertos.has(ds)) acc.classList.add('open');
+      });
+    }
+
     function removerAtividade(id) {
       if (!confirm('Remover esta atividade?')) return;
       // Salva quais dias estavam abertos antes de re-renderizar
@@ -3932,10 +4018,13 @@
           ).join(' &nbsp; ');
 
           html += `
-            <div class="activity-item">
-              <div class="activity-time">${item.time || '--:--'}</div>
+            <div class="activity-item" style="${item.feito ? 'opacity:0.6;' : ''}">
+              <div style="display:flex;align-items:center;gap:4px;">
+                <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggleAtividadeFeita(${item.id})" style="width:16px;height:16px;cursor:pointer;flex-shrink:0;accent-color:var(--brand-primary);" title="Marcar como feito">
+                <div class="activity-time">${item.time || '--:--'}</div>
+              </div>
               <div class="activity-info">
-                <strong>${item.title}</strong>
+                <strong style="${item.feito ? 'text-decoration:line-through;color:var(--text-muted);' : ''}">${item.title}</strong>
                 ${item.desc ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;white-space:pre-wrap;">${item.desc}</div>` : ''}
                 ${nItens > 0 ? `<div style="font-size:11px;color:var(--brand-primary);margin-top:4px;cursor:pointer;" onclick="abrirModalComprasAtividade(${item.id})">${resumoAtHtml} ▾</div>` : ''}
                 ${isPremium && item.trajeto && (item.trajeto.origem || item.trajeto.destino) ? `
@@ -4043,7 +4132,12 @@
         totalUsd = days * (daily + park) + fuel;
         document.getElementById('trajetosLista').innerHTML = '';
       } else {
-        const lista = appData.transporte.trajetos || [];
+        const lista = [...(appData.transporte.trajetos || [])].sort((a, b) => {
+          // Ordenar por data+hora se disponível, senão manter ordem de inserção
+          const da = a.data ? a.data + (a.hora || '') : String(a.id);
+          const db = b.data ? b.data + (b.hora || '') : String(b.id);
+          return da.localeCompare(db);
+        });
         totalUsd = lista.reduce((a, t) => a + (t.valor || 0), 0);
         let html = lista.length === 0 ? '<p style="font-size:13px;color:var(--text-muted)">Nenhum trajeto adicionado.</p>' : '';
         lista.forEach(t => {
