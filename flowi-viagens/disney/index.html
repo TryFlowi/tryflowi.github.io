@@ -685,9 +685,12 @@
   <main class="main-container">
 
     <div id="alertFreeData" class="alert-free-data">
-
       <div>💾 <strong>Aviso:</strong> Seus dados ficam salvos apenas neste dispositivo e navegador. Se trocar de aparelho, baixe o arquivo offline primeiro.</div>
+    </div>
 
+    <div id="bannerNuvemFree" style="display:none;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:13px;color:#166534;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div>☁️ <strong>Quer acessar de qualquer aparelho?</strong> Ative o Premium e seus dados ficam salvos na nuvem.</div>
+      <a href="#" onclick="abrirPaywall();return false;" style="color:#16A34A;font-weight:700;white-space:nowrap;text-decoration:none;">Garantir Premium →</a>
     </div>
 
     <!-- TAB 1: INÍCIO -->
@@ -2552,6 +2555,9 @@
         const infoBoxResumo = document.getElementById('infoBoxResumo');
         if (infoBoxResumo) infoBoxResumo.style.display = 'none';
 
+        const bannerNuvem = document.getElementById('bannerNuvemFree');
+        if (bannerNuvem) bannerNuvem.style.display = 'none';
+
         const btnPDF = document.getElementById('btnExportarPDF');
 
         if (btnPDF) btnPDF.style.display = 'inline-flex';
@@ -2571,6 +2577,9 @@
         if (cardOffline) cardOffline.style.display = 'block';
 
         if (promoD1) promoD1.style.display = 'block';
+
+        const bannerNuvemF = document.getElementById('bannerNuvemFree');
+        if (bannerNuvemF) bannerNuvemF.style.display = 'flex';
         const trajBlockF = document.getElementById('actTrajBlock');
         if (trajBlockF) trajBlockF.style.display = 'none';
 
